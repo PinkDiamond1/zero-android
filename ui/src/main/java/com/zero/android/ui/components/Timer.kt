@@ -1,11 +1,13 @@
 package com.zero.android.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.zero.android.common.extensions.convertDurationToString
+import com.zero.android.ui.theme.customTextStyle
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -18,7 +20,7 @@ fun Timer(modifier: Modifier = Modifier, fontSize: TextUnit = 14.sp) {
 			ticks++
 		}
 	}
-	Text(text = ticks.times(1000).convertDurationToString(), modifier = modifier, fontSize = fontSize)
+	Text(text = ticks.times(1000).convertDurationToString(), modifier = modifier, style = MaterialTheme.typography.customTextStyle(fontSize))
 }
 
 @Composable
@@ -30,5 +32,5 @@ fun ReverseTimer(modifier: Modifier = Modifier, startTime: Int, fontSize: TextUn
 			ticks--
 		}
 	}
-	Text(text = ticks.times(1000).convertDurationToString(), modifier = modifier, fontSize = fontSize)
+	Text(text = ticks.times(1000).convertDurationToString(), modifier = modifier, style = MaterialTheme.typography.customTextStyle(fontSize))
 }

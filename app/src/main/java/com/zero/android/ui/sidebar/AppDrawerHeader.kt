@@ -16,8 +16,6 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +26,6 @@ import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 
 @Composable
 fun AppDrawerHeader(
@@ -62,7 +59,7 @@ fun AppDrawerHeader(
 					linkTo(start = imageStart.end, end = imageEnd.start, bias = 0.05f)
 				},
 				color = AppTheme.colors.colorTextPrimary,
-				style = Typography.bodyLarge,
+				style = MaterialTheme.typography.bodyLarge,
 				fontSize = 20.sp
 			)
 			Text(
@@ -74,7 +71,7 @@ fun AppDrawerHeader(
 					bottom.linkTo(imageStart.bottom)
 				},
 				color = AppTheme.colors.colorTextSecondaryVariant,
-				style = Typography.bodyMedium
+				style = MaterialTheme.typography.bodyMedium
 			)
 			Image(
 				painter = painterResource(R.drawable.ic_settings),
@@ -103,18 +100,14 @@ fun AppDrawerHeader(
 			) {
 				Text(
 					text = stringResource(R.string.invite_members),
-					style =
-					TextStyle(
-						shadow =
-						Shadow(
-							color = MaterialTheme.colorScheme.outline,
-							offset = Offset(2f, 2f),
-							blurRadius = 50f
-						)
-					),
+					style = MaterialTheme.typography.displayLarge.copy(
+                        shadow = Shadow(
+                            color = MaterialTheme.colorScheme.outline,
+                            offset = Offset(2f, 2f),
+                            blurRadius = 50f
+                        )
+                    ),
 					color = AppTheme.colors.colorTextPrimary,
-					fontSize = 16.sp,
-					fontWeight = FontWeight.Medium
 				)
 			}
 		}

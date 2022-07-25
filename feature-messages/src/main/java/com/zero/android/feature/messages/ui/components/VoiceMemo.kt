@@ -7,7 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zero.android.common.R
 import com.zero.android.common.extensions.convertDurationToString
 import com.zero.android.feature.messages.chatattachment.ChatAttachmentViewModel
@@ -83,7 +82,7 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 					mediaDuration.convertDurationToString()
 				} else "-",
 				modifier = Modifier.align(Alignment.CenterVertically),
-				fontSize = 14.sp
+				style = MaterialTheme.typography.bodyMedium
 			)
 		}
 	}

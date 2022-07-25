@@ -45,9 +45,7 @@ fun ChannelMessage(
 		Modifier.fillMaxWidth()
 			.combinedClickable(
 				onClick = {},
-				onLongClick = {
-                    MessageActionStateHandler.setSelectedMessage(msg)
-				}
+				onLongClick = { MessageActionStateHandler.setSelectedMessage(msg) }
 			)
 	Row(
 		modifier =

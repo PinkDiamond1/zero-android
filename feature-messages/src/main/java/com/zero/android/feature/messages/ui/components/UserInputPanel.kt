@@ -34,7 +34,6 @@ import com.zero.android.common.R
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.ui.components.CustomTextField
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.flow.collectLatest
 
@@ -171,7 +170,7 @@ private fun UserInputText(
                 MessageActionStateHandler.onMessageTextChanged(it)
             },
 			placeholderText = stringResource(R.string.write_your_message),
-			textStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+            textStyle = MaterialTheme.typography.bodyMedium,
 			placeHolderTextStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			modifier = Modifier
                 .fillMaxWidth()

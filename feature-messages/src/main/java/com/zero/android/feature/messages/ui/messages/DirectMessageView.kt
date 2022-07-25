@@ -48,9 +48,7 @@ fun DirectMessage(
 			.fillMaxWidth()
 			.combinedClickable(
 				onClick = {},
-				onLongClick = {
-                    MessageActionStateHandler.setSelectedMessage(msg)
-				}
+				onLongClick = { MessageActionStateHandler.setSelectedMessage(msg) }
 			)
 	) {
 		Row(

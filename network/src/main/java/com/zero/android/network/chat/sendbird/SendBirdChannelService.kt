@@ -1,6 +1,7 @@
 package com.zero.android.network.chat.sendbird
 
 import com.sendbird.android.GroupChannel
+import com.sendbird.android.GroupChannelListQuery
 import com.sendbird.android.OpenChannel
 import com.zero.android.common.extensions.callbackFlowWithAwait
 import com.zero.android.common.extensions.withSameScope
@@ -12,6 +13,7 @@ import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.chat.conversion.encodeToNetworkId
 import com.zero.android.network.chat.conversion.isGroupChannel
 import com.zero.android.network.chat.conversion.isOpenChannel
+import com.zero.android.network.chat.conversion.networkId
 import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toDirectApi
 import com.zero.android.network.chat.conversion.toGroupApi
@@ -66,13 +68,19 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		}
 
 	override suspend fun getDirectChannels() = callbackFlowWithAwait {
-		GroupChannel.createMyGroupChannelListQuery().next { channels, e ->
-			if (e != null) {
-				logger.e("Failed to get direct channels", e)
-				throw e
+		GroupChannel.createMyGroupChannelListQuery()
+			.apply {
+				isIncludeEmpty = false
+				order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 			}
-			trySend(channels.filter { it.data.isNullOrEmpty() }.map { it.toDirectApi() })
-		}
+			.next { channels, e ->
+				if (e != null) {
+					logger.e("Failed to get direct channels", e)
+					throw e
+				}
+
+				trySend(channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() })
+			}
 	}
 
 	override suspend fun createChannel(networkId: String, channel: Channel) = callbackFlowWithAwait {

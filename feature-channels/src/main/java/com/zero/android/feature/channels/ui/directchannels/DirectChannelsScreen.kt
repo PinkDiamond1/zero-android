@@ -24,6 +24,8 @@ import com.zero.android.models.Channel
 import com.zero.android.models.Network
 import com.zero.android.ui.components.SearchView
 import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.theme.customTextStyle
 
 @Composable
 fun DirectChannelsRoute(
@@ -77,7 +79,8 @@ fun DirectChannelsScreen(
 					Modifier.fillMaxWidth()
 						.padding(vertical = 10.dp)
 						.background(MaterialTheme.colorScheme.primary),
-					textAlign = TextAlign.Center
+					textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.labelMedium
 				)
 			}
 		}

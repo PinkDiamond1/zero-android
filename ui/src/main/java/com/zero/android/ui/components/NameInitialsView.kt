@@ -9,9 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.zero.android.common.extensions.initials
 import com.zero.android.ui.theme.AppTheme
 
@@ -27,8 +25,7 @@ fun NameInitialsView(modifier: Modifier = DEFAULT_MODIFIER, userName: String) {
 			userName.initials(),
 			modifier = Modifier.align(Alignment.Center),
 			color = AppTheme.colors.colorTextPrimary,
-			fontWeight = FontWeight.Medium,
-			fontSize = 16.sp
+			style = MaterialTheme.typography.displayLarge
 		)
 	}
 }

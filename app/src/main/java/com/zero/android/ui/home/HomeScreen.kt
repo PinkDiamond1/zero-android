@@ -31,6 +31,7 @@ import com.zero.android.ui.appbar.HOME_DESTINATIONS
 import com.zero.android.ui.components.Background
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.theme.customTextStyle
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.launch
 
@@ -93,7 +94,9 @@ fun HomeScreen(
             }
 			/*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
 				DropdownMenuItem(
-					text = { Text(text = stringResource(R.string.profile)) },
+					text = { Text(text = stringResource(R.string.profile), style = MaterialTheme.typography.customTextStyle(
+                        LocalTextStyle.current
+                    )) },
 					onClick = {},
 					leadingIcon = {
 						Image(
@@ -103,7 +106,9 @@ fun HomeScreen(
 					}
 				)
 				DropdownMenuItem(
-					text = { Text(text = stringResource(R.string.create_a_world)) },
+					text = { Text(text = stringResource(R.string.create_a_world), style = MaterialTheme.typography.customTextStyle(
+                        LocalTextStyle.current
+                    )) },
 					onClick = {},
 					leadingIcon = {
 						IconButton(

@@ -42,7 +42,8 @@ fun ChannelSearchResult(channels: List<Channel>, onClick: (Channel) -> Unit) {
 			Modifier.fillMaxWidth()
 				.padding(vertical = 10.dp)
 				.background(MaterialTheme.colorScheme.primary),
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.labelLarge
 		)
 	}
 }
@@ -63,7 +64,7 @@ fun ChannelSearchItem(header: String, channels: List<GroupChannel>, onClick: (Ch
 			Text(
 				"${channels.size} found",
 				color = AppTheme.colors.colorTextSecondary,
-				style = MaterialTheme.typography.labelLarge
+				style = MaterialTheme.typography.labelMedium
 			)
 		}
 		Spacer(modifier = Modifier.size(8.dp))
