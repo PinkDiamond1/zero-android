@@ -269,10 +269,8 @@ fun MessagesScreen(
 					if (isMemoRecording) {
 						RecordMemoView(onCancel = onRecordMemo, onSendMemo = onSendMemo)
 					} else {
-						val userInputModifier = Modifier.navigationBarsPadding().weight(1f).imePadding()
 						if (editableMessage != null) {
 							UserInputPanel(
-								modifier = userInputModifier,
 								initialText = editableMessage?.message ?: "",
 								onMessageSent = {
 									if (editableMessage != null) {
@@ -290,7 +288,6 @@ fun MessagesScreen(
 							)
 						} else {
 							UserInputPanel(
-								modifier = userInputModifier,
 								onMessageSent = {
 									if (replyMessage != null) {
 										onReplyToMessage(replyMessage!!.id, it)

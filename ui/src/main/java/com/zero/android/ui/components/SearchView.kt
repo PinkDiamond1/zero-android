@@ -39,6 +39,7 @@ fun SearchView(
             },
             placeholderText = placeHolder,
             textStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+            placeHolderTextStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier.weight(1f),
             leadingIcon = {

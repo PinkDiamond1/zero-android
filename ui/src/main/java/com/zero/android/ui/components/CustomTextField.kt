@@ -36,7 +36,8 @@ fun CustomTextField(
 	maxLines: Int = Int.MAX_VALUE,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 	placeholderText: String = "",
-	onTextLayout: (TextLayoutResult) -> Unit = {},
+    placeHolderTextStyle: TextStyle = LocalTextStyle.current,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 	cursorBrush: Brush = SolidColor(AppTheme.colors.colorTextPrimary),
 	shape: Shape = RectangleShape
 ) {
@@ -63,7 +64,7 @@ fun CustomTextField(
 					Spacer(modifier = Modifier.size(12.dp))
 				}
 				Box(Modifier.weight(1f)) {
-					if (value.isEmpty()) Text(placeholderText, style = textStyle)
+					if (value.isEmpty()) Text(placeholderText, style = placeHolderTextStyle)
 					innerTextField()
 				}
 				if (trailingIcon != null) trailingIcon()

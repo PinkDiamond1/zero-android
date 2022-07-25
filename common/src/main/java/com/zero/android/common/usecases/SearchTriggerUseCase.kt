@@ -2,7 +2,9 @@ package com.zero.android.common.usecases
 
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SearchTriggerUseCase @Inject constructor(
     private val searchTriggerManager: SearchTriggerManager
 ) {

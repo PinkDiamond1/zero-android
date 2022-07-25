@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.ui.components.CustomTextField
+import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.Typography
 import com.zero.android.ui.util.BackHandler
 
@@ -73,7 +74,7 @@ fun UserInputPanel(
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
 
-	Row(modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth()) {
+	Row(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()) {
 		IconButton(
 			modifier = Modifier.align(CenterVertically),
 			onClick = {
@@ -147,9 +148,13 @@ private fun UserInputText(
 			value = textFieldValue.text,
 			onValueChange = { onTextChanged(TextFieldValue(it)) },
 			placeholderText = stringResource(R.string.write_your_message),
-			textStyle = Typography.bodyMedium,
-			modifier =
-			Modifier.fillMaxWidth().align(Alignment.CenterStart).onFocusChanged { state ->
+			textStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+			placeHolderTextStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+			modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .align(Alignment.CenterStart)
+                .onFocusChanged { state ->
 				if (lastFocusState != state.isFocused) {
 					onTextFieldFocused(state.isFocused)
 				}
