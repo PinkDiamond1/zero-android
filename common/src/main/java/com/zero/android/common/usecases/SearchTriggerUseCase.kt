@@ -1,17 +1,9 @@
 package com.zero.android.common.usecases
 
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SearchTriggerUseCase @Inject constructor(
-    private val searchTriggerManager: SearchTriggerManager
-) {
-    val showSearchBar: StateFlow<Boolean> = searchTriggerManager.showSearchBar
+interface SearchTriggerUseCase {
+    val showSearchBar: StateFlow<Boolean>
 
-    suspend fun triggerSearch(show: Boolean) {
-        if (show) searchTriggerManager.showSearchBar()
-        else searchTriggerManager.hideSearchBar()
-    }
+    suspend fun triggerSearch(show: Boolean)
 }
