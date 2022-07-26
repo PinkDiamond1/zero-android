@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.zero.android.common.R
+import com.zero.android.common.util.messageFormatter
 import com.zero.android.models.Message
 import com.zero.android.ui.components.ExtraSmallCircularImage
 import com.zero.android.ui.theme.AppTheme
@@ -66,8 +67,8 @@ fun ReplyMessage(
 						message.message!!
 					} else "${message.type.name} Message"
 				Text(
-					text = replyMessage,
-					color = AppTheme.colors.colorTextSecondary,
+					text = replyMessage.messageFormatter(AppTheme.colors.glow),
+					color = Color.LightGray,
 					style = Typography.labelLarge,
 					fontWeight = FontWeight.Normal,
 					maxLines = 2,
@@ -81,7 +82,7 @@ fun ReplyMessage(
 			}
 			if (showCloseButton) {
 				IconButton(onClick = onCloseView) {
-					Icon(imageVector = Icons.Filled.Close, contentDescription = "", tint = Color.DarkGray)
+					Icon(imageVector = Icons.Filled.Close, contentDescription = "", tint = Color.Gray)
 				}
 			}
 		}

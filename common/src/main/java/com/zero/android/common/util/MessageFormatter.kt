@@ -31,7 +31,9 @@ typealias SymbolAnnotation = Pair<AnnotatedString, StringAnnotation?>
 
 fun String.messageFormatter(
 	annotationColor: Color,
-	codeSnippetBackground: Color = Color.Gray
+	codeSnippetBackground: Color = Color.Gray,
+    annotationFontWeight: FontWeight = FontWeight.SemiBold,
+    annotationFontStyle: FontStyle = FontStyle.Normal,
 ): AnnotatedString {
 	val text = this
 	val tokens = symbolPattern.findAll(text)
@@ -46,7 +48,9 @@ fun String.messageFormatter(
 				getSymbolAnnotation(
 					matchResult = token,
 					codeSnippetBackground = codeSnippetBackground,
-					annotationColor = annotationColor
+					annotationColor = annotationColor,
+                    annotationFontWeight = annotationFontWeight,
+                    annotationFontStyle = annotationFontStyle
 				)
 			append(annotatedString)
 
@@ -69,14 +73,16 @@ fun String.messageFormatter(
 private fun getSymbolAnnotation(
 	matchResult: MatchResult,
 	codeSnippetBackground: Color,
-	annotationColor: Color
+	annotationColor: Color,
+    annotationFontWeight: FontWeight,
+    annotationFontStyle: FontStyle,
 ): SymbolAnnotation {
 	return when (matchResult.value.first()) {
 		'@' ->
 			SymbolAnnotation(
 				AnnotatedString(
 					text = matchResult.value.substringBefore("]").replace("[", ""),
-					spanStyle = SpanStyle(color = annotationColor, fontWeight = FontWeight.Bold)
+					spanStyle = SpanStyle(color = annotationColor, fontWeight = annotationFontWeight, fontStyle = annotationFontStyle)
 				),
 				StringAnnotation(
 					item = matchResult.value.substring(1),

@@ -7,8 +7,6 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -35,6 +33,7 @@ import com.zero.android.common.extensions.getActivity
 import com.zero.android.common.extensions.toFile
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.components.ChatScreenAppBarTitle
+import com.zero.android.feature.messages.ui.components.MentionUsersList
 import com.zero.android.feature.messages.ui.components.ReplyMessage
 import com.zero.android.feature.messages.ui.components.UserInputPanel
 import com.zero.android.feature.messages.ui.voicememo.MemoRecorderViewModel
@@ -66,6 +65,7 @@ fun MessagesRoute(
 		if (MessageActionStateHandler.isActionModeStarted) {
 			MessageActionStateHandler.closeActionMode()
 		} else {
+            MessageActionStateHandler.reset()
 			onBackClick()
 		}
 	}
@@ -114,8 +114,10 @@ fun MessagesRoute(
 		chatUiState.messagesUiState,
 		recordingState,
 		onNewMessage = { newMessage ->
+            val channelUiState = chatUiState.channelUiState
+            val members = if (channelUiState is ChatChannelUiState.Success) channelUiState.channel.members else emptyList()
 			viewModel.sendMessage(
-				MessageUtil.newTextMessage(msg = newMessage, authorId = userChannelInfo.first)
+				MessageUtil.newTextMessage(msg = newMessage, authorId = userChannelInfo.first, channelMembers = members)
 			)
 		},
 		onPickImage = { imageSelectorLauncher.launch(it) },
@@ -149,7 +151,9 @@ fun MessagesRoute(
 		onEditMessage = { viewModel.updateMessage(it) },
 		onDeleteMessage = { viewModel.deleteMessage(it) },
 		onReplyToMessage = { messageId, reply ->
-			val replyMessage = MessageUtil.newTextMessage(reply, userChannelInfo.first)
+            val channelUiState = chatUiState.channelUiState
+            val members = if (channelUiState is ChatChannelUiState.Success) channelUiState.channel.members else emptyList()
+			val replyMessage = MessageUtil.newTextMessage(reply, userChannelInfo.first, channelMembers = members)
 			viewModel.replyToMessage(messageId, replyMessage)
 		}
 	)
@@ -176,6 +180,8 @@ fun MessagesScreen(
 	val actionMessage by MessageActionStateHandler.selectedMessage.collectAsState()
 	val editableMessage by MessageActionStateHandler.editableMessage.collectAsState()
 	val replyMessage by MessageActionStateHandler.replyToMessage.collectAsState()
+    val mentionUser by MessageActionStateHandler.mentionUser.collectAsState()
+
 	if (chatChannelUiState is ChatChannelUiState.Success) {
 		val topBar: @Composable () -> Unit = {
 			AppBar(
@@ -186,6 +192,7 @@ fun MessagesScreen(
 							if (actionMessage != null) {
 								MessageActionStateHandler.closeActionMode()
 							} else {
+                                MessageActionStateHandler.reset()
 								onBackClick()
 							}
 						}
@@ -263,6 +270,14 @@ fun MessagesScreen(
 						uiState = messagesUiState
 					)
 					BottomBarDivider()
+                    if (mentionUser) {
+                        val chatMembers = chatChannelUiState.channel.members.filter { it.id != userChannelInfo.first }
+                        if (chatMembers.size > 1) {
+                            MentionUsersList(members = chatMembers, onMemberSelected = {
+                                MessageActionStateHandler.onUserMentionSelected(it)
+                            })
+                        }
+                    }
 					replyMessage?.let {
 						ReplyMessage(message = it) { MessageActionStateHandler.closeActionMode() }
 					}
@@ -275,7 +290,7 @@ fun MessagesScreen(
 								onMessageSent = {
 									if (editableMessage != null) {
 										editableMessage?.copy(message = it)?.let(onEditMessage)
-										MessageActionStateHandler.closeActionMode()
+                                        MessageActionStateHandler.closeActionMode()
 									} else onNewMessage(it)
 								},
 								addAttachment = {
@@ -291,7 +306,7 @@ fun MessagesScreen(
 								onMessageSent = {
 									if (replyMessage != null) {
 										onReplyToMessage(replyMessage!!.id, it)
-										MessageActionStateHandler.closeActionMode()
+                                        MessageActionStateHandler.closeActionMode()
 									} else onNewMessage(it)
 								},
 								addAttachment = {

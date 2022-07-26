@@ -31,10 +31,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
+import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.ui.components.CustomTextField
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.Typography
 import com.zero.android.ui.util.BackHandler
+import kotlinx.coroutines.flow.collectLatest
 
 private enum class InputSelector {
 	TEXT,
@@ -68,8 +70,16 @@ fun UserInputPanel(
 	if (currentInputSelector != InputSelector.TEXT) {
 		BackHandler(onBack = dismissKeyboard)
 	}
-
-	var textState by remember { mutableStateOf(TextFieldValue(initialText)) }
+    val updatedMessage = prepareInitialMessage(initialText)
+	var textState by remember { mutableStateOf(TextFieldValue(updatedMessage)) }
+    LaunchedEffect(Unit) {
+        MessageActionStateHandler.messageUpdatedText.collectLatest {
+            if (it.isNotEmpty()) {
+                textState = TextFieldValue(it)
+                MessageActionStateHandler.messageUpdatedText.emit("")
+            }
+        }
+    }
 
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
@@ -128,6 +138,16 @@ fun UserInputPanel(
 	}
 }
 
+private fun prepareInitialMessage(initialMessage: String): String {
+    val regex = Regex("\\(user\\:[-_a-z0-9]+\\)")
+    val matches = regex.findAll(initialMessage).map { it.value }
+    var updatedMessage = initialMessage
+    matches.distinct().forEach {
+        updatedMessage = updatedMessage.replace(it,"")
+    }
+    return updatedMessage
+}
+
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
 var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
 
@@ -146,7 +166,10 @@ private fun UserInputText(
 		var lastFocusState by remember { mutableStateOf(false) }
 		CustomTextField(
 			value = textFieldValue.text,
-			onValueChange = { onTextChanged(TextFieldValue(it)) },
+			onValueChange = {
+                onTextChanged(TextFieldValue(it))
+                MessageActionStateHandler.onMessageTextChanged(it)
+            },
 			placeholderText = stringResource(R.string.write_your_message),
 			textStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
 			placeHolderTextStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),

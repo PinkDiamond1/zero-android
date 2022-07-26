@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.models.Channel
@@ -35,7 +36,9 @@ fun ChatScreenAppBarTitle(loggedInUserId: String, channel: Channel, isGroupChann
 		}
 		Text(
 			channel.getTitle(loggedInUserId).lowercase(),
-			modifier = Modifier.align(Alignment.CenterVertically)
+			modifier = Modifier.align(Alignment.CenterVertically),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
 		)
 		Spacer(modifier = Modifier.padding(6.dp))
 		if (isGroupChannel) {

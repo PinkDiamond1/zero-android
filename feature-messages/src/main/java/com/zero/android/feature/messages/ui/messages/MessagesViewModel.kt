@@ -9,6 +9,7 @@ import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.ChatRepository
 import com.zero.android.feature.messages.navigation.MessagesDestination
+import com.zero.android.feature.messages.util.MessageUtil
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
@@ -113,7 +114,16 @@ constructor(
 	}
 
 	fun updateMessage(message: Message) {
-		ioScope.launch { chatRepository.updateMessage(message.id, channelId, message.message ?: "") }
+		ioScope.launch {
+            (_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
+                val newText = message.message ?: ""
+                val updatedMessage = message.copy(
+                    message = MessageUtil.prepareMessage(newText, channel.members),
+                    mentions = MessageUtil.getMentionedUsers(newText, channel.members)
+                )
+            }
+            chatRepository.updateMessage(message.id, channelId, message.message ?: "")
+        }
 	}
 
 	fun replyToMessage(messageId: String, replyMessage: DraftMessage) {

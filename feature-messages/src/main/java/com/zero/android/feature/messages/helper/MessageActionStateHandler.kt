@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.helper
 
+import com.zero.android.models.Member
 import com.zero.android.models.Message
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,12 +13,17 @@ object MessageActionStateHandler {
 
 	private val _editableMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val editableMessage: StateFlow<Message?> = _editableMessage
-	private val _selectedMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
+    private val _selectedMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val selectedMessage: StateFlow<Message?> = _selectedMessage
-	private val _replyToMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
+    private val _replyToMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val replyToMessage: StateFlow<Message?> = _replyToMessage
 
-	val isActionModeStarted: Boolean
+    private val _mentionUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val mentionUser: StateFlow<Boolean> = _mentionUser
+    private val messageLastText = MutableStateFlow("")
+    val messageUpdatedText = MutableStateFlow("")
+
+    val isActionModeStarted: Boolean
 		get() = _selectedMessage.value != null
 
 	fun setSelectedMessage(msg: Message) {
@@ -47,12 +53,36 @@ object MessageActionStateHandler {
 	fun closeActionMode() {
 		ioScope.launch {
 			_selectedMessage.emit(null)
-			_editableMessage.emit(null)
-			_replyToMessage.emit(null)
+            _editableMessage.emit(null)
+            _replyToMessage.emit(null)
 		}
 	}
 
 	fun reset() {
-		closeActionMode()
-	}
+        ioScope.launch {
+            _mentionUser.emit(false)
+            messageLastText.emit("")
+            messageUpdatedText.emit("")
+        }
+        closeActionMode()
+    }
+
+    fun onMessageTextChanged(message: String) {
+        ioScope.launch {
+            messageLastText.emit(message)
+            _mentionUser.emit(message.lastOrNull() == '@')
+        }
+    }
+
+    fun onUserMentionSelected(member: Member) {
+        ioScope.launch {
+            val lastMessage = messageLastText.value
+            val newMessageText = buildString {
+                append(lastMessage)
+                append("[${member.name?.trim()?.replace(" ","_")}]")
+            }
+            messageUpdatedText.emit(newMessageText)
+            _mentionUser.emit(false)
+        }
+    }
 }

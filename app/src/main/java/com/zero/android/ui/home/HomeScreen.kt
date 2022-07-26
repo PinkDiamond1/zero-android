@@ -82,10 +82,16 @@ fun HomeScreen(
 					contentDescription = stringResource(R.string.search_channels)
 				)
 			}
-			IconButton(onClick = { showMenu = !showMenu }) {
+			/*IconButton(onClick = { showMenu = !showMenu }) {
 				Icon(Icons.Default.MoreVert, contentDescription = "")
-			}
-			DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+			}*/
+            IconButton(onClick = {}) {
+                Image(
+                    painter = painterResource(R.drawable.img_profile_avatar),
+                    contentDescription = stringResource(R.string.profile)
+                )
+            }
+			/*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
 				DropdownMenuItem(
 					text = { Text(text = stringResource(R.string.profile)) },
 					onClick = {},
@@ -102,7 +108,9 @@ fun HomeScreen(
 					leadingIcon = {
 						IconButton(
 							onClick = {},
-							modifier = Modifier.border(1.dp, AppTheme.colors.glow, CircleShape).size(32.dp)
+							modifier = Modifier
+                                .border(1.dp, AppTheme.colors.glow, CircleShape)
+                                .size(32.dp)
 						) {
 							Icon(
 								imageVector = Icons.Filled.Add,
@@ -111,7 +119,7 @@ fun HomeScreen(
 						}
 					}
 				)
-			}
+			}*/
 		} else {
 			IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
 				Image(
@@ -122,7 +130,9 @@ fun HomeScreen(
 			Spacer(modifier = Modifier.padding(4.dp))
 			IconButton(
 				onClick = {},
-				modifier = Modifier.border(1.dp, AppTheme.colors.glow, CircleShape).size(32.dp)
+				modifier = Modifier
+                    .border(1.dp, AppTheme.colors.glow, CircleShape)
+                    .size(32.dp)
 			) {
 				Icon(
 					imageVector = Icons.Filled.Add,

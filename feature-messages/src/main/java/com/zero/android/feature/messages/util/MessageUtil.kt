@@ -10,19 +10,47 @@ import java.util.*
 
 object MessageUtil {
 
-	fun newTextMessage(msg: String, authorId: String) =
+	fun newTextMessage(msg: String, authorId: String, channelMembers: List<Member>) =
 		DraftMessage(
 			channelId = "",
 			author = Member(authorId),
 			type = MessageType.TEXT,
 			mentionType = MessageMentionType.USER,
-			message = msg,
+			message = prepareMessage(msg, channelMembers),
 			createdAt = Calendar.getInstance().timeInMillis,
 			updatedAt = Calendar.getInstance().timeInMillis,
-			status = MessageStatus.SUCCEEDED
+			status = MessageStatus.SUCCEEDED,
+            mentions = getMentionedUsers(msg, channelMembers).map { it.id }
 		)
 
-	fun newFileMessage(file: File, authorId: String, type: MessageType) =
+    private fun getMessageMentions(msg: String): Sequence<String> {
+        val regex = Regex("(@\\[\\w+\\])")
+        return regex.findAll(msg).map { it.value }
+    }
+
+    fun prepareMessage(msg: String, channelMembers: List<Member>): String {
+        var updatedMessage = msg
+        val matches = getMessageMentions(msg)
+        matches.distinct().forEach { mention ->
+            val mentionedUser: String = mention.replace("_"," ").trim().drop(2).dropLast(1)
+            val member = channelMembers.firstOrNull { mentionedUser.equals(it.name?.trim(), true) }
+            member?.let {
+                updatedMessage = updatedMessage.replace(mention, "$mention(user:${it.id})")
+            }
+        }
+        return updatedMessage
+    }
+
+    fun getMentionedUsers(msg: String, channelMembers: List<Member>): List<Member> {
+        val matches = getMessageMentions(msg)
+        val messageMentions = matches.map { it.replace("_"," ").trim().drop(1) }.toList()
+        val members = channelMembers.filter { member ->
+            messageMentions.any { it.substring(1, it.length-1).equals(member.name?.trim(), true) }
+        }
+        return members
+    }
+
+    fun newFileMessage(file: File, authorId: String, type: MessageType) =
 		DraftMessage(
 			channelId = "",
 			author = Member(authorId),
