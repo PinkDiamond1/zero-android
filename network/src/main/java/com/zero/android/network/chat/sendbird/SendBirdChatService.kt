@@ -19,8 +19,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-internal class SendBirdChatService(private val logger: Logger) :
-	SendBirdBaseService(), ChatService {
+internal class SendBirdChatService(
+	private val logger: Logger,
+	private val messages: SendBirdMessages = SendBirdMessages()
+) : SendBirdBaseService(), ChatService {
 
 	override suspend fun addListener(channelId: String, listener: ChatListener) {
 		SendBird.addChannelHandler(channelId, SendBirdChatListener(listener))
@@ -30,10 +32,9 @@ internal class SendBirdChatService(private val logger: Logger) :
 		SendBird.removeChannelHandler(channelId)
 	}
 
-	override suspend fun getMessages(channel: Channel, timestamp: Long) =
+	override suspend fun getMessages(channel: Channel) =
 		callbackFlowWithAwait<List<ApiMessage>> {
-			val params = SendBirdMessages.params(reverse = true)
-			getChannel(channel).getMessagesByTimestamp(timestamp, params) { messages, e ->
+			messages.getMessages(getChannel(channel)) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					throw e
@@ -43,10 +44,9 @@ internal class SendBirdChatService(private val logger: Logger) :
 			}
 		}
 
-	override suspend fun getMessages(channel: Channel, lastMessageId: String) =
+	override suspend fun getMessages(channel: Channel, before: String) =
 		callbackFlowWithAwait<List<ApiMessage>> {
-			val params = SendBirdMessages.params(reverse = true)
-			getChannel(channel).getMessagesByMessageId(lastMessageId.toLong(), params) { messages, e ->
+			messages.getMessages(getChannel(channel), before) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					throw e

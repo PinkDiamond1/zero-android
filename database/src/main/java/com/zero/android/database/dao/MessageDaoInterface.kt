@@ -44,4 +44,8 @@ abstract class MessageDaoInterface : BaseDao<MessageEntity>() {
 
 	@Query("DELETE FROM messages WHERE id = :id")
 	abstract suspend fun delete(id: String)
+
+	@Transaction
+	@Query("DELETE FROM messages WHERE channelId = :channelId")
+	abstract suspend fun deleteByChannel(channelId: String)
 }

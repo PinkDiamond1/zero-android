@@ -17,4 +17,6 @@ constructor(private val messageDao: MessageDaoInterface, private val memberDao: 
 	suspend fun delete(id: String) = messageDao.delete(id)
 
 	suspend fun delete(message: MessageEntity) = messageDao.delete(message)
+
+	suspend fun deleteByChannel(channelId: String) = messageDao.deleteByChannel(channelId)
 }

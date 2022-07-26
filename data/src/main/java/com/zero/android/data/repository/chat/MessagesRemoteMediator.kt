@@ -4,6 +4,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.MessageWithRefs
@@ -29,14 +30,13 @@ internal class MessagesRemoteMediator(
 			// parameter. For every page after the first, pass the last user
 			// ID to let it continue from where it left off. For REFRESH,
 			// pass null to load the first page.
-			val loadKey =
+			val lastMessageId =
 				when (loadType) {
 					LoadType.REFRESH -> null
 					// In this example, you never need to prepend, since REFRESH
 					// will always load the first page in the list. Immediately
 					// return, reporting end of pagination.
-					LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-					LoadType.APPEND -> {
+					LoadType.PREPEND -> {
 						val lastItem =
 							state.lastItemOrNull()
 								?: return MediatorResult.Success(endOfPaginationReached = true)
@@ -48,6 +48,7 @@ internal class MessagesRemoteMediator(
 						// no more items to load.
 						lastItem.message.id
 					}
+					LoadType.APPEND -> return MediatorResult.Success(endOfPaginationReached = true)
 				}
 
 			// Suspending network load via Retrofit. This doesn't need to be
@@ -56,13 +57,16 @@ internal class MessagesRemoteMediator(
 			// thread.
 			try {
 				val response =
-					loadKey?.let {
-						chatService.getMessages(channel = channel, lastMessageId = loadKey).firstOrNull()
+					lastMessageId?.let {
+						chatService.getMessages(channel = channel, before = it).firstOrNull()
 					}
 						?: chatService.getMessages(channel = channel).firstOrNull()
 
 				response?.map { it.toEntity() }?.let { messageDao.upsert(*it.toTypedArray()) }
-				MediatorResult.Success(endOfPaginationReached = response.isNullOrEmpty())
+				MediatorResult.Success(
+					endOfPaginationReached =
+					response.isNullOrEmpty() || response.size < MESSAGES_PAGE_LIMIT
+				)
 			} catch (e: Exception) {
 				MediatorResult.Error(e)
 			}
