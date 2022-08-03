@@ -20,7 +20,7 @@ object MessageActionStateHandler {
 
     private val _mentionUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val mentionUser: StateFlow<Boolean> = _mentionUser
-    private val messageLastText = MutableStateFlow("")
+    val messageLastText = MutableStateFlow("")
     val messageUpdatedText = MutableStateFlow("")
 
     val isActionModeStarted: Boolean
@@ -70,7 +70,17 @@ object MessageActionStateHandler {
     fun onMessageTextChanged(message: String) {
         ioScope.launch {
             messageLastText.emit(message)
-            _mentionUser.emit(message.lastOrNull() == '@')
+            val startMention =  message.lastOrNull() == '@'
+            val isMentionAlreadyStarted = _mentionUser.value
+            if (isMentionAlreadyStarted) {
+                val endLastMention = startMention || message.lastOrNull() == ' ' || message.isEmpty()
+                if (endLastMention) {
+                    _mentionUser.emit(false)
+                    _mentionUser.emit(startMention)
+                }
+            } else {
+                _mentionUser.emit(startMention)
+            }
         }
     }
 
@@ -78,8 +88,9 @@ object MessageActionStateHandler {
         ioScope.launch {
             val lastMessage = messageLastText.value
             val newMessageText = buildString {
-                append(lastMessage)
-                append("[${member.name?.trim()?.replace(" ","_")}]")
+                val indexOfLastMention = lastMessage.indexOfLast { it == '@' }
+                append(lastMessage.substring(0, indexOfLastMention + 1))
+                append("${member.name?.trim()?.replace(" ","_")}")
             }
             messageUpdatedText.emit(newMessageText)
             _mentionUser.emit(false)

@@ -24,7 +24,7 @@ object MessageUtil {
 		)
 
     private fun getMessageMentions(msg: String): Sequence<String> {
-        val regex = Regex("(@\\[\\w+\\])")
+        val regex = Regex("(@\\w+)")
         return regex.findAll(msg).map { it.value }
     }
 
@@ -32,10 +32,11 @@ object MessageUtil {
         var updatedMessage = msg
         val matches = getMessageMentions(msg)
         matches.distinct().forEach { mention ->
-            val mentionedUser: String = mention.replace("_"," ").trim().drop(2).dropLast(1)
+            val mentionedUser: String = mention.replace("_"," ").trim().drop(1)
             val member = channelMembers.firstOrNull { mentionedUser.equals(it.name?.trim(), true) }
             member?.let {
-                updatedMessage = updatedMessage.replace(mention, "$mention(user:${it.id})")
+                val updatedMention = "@[${mention.drop(1)}]"
+                updatedMessage = updatedMessage.replace(mention, "$updatedMention(user:${it.id})")
             }
         }
         return updatedMessage
@@ -45,7 +46,7 @@ object MessageUtil {
         val matches = getMessageMentions(msg)
         val messageMentions = matches.map { it.replace("_"," ").trim().drop(1) }.toList()
         val members = channelMembers.filter { member ->
-            messageMentions.any { it.substring(1, it.length-1).equals(member.name?.trim(), true) }
+            messageMentions.any { it.equals(member.name?.trim(), true) }
         }
         return members
     }

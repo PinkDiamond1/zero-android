@@ -121,8 +121,8 @@ constructor(
                     message = MessageUtil.prepareMessage(newText, channel.members),
                     mentions = MessageUtil.getMentionedUsers(newText, channel.members)
                 )
+                chatRepository.updateMessage(updatedMessage.id, channelId, updatedMessage.message ?: "")
             }
-            chatRepository.updateMessage(message.id, channelId, message.message ?: "")
         }
 	}
 

@@ -139,11 +139,12 @@ fun UserInputPanel(
 }
 
 private fun prepareInitialMessage(initialMessage: String): String {
-    val regex = Regex("\\(user\\:[-_a-z0-9]+\\)")
+    val regex = Regex("@\\[(.*?)\\]\\(user\\:[-_a-z0-9]+\\)")
     val matches = regex.findAll(initialMessage).map { it.value }
     var updatedMessage = initialMessage
     matches.distinct().forEach {
-        updatedMessage = updatedMessage.replace(it,"")
+        val userName = it.substringBefore("]").replace("[","")
+        updatedMessage = updatedMessage.replace(it, userName)
     }
     return updatedMessage
 }

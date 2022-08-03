@@ -272,11 +272,9 @@ fun MessagesScreen(
 					BottomBarDivider()
                     if (mentionUser) {
                         val chatMembers = chatChannelUiState.channel.members.filter { it.id != userChannelInfo.first }
-                        if (chatMembers.size > 1) {
-                            MentionUsersList(members = chatMembers, onMemberSelected = {
-                                MessageActionStateHandler.onUserMentionSelected(it)
-                            })
-                        }
+                        MentionUsersList(membersList = chatMembers, onMemberSelected = {
+                            MessageActionStateHandler.onUserMentionSelected(it)
+                        })
                     }
 					replyMessage?.let {
 						ReplyMessage(message = it) { MessageActionStateHandler.closeActionMode() }
