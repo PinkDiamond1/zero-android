@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 
 @Composable
 fun SearchView(
@@ -38,8 +34,8 @@ fun SearchView(
                 onValueChanged(searchText)
             },
             placeholderText = placeHolder,
-            textStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
-            placeHolderTextStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+            placeHolderTextStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
             shape = RoundedCornerShape(24.dp),
             modifier = Modifier.weight(1f),
             leadingIcon = {

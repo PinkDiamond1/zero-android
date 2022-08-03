@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -170,8 +171,8 @@ private fun UserInputText(
                 MessageActionStateHandler.onMessageTextChanged(it)
             },
 			placeholderText = stringResource(R.string.write_your_message),
-            textStyle = MaterialTheme.typography.bodyMedium,
-			placeHolderTextStyle = Typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+			placeHolderTextStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp)
