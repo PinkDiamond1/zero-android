@@ -20,6 +20,7 @@ import com.zero.android.network.util.NetworkMediaUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.singleOrNull
 import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
@@ -76,14 +77,14 @@ constructor(
 
 	override suspend fun send(channel: Channel, message: DraftMessage) {
 		if (message.type == MessageType.TEXT) {
-			chatService.send(channel, message)
+			chatService.send(channel, message).singleOrNull()
 		} else {
-			sendFileMessage(channel, message)
+			sendFileMessage(channel, message).singleOrNull()
 		}
 		messagePaging?.invalidate()
 	}
 
-	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage) {
+	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): Flow<ApiMessage> {
 		val uploadInfo = chatMediaService.getUploadInfo()
 		val fileMessage =
 			if (uploadInfo.apiUrl.isNotEmpty() && uploadInfo.query != null) {
@@ -109,7 +110,7 @@ constructor(
 				Timber.e("Upload Info is required for file upload")
 				message
 			}
-		chatService.send(channel, fileMessage).map { it.toModel() }
+		return chatService.send(channel, fileMessage)
 	}
 
 	override suspend fun reply(channel: Channel, id: String, message: DraftMessage) {

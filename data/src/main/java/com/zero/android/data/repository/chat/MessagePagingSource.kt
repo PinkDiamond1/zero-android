@@ -15,22 +15,29 @@ import javax.inject.Inject
 internal class MessagePagingSource
 @Inject
 constructor(private val chatService: ChatService, private val channel: Channel) :
-	PagingSource<Int, Message>() {
-	override fun getRefreshKey(state: PagingState<Int, Message>): Int? {
-		return state.anchorPosition
+	PagingSource<String, Message>() {
+	override fun getRefreshKey(state: PagingState<String, Message>): String? {
+		return state.anchorPosition?.let { anchorPosition ->
+			return state.closestPageToPosition(anchorPosition)?.prevKey
+		}
 	}
 
-	override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Message> {
+	override suspend fun load(params: LoadParams<String>): LoadResult<String, Message> {
 		return try {
 			withContext(Dispatchers.IO) {
-				val nextPage = params.key ?: 1
-				val messages = chatService.getMessages(channel = channel).firstOrNull()
+				val lastMessageId = params.key
+				val messages =
+					lastMessageId?.let {
+						chatService.getMessages(channel = channel, before = lastMessageId).firstOrNull()
+					}
+						?: chatService.getMessages(channel = channel).firstOrNull()
+
 				LoadResult.Page(
 					data = messages?.map { it.toModel() } ?: emptyList(),
-					prevKey = if (nextPage == 1) null else nextPage - 1,
-					nextKey =
+					prevKey =
 					if (messages.isNullOrEmpty() || messages.size < MESSAGES_PAGE_LIMIT) null
-					else nextPage + 1
+					else messages.firstOrNull()?.id,
+					nextKey = lastMessageId
 				)
 			}
 		} catch (exception: Exception) {
