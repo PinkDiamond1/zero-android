@@ -15,20 +15,21 @@ object MessageUtil {
 			channelId = "",
 			author = Member(authorId),
 			type = MessageType.TEXT,
-			mentionType = MessageMentionType.UNKNOWN,
+			mentionType = MessageMentionType.USER,
 			message = msg,
 			createdAt = Calendar.getInstance().timeInMillis,
 			updatedAt = Calendar.getInstance().timeInMillis,
 			status = MessageStatus.SUCCEEDED
 		)
 
-	fun newFileMessage(file: File, authorId: String) =
+	fun newFileMessage(file: File, authorId: String, type: MessageType) =
 		DraftMessage(
 			channelId = "",
 			author = Member(authorId),
-			type = MessageType.IMAGE,
-			mentionType = MessageMentionType.UNKNOWN,
+			type = type,
+			mentionType = MessageMentionType.USER,
 			file = file,
+			fileMimeType = type.serializedName,
 			createdAt = Calendar.getInstance().timeInMillis,
 			updatedAt = Calendar.getInstance().timeInMillis,
 			status = MessageStatus.SUCCEEDED

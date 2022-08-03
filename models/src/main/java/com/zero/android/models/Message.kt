@@ -28,7 +28,7 @@ data class Message(
 	override val author: Member,
 	val mentions: List<Member> = emptyList(),
 	override val type: MessageType,
-	override val mentionType: MessageMentionType,
+	override val mentionType: MessageMentionType = MessageMentionType.UNKNOWN,
 	override val message: String? = null,
 	override val createdAt: Long,
 	override val updatedAt: Long,
@@ -41,14 +41,18 @@ data class Message(
 	override val fileThumbnails: List<FileThumbnail>? = null,
 	override val fileMimeType: String? = null,
 	val reactions: List<MessageReaction> = emptyList()
-) : BaseMessage
+) : BaseMessage {
+
+	val isReply
+		get() = parentMessage != null
+}
 
 data class DraftMessage(
 	override val channelId: String,
 	override val author: Member,
 	val mentions: List<String> = emptyList(),
 	override val type: MessageType,
-	override val mentionType: MessageMentionType,
+	override val mentionType: MessageMentionType = MessageMentionType.UNKNOWN,
 	override val message: String? = null,
 	override val createdAt: Long,
 	override val updatedAt: Long,

@@ -1,4 +1,4 @@
-package com.zero.android.feature.messages.ui.messages
+package com.zero.android.feature.messages.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
@@ -10,24 +10,31 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.zero.android.common.util.SymbolAnnotationType
 import com.zero.android.common.util.messageFormatter
+import com.zero.android.feature.messages.chatattachment.ChatAttachmentViewModel
 import com.zero.android.models.Member
 import com.zero.android.models.Message
+import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.White
 
 @Composable
-fun ColumnScope.MessageContent(message: Message, authorClicked: (Member) -> Unit) {
-	message.message?.let {
-		if (message.fileUrl.isNullOrEmpty()) {
-			ClickableMessage(message = message, authorClicked = authorClicked)
-		}
-	}
-	message.fileUrl?.let {
-		AsyncImage(
-			model = it,
-			contentDescription = "",
-			modifier = Modifier.wrapContentWidth().defaultMinSize(160.dp)
-		)
+fun ColumnScope.MessageContent(
+	message: Message,
+	chatAttachmentViewModel: ChatAttachmentViewModel,
+	authorClicked: (Member) -> Unit
+) {
+	when (message.type) {
+		MessageType.IMAGE ->
+			message.fileUrl?.let {
+				AsyncImage(
+					model = it,
+					contentDescription = "",
+					modifier = Modifier.wrapContentWidth().defaultMinSize(160.dp)
+				)
+			}
+		MessageType.AUDIO -> message.fileUrl?.let { VoiceMessage(message, chatAttachmentViewModel) }
+		else ->
+			message.message?.let { ClickableMessage(message = message, authorClicked = authorClicked) }
 	}
 }
 

@@ -1,13 +1,18 @@
 package com.zero.android.network.chat.sendbird
 
-import com.sendbird.android.BaseChannel
-import com.sendbird.android.MessageListParams
-import com.sendbird.android.MessagePayloadFilter
-import com.sendbird.android.PreviousMessageListQuery
-import com.sendbird.android.ReplyTypeFilter
+import com.sendbird.android.*
+import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
+import com.zero.android.models.Message
+import com.zero.android.models.enums.MessageType
+import com.zero.android.network.chat.conversion.toApi
+import com.zero.android.network.chat.conversion.toParams
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
+import javax.inject.Inject
+import kotlin.coroutines.resumeWithException
 
-internal class SendBirdMessages {
+internal class SendBirdMessages @Inject constructor(private val logger: Logger) {
 
 	private var channel: BaseChannel? = null
 	private lateinit var query: PreviousMessageListQuery
@@ -28,8 +33,8 @@ internal class SendBirdMessages {
 					.build()
 		}
 
-	private fun init(channel: BaseChannel) {
-		if (this.channel?.url == channel.url) return
+	private fun init(channel: BaseChannel, refresh: Boolean = false) {
+		if (!refresh && this.channel?.url == channel.url) return
 		this.channel = channel
 
 		query =
@@ -40,6 +45,10 @@ internal class SendBirdMessages {
 				replyTypeFilter = params.replyTypeFilter
 				messagePayloadFilter = params.messagePayloadFilter
 			}
+	}
+
+	fun reset() {
+		this.channel = null
 	}
 
 	fun getMessages(channel: BaseChannel, callback: PreviousMessageListQuery.MessageListQueryResult) {
@@ -58,4 +67,28 @@ internal class SendBirdMessages {
 
 		channel.getMessagesByMessageId(beforeId.toLong(), params, callback)
 	}
+
+	@OptIn(ExperimentalCoroutinesApi::class)
+	suspend fun getMessage(message: Message) =
+		suspendCancellableCoroutine<BaseMessage> { coroutine ->
+			if (message.type == MessageType.TEXT) {
+				UserMessage.getMessage(message.toApi().toParams()) { baseMessage, e ->
+					if (e != null) {
+						logger.e(e)
+						coroutine.resumeWithException(e)
+					} else {
+						coroutine.resume(baseMessage) { coroutine.resumeWithException(it) }
+					}
+				}
+			} else {
+				FileMessage.getMessage(message.toApi().toParams()) { baseMessage, e ->
+					if (e != null) {
+						logger.e(e)
+						coroutine.resumeWithException(e)
+					} else {
+						coroutine.resume(baseMessage) { coroutine.resumeWithException(it) }
+					}
+				}
+			}
+		}
 }

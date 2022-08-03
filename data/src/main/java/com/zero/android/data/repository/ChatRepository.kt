@@ -11,20 +11,17 @@ interface ChatRepository {
 
 	val channelChatMessages: MutableStateFlow<PagingData<Message>>
 
-	suspend fun getMessages(
-		channel: Channel,
-		timestamp: Long = Long.MAX_VALUE
-	): Flow<PagingData<Message>>
+	suspend fun getMessages(channel: Channel): Flow<PagingData<Message>>
 
 	suspend fun getMessages(channel: Channel, lastMessageId: String): Flow<List<Message>>
 
-	suspend fun send(channel: Channel, message: DraftMessage): Flow<Message>
+	suspend fun send(channel: Channel, message: DraftMessage)
 
-	suspend fun reply(channel: Channel, id: String, message: DraftMessage): Flow<Message>
+	suspend fun reply(channel: Channel, id: String, message: DraftMessage)
 
 	suspend fun updateMessage(id: String, channelId: String, text: String)
 
-	suspend fun deleteMessage(id: String, channelId: String)
+	suspend fun deleteMessage(message: Message, channel: Channel)
 
 	suspend fun addListener(id: String)
 

@@ -11,7 +11,6 @@ import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import com.zero.android.network.chat.ChatListener
 import com.zero.android.network.chat.conversion.toApi
-import com.zero.android.network.chat.conversion.toMessage
 import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatService
@@ -21,7 +20,7 @@ import kotlin.coroutines.resumeWithException
 
 internal class SendBirdChatService(
 	private val logger: Logger,
-	private val messages: SendBirdMessages = SendBirdMessages()
+	private val messages: SendBirdMessages = SendBirdMessages(logger)
 ) : SendBirdBaseService(), ChatService {
 
 	override suspend fun addListener(channelId: String, listener: ChatListener) {
@@ -30,6 +29,7 @@ internal class SendBirdChatService(
 
 	override suspend fun removeListener(channelId: String) {
 		SendBird.removeChannelHandler(channelId)
+		messages.reset()
 	}
 
 	override suspend fun getMessages(channel: Channel) =
@@ -84,9 +84,9 @@ internal class SendBirdChatService(
 	override suspend fun deleteMessage(channel: Channel, message: Message) =
 		suspendCancellableCoroutine<Unit> { coroutine ->
 			withSameScope {
-				getChannel(channel).deleteMessage(message.toApi().toMessage()) {
+				getChannel(channel).deleteMessage(messages.getMessage(message)) {
 					if (it != null) {
-						logger.e("Failed to send text message", it)
+						logger.e("Failed to delete message", it)
 						coroutine.resumeWithException(it)
 					} else {
 						coroutine.resume(Unit)

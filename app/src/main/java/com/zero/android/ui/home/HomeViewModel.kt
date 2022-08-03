@@ -5,6 +5,7 @@ import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
+import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.data.repository.NetworkRepository
 import com.zero.android.feature.feed.navigation.FeedDestination
 import com.zero.android.models.Network
@@ -16,8 +17,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val networkRepository: NetworkRepository) :
-	BaseViewModel() {
+class HomeViewModel
+@Inject
+constructor(
+	private val networkRepository: NetworkRepository,
+	private val searchTriggerUseCase: SearchTriggerUseCase
+) : BaseViewModel() {
 
 	val currentScreen = MutableStateFlow<NavDestination>(FeedDestination)
 
@@ -59,5 +64,9 @@ class HomeViewModel @Inject constructor(private val networkRepository: NetworkRe
 				networks.emit(Result.Success(allNetworks.filter { it.id != network.id }))
 			}
 		}
+	}
+
+	fun triggerSearch(show: Boolean) {
+		ioScope.launch { searchTriggerUseCase.triggerSearch(show) }
 	}
 }
