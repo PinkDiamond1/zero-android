@@ -45,7 +45,8 @@ internal class SendBirdMessages {
 	fun getMessages(channel: BaseChannel, callback: PreviousMessageListQuery.MessageListQueryResult) {
 		init(channel)
 
-		if (query.hasMore()) query.load(callback) else callback.onResult(null, null)
+		if (query.hasMore()) query.load(query.limit, query.shouldReverse(), callback)
+		else callback.onResult(null, null)
 	}
 
 	fun getMessages(

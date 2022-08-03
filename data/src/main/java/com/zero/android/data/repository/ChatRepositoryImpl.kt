@@ -1,21 +1,20 @@
 package com.zero.android.data.repository
 
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.conversion.toModel
-import com.zero.android.data.repository.chat.MessageListener
-import com.zero.android.data.repository.chat.MessagesRemoteMediator
+import com.zero.android.data.repository.chat.MessagePagingSource
 import com.zero.android.database.dao.MessageDao
-import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
+import com.zero.android.network.chat.ChatListener
+import com.zero.android.network.model.ApiChannel
+import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
@@ -40,8 +39,23 @@ constructor(
 
 	override val channelChatMessages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
 
-	override suspend fun addListener(id: String) =
-		chatService.addListener(id, MessageListener(messageDao))
+	private lateinit var messagePaging: MessagePagingSource
+	private val messageListener =
+		object : ChatListener {
+			override fun onMessageReceived(channel: ApiChannel, message: ApiMessage) {
+				messagePaging.invalidate()
+			}
+
+			override fun onMessageDeleted(channel: ApiChannel, msgId: String) {
+				messagePaging.invalidate()
+			}
+
+			override fun onMessageUpdated(channel: ApiChannel, message: ApiMessage) {
+				messagePaging.invalidate()
+			}
+		}
+
+	override suspend fun addListener(id: String) = chatService.addListener(id, messageListener)
 
 	override suspend fun removeListener(id: String) = chatService.removeListener(id)
 
@@ -51,17 +65,16 @@ constructor(
 		}
 	}
 
-	@OptIn(ExperimentalPagingApi::class)
 	override suspend fun getMessages(channel: Channel, timestamp: Long): Flow<PagingData<Message>> {
+		messagePaging = MessagePagingSource(chatService, channel)
+		chatService.removeListener(channel.id)
 		channelChatMessages.emit(PagingData.empty())
+
 		return Pager(
 			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT),
-			remoteMediator = MessagesRemoteMediator(chatService, messageDao, channel),
-			pagingSourceFactory = { messageDao.getByChannel(channel.id) }
+			pagingSourceFactory = { messagePaging }
 		)
-			.flow
-			.map { data -> data.map { it.toModel() } }
-			.apply { collect(channelChatMessages) }
+			.flow.apply { collect(channelChatMessages) }
 	}
 
 	override suspend fun send(channel: Channel, message: DraftMessage): Flow<Message> {
