@@ -25,7 +25,7 @@ import com.zero.android.ui.theme.AppTheme
 val HOME_DESTINATIONS =
 	listOf(
 		AppBarItem(ChannelsDestination, R.drawable.ic_channel, R.drawable.ic_channel),
-		AppBarItem(
+		/*AppBarItem(
 			MembersDestination,
 			R.drawable.ic_people_selected,
 			R.drawable.ic_people_unselected
@@ -35,7 +35,7 @@ val HOME_DESTINATIONS =
 			NotificationsDestination,
 			R.drawable.ic_notification_selected,
 			R.drawable.ic_notification_unselected
-		),
+		),*/
 		AppBarItem(
 			DirectChannelDestination,
 			R.drawable.ic_direct_chat_selected,

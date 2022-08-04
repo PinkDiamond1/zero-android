@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -33,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
-import com.zero.android.ui.components.CustomTextField
+import com.zero.android.ui.components.CustomTextFieldValue
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.flow.collectLatest
@@ -70,16 +72,16 @@ fun UserInputPanel(
 	if (currentInputSelector != InputSelector.TEXT) {
 		BackHandler(onBack = dismissKeyboard)
 	}
-	val updatedMessage = prepareInitialMessage(initialText)
-	var textState by remember { mutableStateOf(TextFieldValue(updatedMessage)) }
-	LaunchedEffect(Unit) {
-		MessageActionStateHandler.messageUpdatedText.collectLatest {
-			if (it.isNotEmpty()) {
-				textState = TextFieldValue(it)
-				MessageActionStateHandler.messageUpdatedText.emit("")
-			}
-		}
-	}
+    val updatedMessage = prepareInitialMessage(initialText)
+	var textState by remember { mutableStateOf(TextFieldValue(updatedMessage, TextRange(updatedMessage.length))) }
+    LaunchedEffect(Unit) {
+        MessageActionStateHandler.messageUpdatedText.collectLatest {
+            if (it.isNotEmpty()) {
+                textState = TextFieldValue(it, TextRange(it.length))
+                MessageActionStateHandler.messageUpdatedText.emit("")
+            }
+        }
+    }
 
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
@@ -165,20 +167,20 @@ private fun UserInputText(
 ) {
 	Box(modifier = modifier.semantics { keyboardShownProperty = keyboardShown }) {
 		var lastFocusState by remember { mutableStateOf(false) }
-		CustomTextField(
-			value = textFieldValue.text,
+		CustomTextFieldValue(
+			value = textFieldValue,
 			onValueChange = {
-				onTextChanged(TextFieldValue(it))
-				MessageActionStateHandler.onMessageTextChanged(it)
-			},
+                onTextChanged(it)
+                MessageActionStateHandler.onMessageTextChanged(it.text)
+            },
 			placeholderText = stringResource(R.string.write_your_message),
-			textStyle =
-			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
-			placeHolderTextStyle =
-			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
-			modifier =
-			Modifier.fillMaxWidth().padding(12.dp).align(Alignment.CenterStart).onFocusChanged {
-					state ->
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+			placeHolderTextStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+			modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .align(Alignment.CenterStart)
+                .onFocusChanged { state ->
 				if (lastFocusState != state.isFocused) {
 					onTextFieldFocused(state.isFocused)
 				}

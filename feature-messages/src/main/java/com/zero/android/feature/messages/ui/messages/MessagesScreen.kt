@@ -199,7 +199,6 @@ fun MessagesScreen(
 	if (chatChannelUiState is Result.Success) {
 		val topBar: @Composable () -> Unit = {
 			AppBar(
-				color = if (actionMessage != null) AppTheme.colors.surface else null,
 				navIcon = {
 					IconButton(
 						onClick = {
@@ -234,7 +233,7 @@ fun MessagesScreen(
 								Icon(
 									painter = painterResource(R.drawable.ic_reply_24),
 									contentDescription = "cd_message_action_reply",
-									tint = Color.DarkGray
+									tint = AppTheme.colors.surface
 								)
 							}
 						}
@@ -244,7 +243,7 @@ fun MessagesScreen(
 									Icon(
 										imageVector = Icons.Filled.Edit,
 										contentDescription = "cd_message_action_edit",
-										tint = Color.DarkGray
+                                        tint = AppTheme.colors.surface
 									)
 								}
 							}
@@ -257,7 +256,7 @@ fun MessagesScreen(
 								Icon(
 									imageVector = Icons.Filled.Delete,
 									contentDescription = "cd_message_action_delete",
-									tint = Color.DarkGray
+                                    tint = AppTheme.colors.surface
 								)
 							}
 						}

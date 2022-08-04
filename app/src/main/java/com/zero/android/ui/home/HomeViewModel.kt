@@ -7,6 +7,7 @@ import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.data.repository.NetworkRepository
+import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.feed.navigation.FeedDestination
 import com.zero.android.models.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,7 @@ constructor(
 	private val searchTriggerUseCase: SearchTriggerUseCase
 ) : BaseViewModel() {
 
-	val currentScreen = MutableStateFlow<NavDestination>(FeedDestination)
+	val currentScreen = MutableStateFlow<NavDestination>(ChannelsDestination)
 
 	private var allNetworks: List<Network>? = null
 	val selectedNetwork = MutableStateFlow<Network?>(null)

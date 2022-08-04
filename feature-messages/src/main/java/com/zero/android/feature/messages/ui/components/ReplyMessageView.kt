@@ -50,7 +50,7 @@ fun ReplyMessage(
 				message.author.name?.let {
 					Text(
 						text = it,
-						color = AppTheme.colors.colorTextPrimary,
+						color = Color.White,
 						style = MaterialTheme.typography.labelLarge,
 						fontWeight = FontWeight.Medium,
 						maxLines = 1,
@@ -64,8 +64,8 @@ fun ReplyMessage(
 					} else "${message.type.name} Message"
 				Text(
 					text = replyMessage.messageFormatter(AppTheme.colors.glow),
-					color = Color.LightGray,
-					style = MaterialTheme.typography.labelLarge,
+					color = Color.White.copy(0.75f),
+                    style = MaterialTheme.typography.labelLarge,
 					fontWeight = FontWeight.Normal,
 					maxLines = 2,
 					overflow = TextOverflow.Ellipsis

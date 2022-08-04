@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,8 +31,7 @@ fun SearchView(
 				onValueChanged(searchText)
 			},
 			placeholderText = placeHolder,
-			textStyle =
-			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
 			placeHolderTextStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			shape = RoundedCornerShape(24.dp),

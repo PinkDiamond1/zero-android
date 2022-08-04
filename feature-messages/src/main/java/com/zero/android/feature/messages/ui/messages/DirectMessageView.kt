@@ -142,9 +142,8 @@ fun DMAuthorAndTextMessage(
 						text = messageDate.format("hh:mm aa"),
 						style = MaterialTheme.typography.bodySmall,
 						modifier = Modifier.align(Alignment.End),
-						color =
-						if (isUserMe) AppTheme.colors.colorTextPrimary
-						else AppTheme.colors.colorTextSecondary
+						color = if (isUserMe) Color.White
+                        else AppTheme.colors.colorTextSecondary
 					)
 				}
 			}

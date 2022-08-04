@@ -132,8 +132,8 @@ private fun AuthorNameTimestamp(isUserMe: Boolean, msg: Message) {
 			text = "${messageDate.toMessageDateFormat()} at ${messageDate.format("hh:mm aa")}",
 			style = MaterialTheme.typography.bodySmall,
 			modifier = Modifier.alignBy(LastBaseline),
-			color =
-			if (isUserMe) AppTheme.colors.colorTextPrimary else AppTheme.colors.colorTextSecondary
+			color = if (isUserMe) Color.White
+            else AppTheme.colors.colorTextSecondary
 		)
 	}
 }
