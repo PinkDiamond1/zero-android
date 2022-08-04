@@ -7,6 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
+import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.conversion.toModel
 import com.zero.android.data.repository.chat.MessageListener
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
@@ -24,7 +25,6 @@ import com.zero.android.network.util.NetworkMediaUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.singleOrNull
 import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
@@ -68,14 +68,16 @@ constructor(
 	}
 
 	override suspend fun send(channel: Channel, message: DraftMessage) {
-		if (message.type == MessageType.TEXT) {
-			chatService.send(channel, message).singleOrNull()
-		} else {
-			sendFileMessage(channel, message).singleOrNull()
-		}
+		val msg =
+			if (message.type == MessageType.TEXT) {
+				chatService.send(channel, message)
+			} else {
+				sendFileMessage(channel, message)
+			}
+		messageDao.upsert(msg.toEntity())
 	}
 
-	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): Flow<ApiMessage> {
+	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): ApiMessage {
 		val uploadInfo = chatMediaService.getUploadInfo()
 		val fileMessage =
 			if (uploadInfo.apiUrl.isNotEmpty() && uploadInfo.query != null) {
