@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -82,36 +81,48 @@ fun HomeScreen(
 					contentDescription = stringResource(R.string.search_channels)
 				)
 			}
-			IconButton(onClick = { showMenu = !showMenu }) {
-				Icon(Icons.Default.MoreVert, contentDescription = "")
-			}
-			DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-				DropdownMenuItem(
-					text = { Text(text = stringResource(R.string.profile)) },
-					onClick = {},
-					leadingIcon = {
-						Image(
-							painter = painterResource(R.drawable.img_profile_avatar),
-							contentDescription = stringResource(R.string.profile)
-						)
-					}
-				)
-				DropdownMenuItem(
-					text = { Text(text = stringResource(R.string.create_a_world)) },
-					onClick = {},
-					leadingIcon = {
-						IconButton(
-							onClick = {},
-							modifier = Modifier.border(1.dp, AppTheme.colors.glow, CircleShape).size(32.dp)
-						) {
-							Icon(
-								imageVector = Icons.Filled.Add,
-								contentDescription = stringResource(R.string.create_a_world)
-							)
-						}
-					}
+      /*IconButton(onClick = { showMenu = !showMenu }) {
+      	Icon(Icons.Default.MoreVert, contentDescription = "")
+      }*/
+			IconButton(onClick = {}) {
+				Image(
+					painter = painterResource(R.drawable.img_profile_avatar),
+					contentDescription = stringResource(R.string.profile)
 				)
 			}
+      /*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+      	DropdownMenuItem(
+      		text = { Text(text = stringResource(R.string.profile), style = MaterialTheme.typography.customTextStyle(
+                           LocalTextStyle.current
+                       )) },
+      		onClick = {},
+      		leadingIcon = {
+      			Image(
+      				painter = painterResource(R.drawable.img_profile_avatar),
+      				contentDescription = stringResource(R.string.profile)
+      			)
+      		}
+      	)
+      	DropdownMenuItem(
+      		text = { Text(text = stringResource(R.string.create_a_world), style = MaterialTheme.typography.customTextStyle(
+                           LocalTextStyle.current
+                       )) },
+      		onClick = {},
+      		leadingIcon = {
+      			IconButton(
+      				onClick = {},
+      				modifier = Modifier
+                                   .border(1.dp, AppTheme.colors.glow, CircleShape)
+                                   .size(32.dp)
+      			) {
+      				Icon(
+      					imageVector = Icons.Filled.Add,
+      					contentDescription = stringResource(R.string.create_a_world)
+      				)
+      			}
+      		}
+      	)
+      }*/
 		} else {
 			IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
 				Image(

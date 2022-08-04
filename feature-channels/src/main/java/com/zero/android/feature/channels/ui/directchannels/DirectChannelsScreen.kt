@@ -77,7 +77,8 @@ fun DirectChannelsScreen(
 					Modifier.fillMaxWidth()
 						.padding(vertical = 10.dp)
 						.background(MaterialTheme.colorScheme.primary),
-					textAlign = TextAlign.Center
+					textAlign = TextAlign.Center,
+					style = MaterialTheme.typography.labelMedium
 				)
 			}
 		}

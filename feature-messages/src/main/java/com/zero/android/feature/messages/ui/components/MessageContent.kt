@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.zero.android.common.util.SymbolAnnotationType
@@ -53,7 +54,10 @@ fun ColumnScope.ChatBubbleSpacing(isFirstMessageByAuthor: Boolean) {
 private fun ClickableMessage(message: Message, authorClicked: (Member) -> Unit) {
 	val uriHandler = LocalUriHandler.current
 	val styledMessage =
-		(message.message ?: "").messageFormatter(annotationColor = AppTheme.colors.glow)
+		(message.message ?: "").messageFormatter(
+			annotationColor = AppTheme.colors.glow,
+			annotationFontWeight = FontWeight.Bold
+		)
 	ClickableText(
 		text = styledMessage,
 		style = MaterialTheme.typography.bodyLarge.copy(color = White),

@@ -22,7 +22,6 @@ import com.zero.android.ui.components.LoadingContainer
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.BODY_PADDING_HORIZONTAL
-import com.zero.android.ui.theme.Typography
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,7 +69,7 @@ fun NetworkDrawerContent(
 				modifier.fillMaxWidth().padding(DRAWER_PADDING.dp).constrainAs(worldsLabel) {
 					top.linkTo(header.bottom)
 				},
-				style = Typography.labelLarge,
+				style = MaterialTheme.typography.labelLarge,
 				color = AppTheme.colors.colorTextPrimary
 			)
 			LazyColumn(

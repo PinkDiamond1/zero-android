@@ -1,10 +1,7 @@
 package com.zero.android.ui.appbar
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -14,6 +11,7 @@ import com.zero.android.common.R.drawable
 import com.zero.android.models.Network
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.theme.customTextStyle
 
 @Composable
 fun AppTopBar(
@@ -24,7 +22,12 @@ fun AppTopBar(
 ) {
 	CenterAlignedTopAppBar(
 		modifier = modifier,
-		title = { Text(network?.displayName ?: "") },
+		title = {
+			Text(
+				network?.displayName ?: "",
+				style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current)
+			)
+		},
 		navigationIcon = {
 			IconButton(onClick = openDrawer) {
 				if (!network?.logo.isNullOrEmpty()) {

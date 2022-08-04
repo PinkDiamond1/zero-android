@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +18,6 @@ import com.zero.android.common.R.drawable
 import com.zero.android.common.R.string
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 
 @Composable
 fun AppDrawerFooter(modifier: Modifier = Modifier, onCreateWorldClick: () -> Unit) {
@@ -44,7 +44,7 @@ fun AppDrawerFooter(modifier: Modifier = Modifier, onCreateWorldClick: () -> Uni
 			)
 			Text(
 				stringResource(string.create_a_world),
-				style = Typography.bodyLarge,
+				style = MaterialTheme.typography.bodyLarge,
 				color = AppTheme.colors.colorTextSecondaryVariant
 			)
 		}

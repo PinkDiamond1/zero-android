@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +19,6 @@ import com.zero.android.ui.components.CountBadge
 import com.zero.android.ui.components.MediumCircularImage
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 
 @Composable
 fun DrawerItem(modifier: Modifier = Modifier, item: Network, onItemClick: (Network) -> Unit) {
@@ -54,7 +54,7 @@ fun DrawerItem(modifier: Modifier = Modifier, item: Network, onItemClick: (Netwo
 				linkTo(start = image.end, end = textEnd.start, bias = 0f)
 			},
 			color = AppTheme.colors.colorTextPrimary,
-			style = Typography.bodyLarge
+			style = MaterialTheme.typography.bodyLarge
 		)
 		Text(
 			text = item.displayName,
@@ -67,7 +67,7 @@ fun DrawerItem(modifier: Modifier = Modifier, item: Network, onItemClick: (Netwo
 				width = Dimension.fillToConstraints
 			},
 			color = AppTheme.colors.colorTextSecondaryVariant,
-			style = Typography.bodyMedium
+			style = MaterialTheme.typography.bodyMedium
 		)
 		if (item.unreadCount > 0) {
 			CountBadge(

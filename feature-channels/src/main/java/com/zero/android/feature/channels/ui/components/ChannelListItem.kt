@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +29,6 @@ import com.zero.android.ui.components.LargeCircularImage
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.UnreadCountText
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 
 @Composable
 fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (Channel) -> Unit) {
@@ -77,7 +77,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 			Text(
 				text = channel.getTitle(loggedInUserId),
 				color = AppTheme.colors.colorTextPrimary,
-				style = Typography.bodyLarge,
+				style = MaterialTheme.typography.bodyLarge,
 				fontWeight = FontWeight.Medium,
 				modifier = Modifier.align(Alignment.CenterVertically),
 				maxLines = 1,
@@ -108,7 +108,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 		Text(
 			text = styledMessage,
 			color = AppTheme.colors.colorTextSecondary,
-			style = Typography.bodyMedium,
+			style = MaterialTheme.typography.bodyMedium,
 			modifier =
 			Modifier.constrainAs(textBottom) {
 				top.linkTo(textTop.bottom, margin = 4.dp)
@@ -122,7 +122,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 		Text(
 			text = channel.lastMessage?.createdAt?.toDate()?.toMessageDateFormat() ?: "",
 			color = AppTheme.colors.colorTextSecondary,
-			style = Typography.bodyMedium,
+			style = MaterialTheme.typography.bodyMedium,
 			fontWeight = FontWeight.Medium,
 			modifier =
 			Modifier.constrainAs(dateTime) {

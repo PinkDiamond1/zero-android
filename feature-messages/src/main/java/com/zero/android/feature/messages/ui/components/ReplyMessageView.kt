@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +15,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.zero.android.common.R
+import com.zero.android.common.util.messageFormatter
 import com.zero.android.models.Message
 import com.zero.android.ui.components.ExtraSmallCircularImage
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 
 @Composable
 fun ReplyMessage(
@@ -54,7 +51,7 @@ fun ReplyMessage(
 					Text(
 						text = it,
 						color = AppTheme.colors.colorTextPrimary,
-						style = Typography.labelLarge,
+						style = MaterialTheme.typography.labelLarge,
 						fontWeight = FontWeight.Medium,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis
@@ -66,9 +63,9 @@ fun ReplyMessage(
 						message.message!!
 					} else "${message.type.name} Message"
 				Text(
-					text = replyMessage,
-					color = AppTheme.colors.colorTextSecondary,
-					style = Typography.labelLarge,
+					text = replyMessage.messageFormatter(AppTheme.colors.glow),
+					color = Color.LightGray,
+					style = MaterialTheme.typography.labelLarge,
 					fontWeight = FontWeight.Normal,
 					maxLines = 2,
 					overflow = TextOverflow.Ellipsis
@@ -81,7 +78,7 @@ fun ReplyMessage(
 			}
 			if (showCloseButton) {
 				IconButton(onClick = onCloseView) {
-					Icon(imageVector = Icons.Filled.Close, contentDescription = "", tint = Color.DarkGray)
+					Icon(imageVector = Icons.Filled.Close, contentDescription = "", tint = Color.Gray)
 				}
 			}
 		}

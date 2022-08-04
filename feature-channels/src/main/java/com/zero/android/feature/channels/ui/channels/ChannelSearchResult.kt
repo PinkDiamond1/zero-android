@@ -4,7 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,7 +41,8 @@ fun ChannelSearchResult(channels: List<Channel>, onClick: (Channel) -> Unit) {
 			Modifier.fillMaxWidth()
 				.padding(vertical = 10.dp)
 				.background(MaterialTheme.colorScheme.primary),
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.labelLarge
 		)
 	}
 }
@@ -62,11 +63,11 @@ fun ChannelSearchItem(header: String, channels: List<GroupChannel>, onClick: (Ch
 			Text(
 				"${channels.size} found",
 				color = AppTheme.colors.colorTextSecondary,
-				style = MaterialTheme.typography.labelLarge
+				style = MaterialTheme.typography.labelMedium
 			)
 		}
 		Spacer(modifier = Modifier.size(8.dp))
-		LazyRow(modifier = Modifier.fillMaxWidth()) {
+		LazyColumn(modifier = Modifier.fillMaxWidth()) {
 			items(
 				channels,
 				itemContent = { channel ->

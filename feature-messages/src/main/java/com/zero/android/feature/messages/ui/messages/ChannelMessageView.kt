@@ -28,7 +28,7 @@ import com.zero.android.feature.messages.ui.components.ReplyMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.ui.components.SmallCircularImage
-import com.zero.android.ui.theme.Gray
+import com.zero.android.ui.theme.AppTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -132,7 +132,8 @@ private fun AuthorNameTimestamp(isUserMe: Boolean, msg: Message) {
 			text = "${messageDate.toMessageDateFormat()} at ${messageDate.format("hh:mm aa")}",
 			style = MaterialTheme.typography.bodySmall,
 			modifier = Modifier.alignBy(LastBaseline),
-			color = Gray
+			color =
+			if (isUserMe) AppTheme.colors.colorTextPrimary else AppTheme.colors.colorTextSecondary
 		)
 	}
 }

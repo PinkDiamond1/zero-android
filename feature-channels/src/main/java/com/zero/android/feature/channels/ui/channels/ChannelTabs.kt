@@ -1,14 +1,9 @@
 package com.zero.android.feature.channels.ui.channels
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -18,15 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.zero.android.feature.channels.model.ChannelTab
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.Typography
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -75,15 +67,13 @@ fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
 				modifier = Modifier.align(Alignment.CenterVertically),
 				fontWeight = FontWeight.Medium,
 				style =
-				TextStyle(
+				MaterialTheme.typography.displayLarge.copy(
 					shadow =
 					Shadow(
 						color = AppTheme.colors.glow,
 						offset = Offset(2f, 2f),
 						blurRadius = 50f
-					),
-					fontWeight = FontWeight.Normal,
-					fontSize = 14.sp
+					)
 				)
 			)
 		} else {
@@ -92,7 +82,7 @@ fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
 				color = AppTheme.colors.colorTextPrimary,
 				modifier = Modifier.align(Alignment.CenterVertically),
 				fontWeight = FontWeight.Medium,
-				style = Typography.bodyMedium
+				style = MaterialTheme.typography.bodyMedium
 			)
 		}
 		if (channelTab.unreadCount > 0) {
@@ -104,7 +94,7 @@ fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
 				Modifier.background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))
 					.wrapContentHeight()
 					.padding(6.dp, 2.dp, 6.dp, 2.dp),
-				style = Typography.labelLarge
+				style = MaterialTheme.typography.labelLarge
 			)
 		}
 	}
