@@ -5,11 +5,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toModel
 import com.zero.android.data.repository.chat.MessageListener
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
-import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
@@ -37,7 +37,7 @@ constructor(
 	private val chatMediaService: ChatMediaService,
 	private val networkMediaUtil: NetworkMediaUtil,
 	private val messageDao: MessageDao,
-	private val channelDao: ChannelDao
+	private val logger: Logger
 ) : ChatRepository {
 
 	override val messages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
@@ -59,7 +59,7 @@ constructor(
 
 		return Pager(
 			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT),
-			remoteMediator = MessagesRemoteMediator(chatService, messageDao, channel),
+			remoteMediator = MessagesRemoteMediator(chatService, messageDao, channel, logger),
 			pagingSourceFactory = { messageDao.getByChannel(channel.id) }
 		)
 			.flow

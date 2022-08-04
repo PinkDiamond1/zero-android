@@ -4,6 +4,8 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import com.zero.android.common.system.Logger
+import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.database.dao.MessageDao
@@ -19,7 +21,8 @@ import java.io.IOException
 internal class MessagesRemoteMediator(
 	private val chatService: ChatService,
 	private val messageDao: MessageDao,
-	private val channel: Channel
+	private val channel: Channel,
+	private val logger: Logger
 ) : RemoteMediator<Int, MessageWithRefs>() {
 
 	override suspend fun load(
@@ -61,7 +64,9 @@ internal class MessagesRemoteMediator(
 					lastMessageId?.let {
 						chatService.getMessages(channel = channel, before = it).firstOrNull()
 					}
-						?: chatService.getMessages(channel = channel).firstOrNull()
+						?: chatService
+							.getMessages(channel = channel, loadSize = INITIAL_LOAD_SIZE)
+							.firstOrNull()
 
 				response?.map { it.toEntity() }?.let { messageDao.upsert(*it.toTypedArray()) }
 
@@ -72,6 +77,7 @@ internal class MessagesRemoteMediator(
 					response.isNullOrEmpty() || response.size < MESSAGES_PAGE_LIMIT
 				)
 			} catch (e: Exception) {
+				logger.e(e)
 				MediatorResult.Error(e)
 			}
 		} catch (e: IOException) {

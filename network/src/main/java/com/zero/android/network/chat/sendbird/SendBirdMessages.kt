@@ -14,9 +14,6 @@ import kotlin.coroutines.resumeWithException
 
 internal class SendBirdMessages @Inject constructor(private val logger: Logger) {
 
-	private var channel: BaseChannel? = null
-	private lateinit var query: PreviousMessageListQuery
-
 	private val params =
 		MessageListParams().apply {
 			previousResultSize = MESSAGES_PAGE_LIMIT
@@ -33,22 +30,19 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 					.build()
 		}
 
-	private fun init(channel: BaseChannel) {
-		if (this.channel?.url == channel.url) return
-		this.channel = channel
-
-		query =
+	fun getMessages(
+		channel: BaseChannel,
+		loadSize: Int = 1,
+		callback: PreviousMessageListQuery.MessageListQueryResult
+	) {
+		val query =
 			channel.createPreviousMessageListQuery().apply {
-				limit = MESSAGES_PAGE_LIMIT
+				limit = MESSAGES_PAGE_LIMIT * loadSize
 				setReverse(params.shouldReverse())
 				setIncludeReactions(params.shouldIncludeReactions())
 				replyTypeFilter = params.replyTypeFilter
 				messagePayloadFilter = params.messagePayloadFilter
 			}
-	}
-
-	fun getMessages(channel: BaseChannel, callback: PreviousMessageListQuery.MessageListQueryResult) {
-		init(channel)
 
 		if (query.hasMore()) query.load(query.limit, query.shouldReverse(), callback)
 		else callback.onResult(null, null)
@@ -59,8 +53,6 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 		beforeId: String,
 		callback: BaseChannel.GetMessagesHandler
 	) {
-		init(channel)
-
 		channel.getMessagesByMessageId(beforeId.toLong(), params, callback)
 	}
 

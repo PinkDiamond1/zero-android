@@ -31,9 +31,9 @@ internal class SendBirdChatService(
 		SendBird.removeChannelHandler(channelId)
 	}
 
-	override suspend fun getMessages(channel: Channel) =
+	override suspend fun getMessages(channel: Channel, loadSize: Int) =
 		callbackFlowWithAwait<List<ApiMessage>> {
-			messages.getMessages(getChannel(channel)) { messages, e ->
+			messages.getMessages(getChannel(channel), loadSize) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					throw e
