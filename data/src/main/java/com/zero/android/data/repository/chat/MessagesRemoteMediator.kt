@@ -39,7 +39,8 @@ internal class MessagesRemoteMediator(
 					// In this example, you never need to prepend, since REFRESH
 					// will always load the first page in the list. Immediately
 					// return, reporting end of pagination.
-					LoadType.PREPEND -> {
+					LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+					LoadType.APPEND -> {
 						val lastItem =
 							state.lastItemOrNull()
 								?: return MediatorResult.Success(endOfPaginationReached = true)
@@ -51,7 +52,6 @@ internal class MessagesRemoteMediator(
 						// no more items to load.
 						lastItem.message.id
 					}
-					LoadType.APPEND -> return MediatorResult.Success(endOfPaginationReached = true)
 				}
 
 			// Suspending network load via Retrofit. This doesn't need to be

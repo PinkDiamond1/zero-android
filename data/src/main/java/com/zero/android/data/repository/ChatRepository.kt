@@ -10,9 +10,7 @@ interface ChatRepository {
 
 	val messages: Flow<PagingData<Message>>
 
-	suspend fun getMessages(channel: Channel): Flow<PagingData<Message>>
-
-	suspend fun getMessages(channel: Channel, lastMessageId: String): Flow<List<Message>>
+	suspend fun getMessages(channel: Channel)
 
 	suspend fun send(channel: Channel, message: DraftMessage)
 

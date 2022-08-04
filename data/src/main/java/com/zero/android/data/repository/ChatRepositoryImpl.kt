@@ -8,7 +8,6 @@ import androidx.paging.map
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
-import com.zero.android.data.conversion.toModel
 import com.zero.android.data.repository.chat.MessageListener
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
 import com.zero.android.database.dao.MessageDao
@@ -22,7 +21,6 @@ import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
 import com.zero.android.network.util.NetworkMediaUtil
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
@@ -47,24 +45,18 @@ constructor(
 
 	override suspend fun removeListener(id: String) = chatService.removeListener(id)
 
-	override suspend fun getMessages(channel: Channel, lastMessageId: String): Flow<List<Message>> {
-		return chatService.getMessages(channel, lastMessageId).map { messages ->
-			messages.map { it.toModel() }
-		}
-	}
-
 	@OptIn(ExperimentalPagingApi::class)
-	override suspend fun getMessages(channel: Channel): Flow<PagingData<Message>> {
+	override suspend fun getMessages(channel: Channel) {
 		messages.emit(PagingData.empty())
 
 		return Pager(
-			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT),
+			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT, prefetchDistance = 0),
 			remoteMediator = MessagesRemoteMediator(chatService, messageDao, channel, logger),
 			pagingSourceFactory = { messageDao.getByChannel(channel.id) }
 		)
 			.flow
 			.map { data -> data.map { it.toModel() } }
-			.apply { collect(messages) }
+			.collect { messages.emit(it) }
 	}
 
 	override suspend fun send(channel: Channel, message: DraftMessage) {

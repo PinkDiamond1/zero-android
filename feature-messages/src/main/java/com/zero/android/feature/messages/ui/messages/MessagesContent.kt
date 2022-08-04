@@ -89,7 +89,7 @@ fun Messages(
 				WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues()
 			) {
 				items(messages) { content ->
-					content as Message
+					content ?: return@items
 					val index = messages.itemSnapshotList.items.indexOf(content)
 
 					val prevAuthor = if (index != 0) messages[index - 1]?.author else null
