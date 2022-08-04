@@ -14,7 +14,6 @@ import com.zero.android.models.Channel
 import com.zero.android.network.service.ChatService
 import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
-import timber.log.Timber
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
@@ -70,7 +69,7 @@ internal class MessagesRemoteMediator(
 
 				response?.map { it.toEntity() }?.let { messageDao.upsert(*it.toTypedArray()) }
 
-				Timber.d("$loadType - $lastMessageId: ${response?.size ?: 0}")
+				logger.d("Loading Messages: $loadType - $lastMessageId: ${response?.size ?: 0}")
 
 				MediatorResult.Success(
 					endOfPaginationReached =

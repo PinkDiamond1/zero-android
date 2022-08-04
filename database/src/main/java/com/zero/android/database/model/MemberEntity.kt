@@ -9,7 +9,7 @@ import com.zero.android.models.enums.ConnectionStatus
 data class MemberEntity(
 	@PrimaryKey override val id: String,
 	val name: String? = null,
-	var profileUrl: String? = null,
+	var profileJson: String? = null,
 	val profileImage: String? = null,
 	var friendDiscoveryKey: String? = null,
 	var friendName: String? = null,
@@ -26,7 +26,7 @@ fun MemberEntity.toModel() =
 	Member(
 		id = id,
 		name = name,
-		profileUrl = profileUrl,
+		profileJson = profileJson,
 		profileImage = profileImage,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,

@@ -28,7 +28,7 @@ internal fun User.toApi() =
 	ApiMember(
 		id = userId,
 		nickname = nickname,
-		profileUrl = profileUrl,
+		profileJson = profileUrl,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,
 		metadata = metaData,
@@ -46,7 +46,7 @@ internal fun Member.toApi(): ApiMember {
 	return ApiMember(
 		id = userId,
 		nickname = nickname,
-		profileUrl = profileUrl,
+		profileJson = profileUrl,
 		profileImage = properties?.profileImage,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,
@@ -69,7 +69,7 @@ internal fun Sender.toApi(): ApiMember {
 	return ApiMember(
 		id = userId,
 		nickname = nickname,
-		profileUrl = profileUrl,
+		profileJson = profileUrl,
 		profileImage = properties?.profileImage,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,

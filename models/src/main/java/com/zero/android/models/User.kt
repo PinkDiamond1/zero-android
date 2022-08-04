@@ -12,7 +12,7 @@ data class User(
 data class Member(
 	val id: String,
 	val name: String? = null,
-	var profileUrl: String? = null,
+	var profileJson: String? = null,
 	val profileImage: String? = null,
 	var friendDiscoveryKey: String? = null,
 	var friendName: String? = null,

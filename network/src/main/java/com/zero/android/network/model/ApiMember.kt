@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class ApiMember(
 	@SerialName("user_id") var id: String,
 	@SerialName("nickname") var nickname: String? = null,
-	@SerialName("profile_url") var profileUrl: String? = null,
+	@SerialName("profile_url") var profileJson: String? = null,
 	@SerialName("friend_discovery_key") var friendDiscoveryKey: String? = null,
 	@SerialName("friend_name") var friendName: String? = null,
 	@SerialName("metadata") var metadata: Map<String, String?>? = null,
