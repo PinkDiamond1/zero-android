@@ -11,7 +11,6 @@ import com.zero.android.feature.feed.navigation.FeedDestination
 import com.zero.android.models.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,10 +36,10 @@ constructor(
 	private fun loadNetworks() {
 		ioScope.launch {
 			allNetworks = null
-			networkRepository.getNetworks().asResult().collectLatest { result ->
+			networkRepository.getNetworks().asResult().collect { result ->
 				if (result is Result.Loading) {
 					if (allNetworks == null) networks.emit(result)
-					return@collectLatest
+					return@collect
 				}
 
 				if (result is Result.Success && result.data.isNotEmpty()) {

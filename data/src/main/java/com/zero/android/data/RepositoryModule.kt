@@ -27,5 +27,8 @@ interface RepositoryModule {
 
 	@Binds fun bindChatRepository(chatRepository: ChatRepositoryImpl): ChatRepository
 
-    @Binds fun bindMediaPlayerRepository(mediaPlayerRepository: MediaPlayerRepositoryImpl): MediaPlayerRepository
+	@Binds
+	fun bindMediaPlayerRepository(
+		mediaPlayerRepository: MediaPlayerRepositoryImpl
+	): MediaPlayerRepository
 }

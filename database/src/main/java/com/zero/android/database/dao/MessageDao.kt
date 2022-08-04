@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 class MessageDao
 @Inject
-constructor(private val messageDao: MessageDaoInterface, private val memberDao: MemberDao) {
+constructor(private val messageDao: MessageDaoImpl, private val memberDao: MemberDao) {
 
 	fun get(id: String) = messageDao.get(id)
 
@@ -14,7 +14,11 @@ constructor(private val messageDao: MessageDaoInterface, private val memberDao: 
 
 	suspend fun upsert(vararg data: MessageWithRefs) = messageDao.upsert(memberDao, *data)
 
+	suspend fun update(id: String, text: String) = messageDao.update(id, text)
+
 	suspend fun delete(id: String) = messageDao.delete(id)
 
 	suspend fun delete(message: MessageEntity) = messageDao.delete(message)
+
+	suspend fun deleteByChannel(channelId: String) = messageDao.deleteByChannel(channelId)
 }

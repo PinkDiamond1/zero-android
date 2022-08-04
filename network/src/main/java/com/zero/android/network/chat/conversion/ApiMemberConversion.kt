@@ -7,7 +7,7 @@ internal fun Member.toApi() =
 	ApiMember(
 		id = id,
 		nickname = name,
-		profileUrl = profileUrl,
+		profileJson = profileJson,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,
 		metadata = metadata,

@@ -24,8 +24,6 @@ import com.zero.android.models.Channel
 import com.zero.android.models.Network
 import com.zero.android.ui.components.SearchView
 import com.zero.android.ui.extensions.Preview
-import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.customTextStyle
 
 @Composable
 fun DirectChannelsRoute(
@@ -61,11 +59,11 @@ fun DirectChannelsScreen(
 	if (directChannelsUiState is DirectChannelUiState.Success) {
 		Column(modifier = Modifier.fillMaxWidth()) {
 			if (showSearchBar) {
-                SearchView(
-                    placeHolder = stringResource(R.string.search_channels),
-                    onValueChanged = { onChannelSearched(it) },
-                    onSearchCancelled = { onSearchClosed() }
-                )
+				SearchView(
+					placeHolder = stringResource(R.string.search_channels),
+					onValueChanged = { onChannelSearched(it) },
+					onSearchCancelled = { onSearchClosed() }
+				)
 			}
 			LazyColumn(modifier = Modifier.weight(1f)) {
 				items(directChannelsUiState.channels) { channel ->
@@ -80,7 +78,7 @@ fun DirectChannelsScreen(
 						.padding(vertical = 10.dp)
 						.background(MaterialTheme.colorScheme.primary),
 					textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.labelMedium
+					style = MaterialTheme.typography.labelMedium
 				)
 			}
 		}

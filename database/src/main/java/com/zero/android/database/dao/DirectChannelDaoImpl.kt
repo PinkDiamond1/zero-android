@@ -8,7 +8,7 @@ import com.zero.android.database.model.DirectChannelWithRefs
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class DirectChannelDaoInterface : ChannelDaoInterface() {
+abstract class DirectChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE isDirectChannel = 1")

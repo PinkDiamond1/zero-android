@@ -15,59 +15,57 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun SearchView(
-    modifier: Modifier = Modifier,
-    placeHolder: String = stringResource(R.string.search),
-    showSearchCancel: Boolean = true,
-    onValueChanged: (String) -> Unit,
-    onSearchCancelled: () -> Unit = {},
+	modifier: Modifier = Modifier,
+	placeHolder: String = stringResource(R.string.search),
+	showSearchCancel: Boolean = true,
+	onValueChanged: (String) -> Unit,
+	onSearchCancelled: () -> Unit = {}
 ) {
-    var searchText: String by remember { mutableStateOf("") }
-    Row(
-        modifier = modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-    ) {
-        CustomTextField(
-            value = searchText,
-            onValueChange = {
-                searchText = it
-                onValueChanged(searchText)
-            },
-            placeholderText = placeHolder,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
-            placeHolderTextStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier.weight(1f),
-            leadingIcon = {
-                Icon(
-                    painterResource(R.drawable.ic_search),
-                    contentDescription = "",
-                    tint = AppTheme.colors.surfaceVariant
-                )
-            },
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        searchText = ""
-                        onValueChanged(searchText)
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_cancel_24),
-                        contentDescription = "",
-                        tint = AppTheme.colors.surfaceVariant
-                    )
-                }
-            }
-        )
-        if (showSearchCancel) {
-            TextButton(
-                onClick = {
-                    searchText = ""
-                    onValueChanged(searchText)
-                    onSearchCancelled()
-                }
-            ) { Text(stringResource(R.string.cancel), color = AppTheme.colors.colorTextPrimary) }
-        }
-    }
+	var searchText: String by remember { mutableStateOf("") }
+	Row(modifier = modifier.padding(8.dp).fillMaxWidth()) {
+		CustomTextField(
+			value = searchText,
+			onValueChange = {
+				searchText = it
+				onValueChanged(searchText)
+			},
+			placeholderText = placeHolder,
+			textStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+			placeHolderTextStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+			shape = RoundedCornerShape(24.dp),
+			modifier = Modifier.weight(1f),
+			leadingIcon = {
+				Icon(
+					painterResource(R.drawable.ic_search),
+					contentDescription = "",
+					tint = AppTheme.colors.surfaceVariant
+				)
+			},
+			trailingIcon = {
+				IconButton(
+					onClick = {
+						searchText = ""
+						onValueChanged(searchText)
+					}
+				) {
+					Icon(
+						painter = painterResource(R.drawable.ic_cancel_24),
+						contentDescription = "",
+						tint = AppTheme.colors.surfaceVariant
+					)
+				}
+			}
+		)
+		if (showSearchCancel) {
+			TextButton(
+				onClick = {
+					searchText = ""
+					onValueChanged(searchText)
+					onSearchCancelled()
+				}
+			) { Text(stringResource(R.string.cancel), color = AppTheme.colors.colorTextPrimary) }
+		}
+	}
 }

@@ -40,9 +40,9 @@ fun ChatScreenAppBarTitle(loggedInUserId: String, channel: Channel, isGroupChann
 		Text(
 			channel.getTitle(loggedInUserId).lowercase(),
 			modifier = Modifier.align(Alignment.CenterVertically),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current)
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis,
+			style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current)
 		)
 		Spacer(modifier = Modifier.padding(6.dp))
 		if (isGroupChannel) {

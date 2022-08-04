@@ -25,7 +25,7 @@ fun ChannelPager(
 		Column(modifier = Modifier.fillMaxSize()) {
 			LazyColumn {
 				items(groupChannelUiState.getChannels(categories[index].name)) { channel ->
-                    ChannelListItem(channel = channel, onClick = onClick)
+					ChannelListItem(channel = channel, onClick = onClick)
 				}
 			}
 		}

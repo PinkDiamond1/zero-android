@@ -54,11 +54,11 @@ fun ChannelsScreen(
 		if (tabs.isNotEmpty()) {
 			Column(modifier = Modifier.fillMaxWidth()) {
 				if (showSearchBar) {
-                    SearchView(
-                        placeHolder = stringResource(R.string.search_channels),
-                        onValueChanged = { onChannelSearched(it) },
-                        onSearchCancelled = { onSearchClosed() }
-                    )
+					SearchView(
+						placeHolder = stringResource(R.string.search_channels),
+						onValueChanged = { onChannelSearched(it) },
+						onSearchCancelled = { onSearchClosed() }
+					)
 				}
 				if (isSearchResult) {
 					ChannelSearchResult(uiState.categoryChannelsUiState.channels) {

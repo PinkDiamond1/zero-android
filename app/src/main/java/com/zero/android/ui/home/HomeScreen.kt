@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,7 +30,6 @@ import com.zero.android.ui.appbar.HOME_DESTINATIONS
 import com.zero.android.ui.components.Background
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.customTextStyle
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.launch
 
@@ -61,7 +59,7 @@ fun HomeScreen(
 	currentNetwork: Network?,
 	networks: Result<List<Network>>,
 	onNetworkSelected: (Network) -> Unit,
-    onTriggerSearch: (Boolean) -> Unit
+	onTriggerSearch: (Boolean) -> Unit
 ) {
 	val navController = rememberNavController()
 	val scaffoldState = rememberScaffoldState()
@@ -71,7 +69,7 @@ fun HomeScreen(
 	var showMenu by remember { mutableStateOf(false) }
 
 	navController.addOnDestinationChangedListener { _, destination, _ ->
-        onTriggerSearch(false)
+		onTriggerSearch(false)
 		isRootDestination = HOME_DESTINATIONS.map { it.destination.route }.contains(destination.route)
 	}
 
@@ -83,48 +81,48 @@ fun HomeScreen(
 					contentDescription = stringResource(R.string.search_channels)
 				)
 			}
-			/*IconButton(onClick = { showMenu = !showMenu }) {
-				Icon(Icons.Default.MoreVert, contentDescription = "")
-			}*/
-            IconButton(onClick = {}) {
-                Image(
-                    painter = painterResource(R.drawable.img_profile_avatar),
-                    contentDescription = stringResource(R.string.profile)
-                )
-            }
-			/*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-				DropdownMenuItem(
-					text = { Text(text = stringResource(R.string.profile), style = MaterialTheme.typography.customTextStyle(
-                        LocalTextStyle.current
-                    )) },
-					onClick = {},
-					leadingIcon = {
-						Image(
-							painter = painterResource(R.drawable.img_profile_avatar),
-							contentDescription = stringResource(R.string.profile)
-						)
-					}
+      /*IconButton(onClick = { showMenu = !showMenu }) {
+      	Icon(Icons.Default.MoreVert, contentDescription = "")
+      }*/
+			IconButton(onClick = {}) {
+				Image(
+					painter = painterResource(R.drawable.img_profile_avatar),
+					contentDescription = stringResource(R.string.profile)
 				)
-				DropdownMenuItem(
-					text = { Text(text = stringResource(R.string.create_a_world), style = MaterialTheme.typography.customTextStyle(
-                        LocalTextStyle.current
-                    )) },
-					onClick = {},
-					leadingIcon = {
-						IconButton(
-							onClick = {},
-							modifier = Modifier
-                                .border(1.dp, AppTheme.colors.glow, CircleShape)
-                                .size(32.dp)
-						) {
-							Icon(
-								imageVector = Icons.Filled.Add,
-								contentDescription = stringResource(R.string.create_a_world)
-							)
-						}
-					}
-				)
-			}*/
+			}
+      /*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+      	DropdownMenuItem(
+      		text = { Text(text = stringResource(R.string.profile), style = MaterialTheme.typography.customTextStyle(
+                           LocalTextStyle.current
+                       )) },
+      		onClick = {},
+      		leadingIcon = {
+      			Image(
+      				painter = painterResource(R.drawable.img_profile_avatar),
+      				contentDescription = stringResource(R.string.profile)
+      			)
+      		}
+      	)
+      	DropdownMenuItem(
+      		text = { Text(text = stringResource(R.string.create_a_world), style = MaterialTheme.typography.customTextStyle(
+                           LocalTextStyle.current
+                       )) },
+      		onClick = {},
+      		leadingIcon = {
+      			IconButton(
+      				onClick = {},
+      				modifier = Modifier
+                                   .border(1.dp, AppTheme.colors.glow, CircleShape)
+                                   .size(32.dp)
+      			) {
+      				Icon(
+      					imageVector = Icons.Filled.Add,
+      					contentDescription = stringResource(R.string.create_a_world)
+      				)
+      			}
+      		}
+      	)
+      }*/
 		} else {
 			IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
 				Image(
@@ -135,9 +133,7 @@ fun HomeScreen(
 			Spacer(modifier = Modifier.padding(4.dp))
 			IconButton(
 				onClick = {},
-				modifier = Modifier
-                    .border(1.dp, AppTheme.colors.glow, CircleShape)
-                    .size(32.dp)
+				modifier = Modifier.border(1.dp, AppTheme.colors.glow, CircleShape).size(32.dp)
 			) {
 				Icon(
 					imageVector = Icons.Filled.Add,

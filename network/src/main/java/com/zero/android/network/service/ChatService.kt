@@ -13,16 +13,13 @@ interface ChatService {
 
 	suspend fun removeListener(channelId: String)
 
-	suspend fun getMessages(
-		channel: Channel,
-		timestamp: Long = Long.MAX_VALUE
-	): Flow<List<ApiMessage>>
+	suspend fun getMessages(channel: Channel, loadSize: Int = 1): Flow<List<ApiMessage>>
 
-	suspend fun getMessages(channel: Channel, id: String): Flow<List<ApiMessage>>
+	suspend fun getMessages(channel: Channel, before: String): Flow<List<ApiMessage>>
 
-	suspend fun send(channel: Channel, message: DraftMessage): Flow<ApiMessage>
+	suspend fun send(channel: Channel, message: DraftMessage): ApiMessage
 
-	suspend fun reply(channel: Channel, id: String, message: DraftMessage): Flow<ApiMessage>
+	suspend fun reply(channel: Channel, id: String, message: DraftMessage): ApiMessage
 
 	suspend fun deleteMessage(channel: Channel, message: Message)
 }

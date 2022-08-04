@@ -9,7 +9,7 @@ import com.zero.android.database.model.ChannelMembersCrossRef
 import com.zero.android.database.model.ChannelOperatorsCrossRef
 
 @Dao
-abstract class ChannelDaoInterface : BaseDao<ChannelEntity>() {
+abstract class BaseChannelDao : BaseDao<ChannelEntity>() {
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun insert(vararg refs: ChannelMembersCrossRef)

@@ -1,18 +1,16 @@
 package com.zero.android.data.repository
 
+import androidx.paging.PagingData
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface ChatRepository {
 
-	val channelChatMessages: MutableStateFlow<List<Message>>
+	val messages: Flow<PagingData<Message>>
 
-	suspend fun getMessages(channel: Channel, timestamp: Long = Long.MAX_VALUE): Flow<List<Message>>
-
-	suspend fun getMessages(channel: Channel, id: String): Flow<List<Message>>
+	suspend fun getMessages(channel: Channel)
 
 	suspend fun send(channel: Channel, message: DraftMessage)
 

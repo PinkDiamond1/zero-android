@@ -22,9 +22,12 @@ fun AppTopBar(
 ) {
 	CenterAlignedTopAppBar(
 		modifier = modifier,
-		title = { Text(network?.displayName ?: "", style = MaterialTheme.typography.customTextStyle(
-            LocalTextStyle.current
-        )) },
+		title = {
+			Text(
+				network?.displayName ?: "",
+				style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current)
+			)
+		},
 		navigationIcon = {
 			IconButton(onClick = openDrawer) {
 				if (!network?.logo.isNullOrEmpty()) {

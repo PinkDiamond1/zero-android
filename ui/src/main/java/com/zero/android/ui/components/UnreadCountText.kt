@@ -13,14 +13,14 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun UnreadCountText(modifier: Modifier = Modifier, text: String) {
-    Text(
-        color = AppTheme.colors.surfaceInverse,
-        text = text,
-        modifier =
-        modifier
-            .background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))
-            .wrapContentHeight()
-            .padding(6.dp, 2.dp, 6.dp, 2.dp),
-        style = MaterialTheme.typography.labelLarge
-    )
+	Text(
+		color = AppTheme.colors.surfaceInverse,
+		text = text,
+		modifier =
+		modifier
+			.background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))
+			.wrapContentHeight()
+			.padding(6.dp, 2.dp, 6.dp, 2.dp),
+		style = MaterialTheme.typography.labelLarge
+	)
 }

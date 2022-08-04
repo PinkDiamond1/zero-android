@@ -1,5 +1,6 @@
 package com.zero.android.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -11,15 +12,15 @@ import com.zero.android.database.model.MessageWithRefs
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class MessageDaoInterface : BaseDao<MessageEntity>() {
+abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 
 	@Transaction
 	@Query("SELECT * FROM messages WHERE id = :id")
 	abstract fun get(id: String): Flow<MessageWithRefs?>
 
 	@Transaction
-	@Query("SELECT * FROM messages WHERE channelId = :channelId")
-	abstract fun getByChannel(channelId: String): Flow<List<MessageWithRefs>>
+	@Query("SELECT * FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC")
+	abstract fun getByChannel(channelId: String): PagingSource<Int, MessageWithRefs>
 
 	@Transaction
 	internal open suspend fun upsert(memberDao: MemberDao, vararg data: MessageWithRefs) {
@@ -41,6 +42,13 @@ abstract class MessageDaoInterface : BaseDao<MessageEntity>() {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun insert(vararg refs: MessageMentionCrossRef)
 
+	@Query("UPDATE messages SET message = :message WHERE id = :id")
+	abstract suspend fun update(id: String, message: String?)
+
 	@Query("DELETE FROM messages WHERE id = :id")
 	abstract suspend fun delete(id: String)
+
+	@Transaction
+	@Query("DELETE FROM messages WHERE channelId = :channelId")
+	abstract suspend fun deleteByChannel(channelId: String)
 }

@@ -1,21 +1,28 @@
 package com.zero.android.data.repository
 
-import com.zero.android.data.conversion.toModel
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.zero.android.common.system.Logger
+import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
+import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.repository.chat.MessageListener
+import com.zero.android.data.repository.chat.MessagesRemoteMediator
 import com.zero.android.database.dao.MessageDao
+import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
-import com.zero.android.network.chat.ChatListener
-import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
 import com.zero.android.network.util.NetworkMediaUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,47 +34,42 @@ constructor(
 	private val messageService: MessageService,
 	private val chatMediaService: ChatMediaService,
 	private val networkMediaUtil: NetworkMediaUtil,
-	private val messageDao: MessageDao
+	private val messageDao: MessageDao,
+	private val logger: Logger
 ) : ChatRepository {
 
-	override val channelChatMessages = MutableStateFlow<List<Message>>(emptyList())
+	override val messages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
 
-	override suspend fun getMessages(channel: Channel, timestamp: Long): Flow<List<Message>> {
-		val messagesResult =
-			chatService.getMessages(channel, timestamp).map { messages ->
-				messages.map { it.toModel() }
-			}
-		messagesResult.collect(channelChatMessages)
-		return messagesResult
-	}
-
-	override suspend fun addListener(id: String) {
-		chatService.addListener(
-			id,
-			object : ChatListener {
-				override fun onMessageReceived(var1: ApiChannel, var2: ApiMessage) {
-					runBlocking(Dispatchers.IO) { appendNewChatMessage(var2.toModel()) }
-				}
-			}
-		)
-	}
+	override suspend fun addListener(id: String) =
+		chatService.addListener(id, MessageListener(messageDao))
 
 	override suspend fun removeListener(id: String) = chatService.removeListener(id)
 
-	override suspend fun getMessages(channel: Channel, id: String): Flow<List<Message>> {
-		return chatService.getMessages(channel, id).map { messages -> messages.map { it.toModel() } }
+	@OptIn(ExperimentalPagingApi::class)
+	override suspend fun getMessages(channel: Channel) {
+		messages.emit(PagingData.empty())
+
+		return Pager(
+			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT, prefetchDistance = 0),
+			remoteMediator = MessagesRemoteMediator(chatService, messageDao, channel, logger),
+			pagingSourceFactory = { messageDao.getByChannel(channel.id) }
+		)
+			.flow
+			.map { data -> data.map { it.toModel() } }
+			.collect { messages.emit(it) }
 	}
 
 	override suspend fun send(channel: Channel, message: DraftMessage) {
-		if (message.type == MessageType.TEXT) {
-			val newMessage = chatService.send(channel, message).map { it.toModel() }
-			newMessage.collectLatest { appendNewChatMessage(it) }
-		} else {
-			sendFileMessage(channel, message)
-		}
+		val msg =
+			if (message.type == MessageType.TEXT) {
+				chatService.send(channel, message)
+			} else {
+				sendFileMessage(channel, message)
+			}
+		messageDao.upsert(msg.toEntity())
 	}
 
-	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): Flow<Message> {
+	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): ApiMessage {
 		val uploadInfo = chatMediaService.getUploadInfo()
 		val fileMessage =
 			if (uploadInfo.apiUrl.isNotEmpty() && uploadInfo.query != null) {
@@ -76,18 +78,24 @@ constructor(
 						networkMediaUtil.getUploadUrl(uploadInfo),
 						networkMediaUtil.getUploadBody(message.file!!)
 					)
-				message.copy(
+				DraftMessage(
+					channelId = channel.id,
+					author = message.author,
+					type = message.type,
+					mentionType = message.mentionType,
 					fileUrl = fileUpload.secureUrl,
 					fileName = fileUpload.originalFilename,
+					fileMimeType = fileUpload.type,
+					createdAt = message.createdAt,
+					updatedAt = message.updatedAt,
+					status = message.status,
 					data = JSONObject(fileUpload.getDataMap(message.type)).toString()
 				)
 			} else {
 				Timber.e("Upload Info is required for file upload")
 				message
 			}
-		val newMessage = chatService.send(channel, fileMessage).map { it.toModel() }
-		newMessage.collectLatest { appendNewChatMessage(it) }
-		return newMessage
+		return chatService.send(channel, fileMessage)
 	}
 
 	override suspend fun reply(channel: Channel, id: String, message: DraftMessage) {
@@ -95,30 +103,12 @@ constructor(
 	}
 
 	override suspend fun updateMessage(id: String, channelId: String, text: String) {
-		val response = messageService.updateMessage(id, channelId, text)
-		if (response.isSuccessful) {
-			channelChatMessages.update { messages ->
-				val updatedMessage = messages.firstOrNull { it.id == id }?.copy(message = text)
-				if (updatedMessage != null) {
-					messages.toMutableList().apply {
-						this[messages.indexOfFirst { it.id == id }] = updatedMessage
-					}
-				} else messages
-			}
-		}
+		val res = messageService.updateMessage(id, channelId, text)
+		if (res.isSuccessful) messageDao.update(id, text)
 	}
 
 	override suspend fun deleteMessage(message: Message, channel: Channel) {
-		chatService.deleteMessage(channel, message).also {
-			val messages = channelChatMessages.firstOrNull()?.toMutableList() ?: mutableListOf()
-			messages.remove(message)
-			channelChatMessages.tryEmit(messages)
-		}
-	}
-
-	private suspend fun appendNewChatMessage(message: Message) {
-		val messages = channelChatMessages.firstOrNull()?.toMutableList() ?: mutableListOf()
-		messages.add(0, message)
-		channelChatMessages.tryEmit(messages)
+		chatService.deleteMessage(channel, message)
+		messageDao.delete(message.id)
 	}
 }

@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -66,7 +65,7 @@ constructor(
 
 	private fun loadChannels() {
 		ioScope.launch {
-			channelRepository.getDirectChannels().asResult().collectLatest {
+			channelRepository.getDirectChannels().asResult().collect {
 				when (it) {
 					is Result.Success -> {
 						_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Success(it.data)))

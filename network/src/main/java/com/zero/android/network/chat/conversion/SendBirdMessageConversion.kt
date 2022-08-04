@@ -14,7 +14,7 @@ import com.zero.android.network.model.ApiMessageReaction
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-internal fun BaseMessage.toApi(): ApiMessage {
+internal fun BaseMessage.toApi(channelId: String = channelUrl): ApiMessage {
 	val data =
 		if (this is FileMessage && data.isNotEmpty()) {
 			Json { ignoreUnknownKeys = true }.decodeFromString<ApiFileData?>(data)
@@ -23,22 +23,22 @@ internal fun BaseMessage.toApi(): ApiMessage {
 		id = messageId.toString(),
 		type = if (this is FileMessage) data?.type.toMessageType() else customType.toMessageType(),
 		mentionType = mentionType.toType(),
-		channelId = channelUrl ?: "",
+		channelId = channelId,
 		author = sender.toApi(),
 		status = sendingStatus.toType(),
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		message = message,
-		parentMessage = parentMessage?.toApi(),
+		parentMessage = parentMessage?.toApi(channelId),
 		fileUrl = (this as? FileMessage)?.url,
 		fileName = (this as? FileMessage)?.name
 	)
 }
 
-internal fun UserMessage.toApi() =
+internal fun UserMessage.toApi(channelId: String = channelUrl) =
 	ApiMessage(
 		id = messageId.toString(),
-		channelId = channelUrl ?: "",
+		channelId = channelId,
 		author = sender.toApi(),
 		mentions = mentionedUsers.map { it.toApi() },
 		type = customType.toMessageType(),
@@ -47,15 +47,15 @@ internal fun UserMessage.toApi() =
 		updatedAt = updatedAt,
 		status = sendingStatus.toType(),
 		data = data,
-		parentMessage = parentMessage?.toApi(),
+		parentMessage = parentMessage?.toApi(channelId),
 		isMuted = isSilent,
 		message = message
 	)
 
-internal fun FileMessage.toApi() =
+internal fun FileMessage.toApi(channelId: String = channelUrl) =
 	ApiMessage(
 		id = messageId.toString(),
-		channelId = channelUrl ?: "",
+		channelId = channelId,
 		author = sender.toApi(),
 		mentions = mentionedUsers.map { it.toApi() },
 		type = type.toMessageType(),
@@ -64,7 +64,7 @@ internal fun FileMessage.toApi() =
 		updatedAt = updatedAt,
 		status = sendingStatus.toType(),
 		data = data,
-		parentMessage = parentMessage?.toApi(),
+		parentMessage = parentMessage?.toApi(channelId),
 		isMuted = isSilent,
 		fileUrl = url,
 		fileName = name,

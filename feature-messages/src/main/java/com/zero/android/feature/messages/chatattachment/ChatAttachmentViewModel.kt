@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.chatattachment
 
+import androidx.paging.compose.LazyPagingItems
 import com.zero.android.common.extensions.isValidUrl
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.repository.mediaplayer.MediaPlayerRepository
@@ -17,11 +18,11 @@ constructor(private val mediaPlayerRepository: MediaPlayerRepository) : BaseView
 	private val voiceMemoMediaSources = mutableMapOf<String, ChatAttachmentProvider>()
 	private var lastMediaId: String? = null
 
-	fun configure(messages: List<Message>) {
+	fun configure(messages: LazyPagingItems<Message>) {
 		ioScope.launch {
-			messages
+			messages.itemSnapshotList.items
 				.filter { it.type == MessageType.AUDIO }
-				.forEach {
+				.map {
 					if (!voiceMemoMediaSources.containsKey(it.id)) {
 						val mediaSource = ChatAttachmentProvider(it.fileName, mediaPlayerRepository)
 						voiceMemoMediaSources[it.id] = mediaSource

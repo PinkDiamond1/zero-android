@@ -14,7 +14,7 @@ import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatService
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -32,10 +32,9 @@ internal class SendBirdChatService(
 		SendBird.removeChannelHandler(channelId)
 	}
 
-	override suspend fun getMessages(channel: Channel, timestamp: Long) =
+	override suspend fun getMessages(channel: Channel, loadSize: Int) =
 		callbackFlowWithAwait<List<ApiMessage>> {
-			val params = messages.listParams(reverse = true)
-			getChannel(channel).getMessagesByTimestamp(timestamp, params) { messages, e ->
+			messages.getMessages(getChannel(channel), loadSize) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					throw e
@@ -45,10 +44,9 @@ internal class SendBirdChatService(
 			}
 		}
 
-	override suspend fun getMessages(channel: Channel, id: String) =
-		callbackFlow<List<ApiMessage>> {
-			val params = messages.listParams(reverse = true)
-			getChannel(channel).getMessagesByMessageId(id.toLong(), params) { messages, e ->
+	override suspend fun getMessages(channel: Channel, before: String) =
+		callbackFlowWithAwait<List<ApiMessage>> {
+			messages.getMessages(getChannel(channel), before) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					throw e
@@ -58,27 +56,28 @@ internal class SendBirdChatService(
 			}
 		}
 
-	override suspend fun send(channel: Channel, message: DraftMessage) = callbackFlowWithAwait {
-		val params = message.toParams()
-		val sbChannel = getChannel(channel)
-		if (params is FileMessageParams) {
-			sbChannel.sendFileMessage(params) { fileMessage, e ->
-				if (e != null) {
-					logger.e("Failed to send file message", e)
-					throw e
+	override suspend fun send(channel: Channel, message: DraftMessage) =
+		suspendCancellableCoroutine<ApiMessage> { coroutine ->
+			val params = message.toParams()
+			val sbChannel = runBlocking { getChannel(channel) }
+			if (params is FileMessageParams) {
+				sbChannel.sendFileMessage(params) { fileMessage, e ->
+					if (e != null) {
+						logger.e("Failed to send file message", e)
+						coroutine.resumeWithException(e)
+					}
+					coroutine.resume(fileMessage.toApi())
 				}
-				trySend(fileMessage.toApi())
-			}
-		} else if (params is UserMessageParams) {
-			sbChannel.sendUserMessage(params) { userMessage, e ->
-				if (e != null) {
-					logger.e("Failed to send text message", e)
-					throw e
+			} else if (params is UserMessageParams) {
+				sbChannel.sendUserMessage(params) { userMessage, e ->
+					if (e != null) {
+						logger.e("Failed to send text message", e)
+						coroutine.resumeWithException(e)
+					}
+					coroutine.resume(userMessage.toApi())
 				}
-				trySend(userMessage.toApi())
 			}
 		}
-	}
 
 	override suspend fun reply(channel: Channel, id: String, message: DraftMessage) =
 		send(channel, message.apply { parentMessageId = id })

@@ -13,17 +13,17 @@ object MessageActionStateHandler {
 
 	private val _editableMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val editableMessage: StateFlow<Message?> = _editableMessage
-    private val _selectedMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
+	private val _selectedMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val selectedMessage: StateFlow<Message?> = _selectedMessage
-    private val _replyToMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
+	private val _replyToMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val replyToMessage: StateFlow<Message?> = _replyToMessage
 
-    private val _mentionUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val mentionUser: StateFlow<Boolean> = _mentionUser
-    val messageLastText = MutableStateFlow("")
-    val messageUpdatedText = MutableStateFlow("")
+	private val _mentionUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
+	val mentionUser: StateFlow<Boolean> = _mentionUser
+	val messageLastText = MutableStateFlow("")
+	val messageUpdatedText = MutableStateFlow("")
 
-    val isActionModeStarted: Boolean
+	val isActionModeStarted: Boolean
 		get() = _selectedMessage.value != null
 
 	fun setSelectedMessage(msg: Message) {
@@ -53,47 +53,47 @@ object MessageActionStateHandler {
 	fun closeActionMode() {
 		ioScope.launch {
 			_selectedMessage.emit(null)
-            _editableMessage.emit(null)
-            _replyToMessage.emit(null)
+			_editableMessage.emit(null)
+			_replyToMessage.emit(null)
 		}
 	}
 
 	fun reset() {
-        ioScope.launch {
-            _mentionUser.emit(false)
-            messageLastText.emit("")
-            messageUpdatedText.emit("")
-        }
-        closeActionMode()
-    }
+		ioScope.launch {
+			_mentionUser.emit(false)
+			messageLastText.emit("")
+			messageUpdatedText.emit("")
+		}
+		closeActionMode()
+	}
 
-    fun onMessageTextChanged(message: String) {
-        ioScope.launch {
-            messageLastText.emit(message)
-            val startMention =  message.lastOrNull() == '@'
-            val isMentionAlreadyStarted = _mentionUser.value
-            if (isMentionAlreadyStarted) {
-                val endLastMention = startMention || message.lastOrNull() == ' ' || message.isEmpty()
-                if (endLastMention) {
-                    _mentionUser.emit(false)
-                    _mentionUser.emit(startMention)
-                }
-            } else {
-                _mentionUser.emit(startMention)
-            }
-        }
-    }
+	fun onMessageTextChanged(message: String) {
+		ioScope.launch {
+			messageLastText.emit(message)
+			val startMention = message.lastOrNull() == '@'
+			val isMentionAlreadyStarted = _mentionUser.value
+			if (isMentionAlreadyStarted) {
+				val endLastMention = startMention || message.lastOrNull() == ' ' || message.isEmpty()
+				if (endLastMention) {
+					_mentionUser.emit(false)
+					_mentionUser.emit(startMention)
+				}
+			} else {
+				_mentionUser.emit(startMention)
+			}
+		}
+	}
 
-    fun onUserMentionSelected(member: Member) {
-        ioScope.launch {
-            val lastMessage = messageLastText.value
-            val newMessageText = buildString {
-                val indexOfLastMention = lastMessage.indexOfLast { it == '@' }
-                append(lastMessage.substring(0, indexOfLastMention + 1))
-                append("${member.name?.trim()?.replace(" ","_")}")
-            }
-            messageUpdatedText.emit(newMessageText)
-            _mentionUser.emit(false)
-        }
-    }
+	fun onUserMentionSelected(member: Member) {
+		ioScope.launch {
+			val lastMessage = messageLastText.value
+			val newMessageText = buildString {
+				val indexOfLastMention = lastMessage.indexOfLast { it == '@' }
+				append(lastMessage.substring(0, indexOfLastMention + 1))
+				append("${member.name?.trim()?.replace(" ","_")}")
+			}
+			messageUpdatedText.emit(newMessageText)
+			_mentionUser.emit(false)
+		}
+	}
 }

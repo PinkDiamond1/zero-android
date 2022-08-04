@@ -20,49 +20,42 @@ import com.zero.android.ui.theme.AppTheme
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun MentionUsersList(
-    membersList: List<Member>,
-    onMemberSelected: (Member) -> Unit
-) {
-    var members by remember { mutableStateOf(membersList) }
-    LaunchedEffect(Unit) {
-        MessageActionStateHandler.messageLastText.collectLatest { filter ->
-            val lastMentionFilter = filter.split("@").lastOrNull()?.split(" ")?.firstOrNull()?.trim() ?: ""
-            members = if (lastMentionFilter.isNotEmpty()) {
-                membersList.filter { it.name?.startsWith(lastMentionFilter, true) == true }
-            } else {
-                membersList
-            }
-        }
-    }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = 150.dp)
-    ) {
-        items(members) { member ->
-            Column(modifier = Modifier.clickable { onMemberSelected(member) }) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SmallCircularImage(
-                        imageUrl = member.profileImage,
-                        placeHolder = R.drawable.ic_user_profile_placeholder
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = member.name ?: "",
-                        color = AppTheme.colors.colorTextPrimary,
-                        style = MaterialTheme.typography.bodyLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Divider()
-            }
-        }
-    }
+fun MentionUsersList(membersList: List<Member>, onMemberSelected: (Member) -> Unit) {
+	var members by remember { mutableStateOf(membersList) }
+	LaunchedEffect(Unit) {
+		MessageActionStateHandler.messageLastText.collectLatest { filter ->
+			val lastMentionFilter =
+				filter.split("@").lastOrNull()?.split(" ")?.firstOrNull()?.trim() ?: ""
+			members =
+				if (lastMentionFilter.isNotEmpty()) {
+					membersList.filter { it.name?.startsWith(lastMentionFilter, true) == true }
+				} else {
+					membersList
+				}
+		}
+	}
+	LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)) {
+		items(members) { member ->
+			Column(modifier = Modifier.clickable { onMemberSelected(member) }) {
+				Row(
+					modifier = Modifier.fillMaxWidth().padding(12.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					SmallCircularImage(
+						imageUrl = member.profileImage,
+						placeHolder = R.drawable.ic_user_profile_placeholder
+					)
+					Spacer(modifier = Modifier.size(8.dp))
+					Text(
+						text = member.name ?: "",
+						color = AppTheme.colors.colorTextPrimary,
+						style = MaterialTheme.typography.bodyLarge,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis
+					)
+				}
+				Divider()
+			}
+		}
+	}
 }

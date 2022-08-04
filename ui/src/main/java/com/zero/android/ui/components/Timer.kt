@@ -20,7 +20,11 @@ fun Timer(modifier: Modifier = Modifier, fontSize: TextUnit = 14.sp) {
 			ticks++
 		}
 	}
-	Text(text = ticks.times(1000).convertDurationToString(), modifier = modifier, style = MaterialTheme.typography.customTextStyle(fontSize))
+	Text(
+		text = ticks.times(1000).convertDurationToString(),
+		modifier = modifier,
+		style = MaterialTheme.typography.customTextStyle(fontSize)
+	)
 }
 
 @Composable
@@ -32,5 +36,9 @@ fun ReverseTimer(modifier: Modifier = Modifier, startTime: Int, fontSize: TextUn
 			ticks--
 		}
 	}
-	Text(text = ticks.times(1000).convertDurationToString(), modifier = modifier, style = MaterialTheme.typography.customTextStyle(fontSize))
+	Text(
+		text = ticks.times(1000).convertDurationToString(),
+		modifier = modifier,
+		style = MaterialTheme.typography.customTextStyle(fontSize)
+	)
 }

@@ -13,9 +13,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MediaPlayerRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
-): MediaPlayerRepository {
+class MediaPlayerRepositoryImpl
+@Inject
+constructor(@ApplicationContext private val context: Context) : MediaPlayerRepository {
 	override val baseFilePath by lazy { "${context.externalCacheDir?.absolutePath ?: ""}/Memos" }
 
 	init {

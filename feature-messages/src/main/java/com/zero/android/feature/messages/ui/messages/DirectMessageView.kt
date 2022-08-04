@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
-import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.chatattachment.ChatAttachmentViewModel
+import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.components.ChatBubbleSpacing
 import com.zero.android.feature.messages.ui.components.MessageContent
 import com.zero.android.feature.messages.ui.components.ReplyMessage
@@ -32,13 +32,13 @@ import com.zero.android.ui.theme.AppTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DirectMessage(
-    msg: Message,
-    isUserMe: Boolean,
-    isSameDay: Boolean,
-    isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean,
-    chatAttachmentViewModel: ChatAttachmentViewModel,
-    onAuthorClick: (Member) -> Unit
+	msg: Message,
+	isUserMe: Boolean,
+	isSameDay: Boolean,
+	isFirstMessageByAuthor: Boolean,
+	isLastMessageByAuthor: Boolean,
+	chatAttachmentViewModel: ChatAttachmentViewModel,
+	onAuthorClick: (Member) -> Unit
 ) {
 	val currentSelectedMessage: Message? by MessageActionStateHandler.selectedMessage.collectAsState()
 	val modifier = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
@@ -87,14 +87,14 @@ private val ChatDirectSame = RoundedCornerShape(8.dp, 8.dp, 8.dp, 8.dp)
 
 @Composable
 fun DMAuthorAndTextMessage(
-    modifier: Modifier = Modifier,
-    message: Message,
-    isUserMe: Boolean,
-    isSameDay: Boolean,
-    isFirstMessageByAuthor: Boolean,
-    isLastMessageByAuthor: Boolean,
-    chatAttachmentViewModel: ChatAttachmentViewModel,
-    authorClicked: (Member) -> Unit
+	modifier: Modifier = Modifier,
+	message: Message,
+	isUserMe: Boolean,
+	isSameDay: Boolean,
+	isFirstMessageByAuthor: Boolean,
+	isLastMessageByAuthor: Boolean,
+	chatAttachmentViewModel: ChatAttachmentViewModel,
+	authorClicked: (Member) -> Unit
 ) {
 	val backgroundColorsList =
 		if (isUserMe) {
@@ -142,8 +142,9 @@ fun DMAuthorAndTextMessage(
 						text = messageDate.format("hh:mm aa"),
 						style = MaterialTheme.typography.bodySmall,
 						modifier = Modifier.align(Alignment.End),
-						color = if (isUserMe) AppTheme.colors.colorTextPrimary
-                        else AppTheme.colors.colorTextSecondary
+						color =
+						if (isUserMe) AppTheme.colors.colorTextPrimary
+						else AppTheme.colors.colorTextSecondary
 					)
 				}
 			}

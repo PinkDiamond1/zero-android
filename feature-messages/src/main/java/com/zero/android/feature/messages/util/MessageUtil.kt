@@ -20,38 +20,39 @@ object MessageUtil {
 			createdAt = Calendar.getInstance().timeInMillis,
 			updatedAt = Calendar.getInstance().timeInMillis,
 			status = MessageStatus.SUCCEEDED,
-            mentions = getMentionedUsers(msg, channelMembers).map { it.id }
+			mentions = getMentionedUsers(msg, channelMembers).map { it.id }
 		)
 
-    private fun getMessageMentions(msg: String): Sequence<String> {
-        val regex = Regex("(@\\w+)")
-        return regex.findAll(msg).map { it.value }
-    }
+	private fun getMessageMentions(msg: String): Sequence<String> {
+		val regex = Regex("(@\\w+)")
+		return regex.findAll(msg).map { it.value }
+	}
 
-    fun prepareMessage(msg: String, channelMembers: List<Member>): String {
-        var updatedMessage = msg
-        val matches = getMessageMentions(msg)
-        matches.distinct().forEach { mention ->
-            val mentionedUser: String = mention.replace("_"," ").trim().drop(1)
-            val member = channelMembers.firstOrNull { mentionedUser.equals(it.name?.trim(), true) }
-            member?.let {
-                val updatedMention = "@[${mention.drop(1)}]"
-                updatedMessage = updatedMessage.replace(mention, "$updatedMention(user:${it.id})")
-            }
-        }
-        return updatedMessage
-    }
+	fun prepareMessage(msg: String, channelMembers: List<Member>): String {
+		var updatedMessage = msg
+		val matches = getMessageMentions(msg)
+		matches.distinct().forEach { mention ->
+			val mentionedUser: String = mention.replace("_", " ").trim().drop(1)
+			val member = channelMembers.firstOrNull { mentionedUser.equals(it.name?.trim(), true) }
+			member?.let {
+				val updatedMention = "@[${mention.drop(1)}]"
+				updatedMessage = updatedMessage.replace(mention, "$updatedMention(user:${it.id})")
+			}
+		}
+		return updatedMessage
+	}
 
-    fun getMentionedUsers(msg: String, channelMembers: List<Member>): List<Member> {
-        val matches = getMessageMentions(msg)
-        val messageMentions = matches.map { it.replace("_"," ").trim().drop(1) }.toList()
-        val members = channelMembers.filter { member ->
-            messageMentions.any { it.equals(member.name?.trim(), true) }
-        }
-        return members
-    }
+	fun getMentionedUsers(msg: String, channelMembers: List<Member>): List<Member> {
+		val matches = getMessageMentions(msg)
+		val messageMentions = matches.map { it.replace("_", " ").trim().drop(1) }.toList()
+		val members =
+			channelMembers.filter { member ->
+				messageMentions.any { it.equals(member.name?.trim(), true) }
+			}
+		return members
+	}
 
-    fun newFileMessage(file: File, authorId: String, type: MessageType) =
+	fun newFileMessage(file: File, authorId: String, type: MessageType) =
 		DraftMessage(
 			channelId = "",
 			author = Member(authorId),

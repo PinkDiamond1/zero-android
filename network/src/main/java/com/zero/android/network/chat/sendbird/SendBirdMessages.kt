@@ -1,34 +1,28 @@
 package com.zero.android.network.chat.sendbird
 
-import com.sendbird.android.BaseMessage
-import com.sendbird.android.FileMessage
-import com.sendbird.android.MessageListParams
-import com.sendbird.android.MessagePayloadFilter
-import com.sendbird.android.ReplyTypeFilter
-import com.sendbird.android.UserMessage
+import com.sendbird.android.*
 import com.zero.android.common.system.Logger
+import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toParams
-import com.zero.android.network.util.MESSAGES_PAGE_LIMIT
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
+import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
 
-internal class SendBirdMessages(private val logger: Logger) {
+internal class SendBirdMessages @Inject constructor(private val logger: Logger) {
 
-	fun listParams(
-		reverse: Boolean = true,
-		limit: Int = MESSAGES_PAGE_LIMIT,
-		replyFilter: ReplyTypeFilter = ReplyTypeFilter.ALL
-	) =
+	private val params =
 		MessageListParams().apply {
-			previousResultSize = limit
-			nextResultSize = limit
+			previousResultSize = MESSAGES_PAGE_LIMIT
+			nextResultSize = 0
 			isInclusive = true
-			setReverse(reverse)
-			replyTypeFilter = replyFilter
+			setReverse(true)
+			setIncludeReactions(true)
+			isInclusive = false
+			replyTypeFilter = ReplyTypeFilter.ALL
 			messagePayloadFilter =
 				MessagePayloadFilter.Builder()
 					.setIncludeParentMessageInfo(true)
@@ -36,6 +30,33 @@ internal class SendBirdMessages(private val logger: Logger) {
 					.build()
 		}
 
+	fun getMessages(
+		channel: BaseChannel,
+		loadSize: Int = 1,
+		callback: PreviousMessageListQuery.MessageListQueryResult
+	) {
+		val query =
+			channel.createPreviousMessageListQuery().apply {
+				limit = MESSAGES_PAGE_LIMIT * loadSize
+				setReverse(params.shouldReverse())
+				setIncludeReactions(params.shouldIncludeReactions())
+				replyTypeFilter = params.replyTypeFilter
+				messagePayloadFilter = params.messagePayloadFilter
+			}
+
+		if (query.hasMore()) query.load(query.limit, query.shouldReverse(), callback)
+		else callback.onResult(null, null)
+	}
+
+	fun getMessages(
+		channel: BaseChannel,
+		beforeId: String,
+		callback: BaseChannel.GetMessagesHandler
+	) {
+		channel.getMessagesByMessageId(beforeId.toLong(), params, callback)
+	}
+
+	@OptIn(ExperimentalCoroutinesApi::class)
 	suspend fun getMessage(message: Message) =
 		suspendCancellableCoroutine<BaseMessage> { coroutine ->
 			if (message.type == MessageType.TEXT) {
@@ -44,7 +65,7 @@ internal class SendBirdMessages(private val logger: Logger) {
 						logger.e(e)
 						coroutine.resumeWithException(e)
 					} else {
-						coroutine.resume(baseMessage)
+						coroutine.resume(baseMessage) { coroutine.resumeWithException(it) }
 					}
 				}
 			} else {
@@ -53,7 +74,7 @@ internal class SendBirdMessages(private val logger: Logger) {
 						logger.e(e)
 						coroutine.resumeWithException(e)
 					} else {
-						coroutine.resume(baseMessage)
+						coroutine.resume(baseMessage) { coroutine.resumeWithException(it) }
 					}
 				}
 			}

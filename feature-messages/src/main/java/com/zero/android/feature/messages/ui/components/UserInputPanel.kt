@@ -70,16 +70,16 @@ fun UserInputPanel(
 	if (currentInputSelector != InputSelector.TEXT) {
 		BackHandler(onBack = dismissKeyboard)
 	}
-    val updatedMessage = prepareInitialMessage(initialText)
+	val updatedMessage = prepareInitialMessage(initialText)
 	var textState by remember { mutableStateOf(TextFieldValue(updatedMessage)) }
-    LaunchedEffect(Unit) {
-        MessageActionStateHandler.messageUpdatedText.collectLatest {
-            if (it.isNotEmpty()) {
-                textState = TextFieldValue(it)
-                MessageActionStateHandler.messageUpdatedText.emit("")
-            }
-        }
-    }
+	LaunchedEffect(Unit) {
+		MessageActionStateHandler.messageUpdatedText.collectLatest {
+			if (it.isNotEmpty()) {
+				textState = TextFieldValue(it)
+				MessageActionStateHandler.messageUpdatedText.emit("")
+			}
+		}
+	}
 
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
@@ -139,14 +139,14 @@ fun UserInputPanel(
 }
 
 private fun prepareInitialMessage(initialMessage: String): String {
-    val regex = Regex("@\\[(.*?)\\]\\(user\\:[-_a-z0-9]+\\)")
-    val matches = regex.findAll(initialMessage).map { it.value }
-    var updatedMessage = initialMessage
-    matches.distinct().forEach {
-        val userName = it.substringBefore("]").replace("[","")
-        updatedMessage = updatedMessage.replace(it, userName)
-    }
-    return updatedMessage
+	val regex = Regex("@\\[(.*?)\\]\\(user\\:[-_a-z0-9]+\\)")
+	val matches = regex.findAll(initialMessage).map { it.value }
+	var updatedMessage = initialMessage
+	matches.distinct().forEach {
+		val userName = it.substringBefore("]").replace("[", "")
+		updatedMessage = updatedMessage.replace(it, userName)
+	}
+	return updatedMessage
 }
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
@@ -168,17 +168,17 @@ private fun UserInputText(
 		CustomTextField(
 			value = textFieldValue.text,
 			onValueChange = {
-                onTextChanged(TextFieldValue(it))
-                MessageActionStateHandler.onMessageTextChanged(it)
-            },
+				onTextChanged(TextFieldValue(it))
+				MessageActionStateHandler.onMessageTextChanged(it)
+			},
 			placeholderText = stringResource(R.string.write_your_message),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
-			placeHolderTextStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
-			modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .align(Alignment.CenterStart)
-                .onFocusChanged { state ->
+			textStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
+			placeHolderTextStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+			modifier =
+			Modifier.fillMaxWidth().padding(12.dp).align(Alignment.CenterStart).onFocusChanged {
+					state ->
 				if (lastFocusState != state.isFocused) {
 					onTextFieldFocused(state.isFocused)
 				}

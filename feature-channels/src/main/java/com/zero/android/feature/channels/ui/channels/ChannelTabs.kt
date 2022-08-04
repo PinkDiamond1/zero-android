@@ -66,13 +66,15 @@ fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
 				color = AppTheme.colors.colorTextPrimary,
 				modifier = Modifier.align(Alignment.CenterVertically),
 				fontWeight = FontWeight.Medium,
-				style = MaterialTheme.typography.displayLarge.copy(
-                    shadow = Shadow(
-                        color = AppTheme.colors.glow,
-                        offset = Offset(2f, 2f),
-                        blurRadius = 50f
-                    )
-                )
+				style =
+				MaterialTheme.typography.displayLarge.copy(
+					shadow =
+					Shadow(
+						color = AppTheme.colors.glow,
+						offset = Offset(2f, 2f),
+						blurRadius = 50f
+					)
+				)
 			)
 		} else {
 			Text(

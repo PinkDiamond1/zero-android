@@ -100,14 +100,16 @@ fun AppDrawerHeader(
 			) {
 				Text(
 					text = stringResource(R.string.invite_members),
-					style = MaterialTheme.typography.displayLarge.copy(
-                        shadow = Shadow(
-                            color = MaterialTheme.colorScheme.outline,
-                            offset = Offset(2f, 2f),
-                            blurRadius = 50f
-                        )
-                    ),
-					color = AppTheme.colors.colorTextPrimary,
+					style =
+					MaterialTheme.typography.displayLarge.copy(
+						shadow =
+						Shadow(
+							color = MaterialTheme.colorScheme.outline,
+							offset = Offset(2f, 2f),
+							blurRadius = 50f
+						)
+					),
+					color = AppTheme.colors.colorTextPrimary
 				)
 			}
 		}

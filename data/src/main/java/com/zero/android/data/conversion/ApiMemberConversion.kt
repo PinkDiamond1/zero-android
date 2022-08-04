@@ -8,7 +8,7 @@ internal fun ApiMember.toModel() =
 	Member(
 		id = id,
 		name = nickname,
-		profileUrl = profileUrl,
+		profileJson = profileJson,
 		profileImage = profileImage,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,
@@ -25,7 +25,7 @@ internal fun ApiMember.toEntity() =
 	MemberEntity(
 		id = id,
 		name = nickname,
-		profileUrl = profileUrl,
+		profileJson = profileJson,
 		profileImage = profileImage,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,

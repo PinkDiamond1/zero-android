@@ -20,9 +20,9 @@ import com.zero.android.ui.theme.White
 
 @Composable
 fun ColumnScope.MessageContent(
-    message: Message,
-    chatAttachmentViewModel: ChatAttachmentViewModel,
-    authorClicked: (Member) -> Unit
+	message: Message,
+	chatAttachmentViewModel: ChatAttachmentViewModel,
+	authorClicked: (Member) -> Unit
 ) {
 	when (message.type) {
 		MessageType.IMAGE ->
@@ -54,7 +54,10 @@ fun ColumnScope.ChatBubbleSpacing(isFirstMessageByAuthor: Boolean) {
 private fun ClickableMessage(message: Message, authorClicked: (Member) -> Unit) {
 	val uriHandler = LocalUriHandler.current
 	val styledMessage =
-		(message.message ?: "").messageFormatter(annotationColor = AppTheme.colors.glow, annotationFontWeight = FontWeight.Bold)
+		(message.message ?: "").messageFormatter(
+			annotationColor = AppTheme.colors.glow,
+			annotationFontWeight = FontWeight.Bold
+		)
 	ClickableText(
 		text = styledMessage,
 		style = MaterialTheme.typography.bodyLarge.copy(color = White),

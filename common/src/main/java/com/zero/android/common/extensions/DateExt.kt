@@ -3,9 +3,7 @@ package com.zero.android.common.extensions
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun Long.toDate(): Date = Calendar.getInstance().apply {
-    timeInMillis = this@toDate
-}.time
+fun Long.toDate(): Date = Calendar.getInstance().apply { timeInMillis = this@toDate }.time
 
 fun Date.toMessageDateFormat(): String {
 	val currentCalendar = Calendar.getInstance()
