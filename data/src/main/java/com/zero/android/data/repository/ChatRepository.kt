@@ -5,11 +5,10 @@ import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface ChatRepository {
 
-	val channelChatMessages: MutableStateFlow<PagingData<Message>>
+	val messages: Flow<PagingData<Message>>
 
 	suspend fun getMessages(channel: Channel): Flow<PagingData<Message>>
 

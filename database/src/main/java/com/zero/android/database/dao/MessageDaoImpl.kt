@@ -12,7 +12,7 @@ import com.zero.android.database.model.MessageWithRefs
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class MessageDaoInterface : BaseDao<MessageEntity>() {
+abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 
 	@Transaction
 	@Query("SELECT * FROM messages WHERE id = :id")
@@ -41,6 +41,9 @@ abstract class MessageDaoInterface : BaseDao<MessageEntity>() {
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun insert(vararg refs: MessageMentionCrossRef)
+
+	@Query("UPDATE messages SET message = :message WHERE id = :id")
+	abstract suspend fun update(id: String, message: String?)
 
 	@Query("DELETE FROM messages WHERE id = :id")
 	abstract suspend fun delete(id: String)

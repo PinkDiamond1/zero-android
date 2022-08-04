@@ -6,13 +6,15 @@ import javax.inject.Inject
 
 class MessageDao
 @Inject
-constructor(private val messageDao: MessageDaoInterface, private val memberDao: MemberDao) {
+constructor(private val messageDao: MessageDaoImpl, private val memberDao: MemberDao) {
 
 	fun get(id: String) = messageDao.get(id)
 
 	fun getByChannel(channelId: String) = messageDao.getByChannel(channelId)
 
 	suspend fun upsert(vararg data: MessageWithRefs) = messageDao.upsert(memberDao, *data)
+
+	suspend fun update(id: String, text: String) = messageDao.update(id, text)
 
 	suspend fun delete(id: String) = messageDao.delete(id)
 

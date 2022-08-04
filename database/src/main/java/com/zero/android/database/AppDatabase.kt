@@ -7,10 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zero.android.database.converter.DateConverters
 import com.zero.android.database.converter.ListConverters
-import com.zero.android.database.dao.DirectChannelDaoInterface
-import com.zero.android.database.dao.GroupChannelDaoInterface
+import com.zero.android.database.dao.DirectChannelDaoImpl
+import com.zero.android.database.dao.GroupChannelDaoImpl
 import com.zero.android.database.dao.MemberDao
-import com.zero.android.database.dao.MessageDaoInterface
+import com.zero.android.database.dao.MessageDaoImpl
 import com.zero.android.database.dao.NetworkDao
 import com.zero.android.database.dao.ProfileDao
 import com.zero.android.database.dao.UserDao
@@ -68,9 +68,9 @@ abstract class AppDatabase : RoomDatabase() {
 
 	abstract fun networkDao(): NetworkDao
 
-	abstract fun directChannelDao(): DirectChannelDaoInterface
+	abstract fun directChannelDao(): DirectChannelDaoImpl
 
-	abstract fun groupChannelDao(): GroupChannelDaoInterface
+	abstract fun groupChannelDao(): GroupChannelDaoImpl
 
-	abstract fun messageDao(): MessageDaoInterface
+	abstract fun messageDao(): MessageDaoImpl
 }

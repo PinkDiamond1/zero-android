@@ -1,17 +1,21 @@
 package com.zero.android.data.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.map
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toModel
-import com.zero.android.data.repository.chat.MessagePagingSource
+import com.zero.android.data.repository.chat.MessageListener
+import com.zero.android.data.repository.chat.MessagesRemoteMediator
+import com.zero.android.database.dao.ChannelDao
+import com.zero.android.database.dao.MessageDao
+import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
-import com.zero.android.network.chat.ChatListener
-import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
@@ -31,29 +35,15 @@ constructor(
 	private val chatService: ChatService,
 	private val messageService: MessageService,
 	private val chatMediaService: ChatMediaService,
-	private val networkMediaUtil: NetworkMediaUtil
+	private val networkMediaUtil: NetworkMediaUtil,
+	private val messageDao: MessageDao,
+	private val channelDao: ChannelDao
 ) : ChatRepository {
 
-	override val channelChatMessages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
+	override val messages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
 
-	private var chatChannel: Channel? = null
-	private var messagePaging: MessagePagingSource? = null
-	private val messageListener =
-		object : ChatListener {
-			override fun onMessageReceived(channel: ApiChannel, message: ApiMessage) {
-				messagePaging?.invalidate()
-			}
-
-			override fun onMessageDeleted(channel: ApiChannel, msgId: String) {
-				messagePaging?.invalidate()
-			}
-
-			override fun onMessageUpdated(channel: ApiChannel, message: ApiMessage) {
-				messagePaging?.invalidate()
-			}
-		}
-
-	override suspend fun addListener(id: String) = chatService.addListener(id, messageListener)
+	override suspend fun addListener(id: String) =
+		chatService.addListener(id, MessageListener(messageDao))
 
 	override suspend fun removeListener(id: String) = chatService.removeListener(id)
 
@@ -63,16 +53,18 @@ constructor(
 		}
 	}
 
+	@OptIn(ExperimentalPagingApi::class)
 	override suspend fun getMessages(channel: Channel): Flow<PagingData<Message>> {
-		messagePaging = MessagePagingSource(chatService, channel)
-		chatService.removeListener(channel.id)
-		channelChatMessages.emit(PagingData.empty())
+		messages.emit(PagingData.empty())
 
 		return Pager(
 			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT),
-			pagingSourceFactory = { messagePaging!! }
+			remoteMediator = MessagesRemoteMediator(chatService, messageDao, channel),
+			pagingSourceFactory = { messageDao.getByChannel(channel.id) }
 		)
-			.flow.apply { collect(channelChatMessages) }
+			.flow
+			.map { data -> data.map { it.toModel() } }
+			.apply { collect(messages) }
 	}
 
 	override suspend fun send(channel: Channel, message: DraftMessage) {
@@ -81,7 +73,6 @@ constructor(
 		} else {
 			sendFileMessage(channel, message).singleOrNull()
 		}
-		messagePaging?.invalidate()
 	}
 
 	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): Flow<ApiMessage> {
@@ -118,11 +109,12 @@ constructor(
 	}
 
 	override suspend fun updateMessage(id: String, channelId: String, text: String) {
-		val response = messageService.updateMessage(id, channelId, text)
-		if (response.isSuccessful) messagePaging?.invalidate()
+		val res = messageService.updateMessage(id, channelId, text)
+		if (res.isSuccessful) messageDao.update(id, text)
 	}
 
 	override suspend fun deleteMessage(message: Message, channel: Channel) {
-		chatService.deleteMessage(channel, message).also { messagePaging?.invalidate() }
+		chatService.deleteMessage(channel, message)
+		messageDao.delete(message.id)
 	}
 }

@@ -29,7 +29,6 @@ internal class SendBirdChatService(
 
 	override suspend fun removeListener(channelId: String) {
 		SendBird.removeChannelHandler(channelId)
-		messages.reset()
 	}
 
 	override suspend fun getMessages(channel: Channel) =

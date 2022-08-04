@@ -2,7 +2,6 @@ package com.zero.android.feature.messages.ui.messages
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
@@ -15,7 +14,12 @@ import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -37,7 +41,7 @@ constructor(
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 
-	val messages: Flow<PagingData<Message>> = chatRepository.channelChatMessages
+	val messages = chatRepository.messages
 	private val _messagesResult = messages.asResult()
 
 	val uiState: StateFlow<ChatScreenUiState> =
@@ -62,9 +66,10 @@ constructor(
 				} else {
 					channelRepository.getDirectChannel(channelId)
 				}
-			request.asResult().collectLatest {
-				_channel.emit(it)
-				if (it is Result.Success) configureChat(it.data)
+
+			request.firstOrNull()?.let { channel ->
+				_channel.emit(Result.Success(channel))
+				configureChat(channel)
 			}
 		}
 	}

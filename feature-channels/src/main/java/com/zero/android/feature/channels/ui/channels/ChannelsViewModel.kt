@@ -13,7 +13,12 @@ import com.zero.android.models.GroupChannel
 import com.zero.android.models.Network
 import com.zero.android.models.getTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -114,13 +119,13 @@ constructor(
 
 	private fun loadCategories() {
 		ioScope.launch {
-			networkRepository.getCategories(network.id).asResult().collectLatest { _categories.emit(it) }
+			networkRepository.getCategories(network.id).asResult().collect { _categories.emit(it) }
 		}
 	}
 
 	private fun loadChannels() {
 		ioScope.launch {
-			channelRepository.getGroupChannels(network.id).asResult().collectLatest { _channels.emit(it) }
+			channelRepository.getGroupChannels(network.id).asResult().collect { _channels.emit(it) }
 		}
 	}
 }

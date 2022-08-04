@@ -33,8 +33,8 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 					.build()
 		}
 
-	private fun init(channel: BaseChannel, refresh: Boolean = false) {
-		if (!refresh && this.channel?.url == channel.url) return
+	private fun init(channel: BaseChannel) {
+		if (this.channel?.url == channel.url) return
 		this.channel = channel
 
 		query =
@@ -45,10 +45,6 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 				replyTypeFilter = params.replyTypeFilter
 				messagePayloadFilter = params.messagePayloadFilter
 			}
-	}
-
-	fun reset() {
-		this.channel = null
 	}
 
 	fun getMessages(channel: BaseChannel, callback: PreviousMessageListQuery.MessageListQueryResult) {

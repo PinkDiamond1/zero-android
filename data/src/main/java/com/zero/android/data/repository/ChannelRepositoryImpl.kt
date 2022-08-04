@@ -64,7 +64,7 @@ constructor(private val channelDao: ChannelDao, private val channelService: Chan
 				channelDao
 					.getGroupChannel(id)
 					.mapNotNull { channel -> channel?.toModel() }
-					.collectLatest { trySend(it) }
+					.collect { trySend(it) }
 			}
 		launch {
 			channelService.getChannel(id, type = ChannelType.GROUP).map {

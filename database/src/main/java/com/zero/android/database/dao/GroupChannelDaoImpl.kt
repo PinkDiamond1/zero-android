@@ -9,7 +9,7 @@ import com.zero.android.database.model.GroupChannelWithRefs
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class GroupChannelDaoInterface : ChannelDaoInterface() {
+abstract class GroupChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId")

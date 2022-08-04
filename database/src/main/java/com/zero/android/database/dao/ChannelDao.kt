@@ -8,8 +8,8 @@ import javax.inject.Inject
 class ChannelDao
 @Inject
 constructor(
-	private val directChannelDao: DirectChannelDaoInterface,
-	private val groupChannelDao: GroupChannelDaoInterface,
+	private val directChannelDao: DirectChannelDaoImpl,
+	private val groupChannelDao: GroupChannelDaoImpl,
 	private val memberDao: MemberDao,
 	private val messageDao: MessageDao
 ) {
