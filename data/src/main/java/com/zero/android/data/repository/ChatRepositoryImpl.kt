@@ -78,11 +78,11 @@ constructor(
 						networkMediaUtil.getUploadUrl(uploadInfo),
 						networkMediaUtil.getUploadBody(message.file!!)
 					)
-                message.copy(
-                    fileUrl = fileUpload.secureUrl,
-                    fileName = fileUpload.originalFilename,
-                    data = JSONObject(fileUpload.getDataMap(message.type)).toString()
-                )
+				message.copy(
+					fileUrl = fileUpload.secureUrl,
+					fileName = fileUpload.originalFilename,
+					data = JSONObject(fileUpload.getDataMap(message.type)).toString()
+				)
 			} else {
 				Timber.e("Upload Info is required for file upload")
 				message

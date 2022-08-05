@@ -12,11 +12,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.common.navigation.NavDestination
-import com.zero.android.feature.account.navigation.NotificationsDestination
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.ui.directchannels.DirectChannelDestination
 import com.zero.android.feature.feed.navigation.FeedDestination
-import com.zero.android.feature.people.navigation.MembersDestination
 import com.zero.android.ui.components.BottomBarDivider
 import com.zero.android.ui.components.CountBadge
 import com.zero.android.ui.extensions.Preview
@@ -25,17 +23,17 @@ import com.zero.android.ui.theme.AppTheme
 val HOME_DESTINATIONS =
 	listOf(
 		AppBarItem(ChannelsDestination, R.drawable.ic_channel, R.drawable.ic_channel),
-		/*AppBarItem(
-			MembersDestination,
-			R.drawable.ic_people_selected,
-			R.drawable.ic_people_unselected
-		),
-		AppBarItem(FeedDestination, R.drawable.ic_feeds, R.drawable.ic_feeds),
-		AppBarItem(
-			NotificationsDestination,
-			R.drawable.ic_notification_selected,
-			R.drawable.ic_notification_unselected
-		),*/
+        /*AppBarItem(
+        	MembersDestination,
+        	R.drawable.ic_people_selected,
+        	R.drawable.ic_people_unselected
+        ),
+        AppBarItem(FeedDestination, R.drawable.ic_feeds, R.drawable.ic_feeds),
+        AppBarItem(
+        	NotificationsDestination,
+        	R.drawable.ic_notification_selected,
+        	R.drawable.ic_notification_unselected
+        ),*/
 		AppBarItem(
 			DirectChannelDestination,
 			R.drawable.ic_direct_chat_selected,

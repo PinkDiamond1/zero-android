@@ -65,7 +65,7 @@ fun ReplyMessage(
 				Text(
 					text = replyMessage.messageFormatter(AppTheme.colors.glow),
 					color = Color.White.copy(0.75f),
-                    style = MaterialTheme.typography.labelLarge,
+					style = MaterialTheme.typography.labelLarge,
 					fontWeight = FontWeight.Normal,
 					maxLines = 2,
 					overflow = TextOverflow.Ellipsis

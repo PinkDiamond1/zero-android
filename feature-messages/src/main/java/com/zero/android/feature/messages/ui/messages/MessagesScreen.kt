@@ -21,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -243,7 +242,7 @@ fun MessagesScreen(
 									Icon(
 										imageVector = Icons.Filled.Edit,
 										contentDescription = "cd_message_action_edit",
-                                        tint = AppTheme.colors.surface
+										tint = AppTheme.colors.surface
 									)
 								}
 							}
@@ -256,7 +255,7 @@ fun MessagesScreen(
 								Icon(
 									imageVector = Icons.Filled.Delete,
 									contentDescription = "cd_message_action_delete",
-                                    tint = AppTheme.colors.surface
+									tint = AppTheme.colors.surface
 								)
 							}
 						}

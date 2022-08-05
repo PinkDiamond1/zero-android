@@ -31,7 +31,7 @@ fun SearchView(
 				onValueChanged(searchText)
 			},
 			placeholderText = placeHolder,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+			textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
 			placeHolderTextStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			shape = RoundedCornerShape(24.dp),

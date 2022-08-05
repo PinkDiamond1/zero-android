@@ -24,3 +24,11 @@ inline fun <T> callbackFlowWithAwait(
 	block(this)
 	awaitClose()
 }
+
+@OptIn(ExperimentalTypeInference::class)
+inline fun <T> channelFlowWithAwait(
+	@BuilderInference crossinline block: suspend ProducerScope<T>.() -> Unit
+) = callbackFlow {
+	block(this)
+	awaitClose()
+}

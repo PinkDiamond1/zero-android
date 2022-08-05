@@ -38,8 +38,8 @@ fun CustomTextFieldValue(
 	maxLines: Int = Int.MAX_VALUE,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 	placeholderText: String = "",
-    placeHolderTextStyle: TextStyle = LocalTextStyle.current,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
+	placeHolderTextStyle: TextStyle = LocalTextStyle.current,
+	onTextLayout: (TextLayoutResult) -> Unit = {},
 	cursorBrush: Brush = SolidColor(AppTheme.colors.colorTextPrimary),
 	shape: Shape = RectangleShape
 ) {

@@ -18,6 +18,14 @@ abstract class NetworkDao : BaseDao<NetworkEntity>() {
 	@Query("SELECT * FROM networks WHERE id = :id")
 	abstract fun get(id: String): Flow<NetworkEntity?>
 
-	@Query("SELECT DISTINCT category from channels WHERE networkId = :id AND isDirectChannel = 0")
+	@Query(
+		"""
+		SELECT DISTINCT category from channels 
+		WHERE networkId = :id 
+		AND isDirectChannel = 0 
+		AND category IS NOT NULL AND category != '' 
+		ORDER BY category
+		"""
+	)
 	abstract fun getCategories(id: String): Flow<List<ChannelCategory>>
 }

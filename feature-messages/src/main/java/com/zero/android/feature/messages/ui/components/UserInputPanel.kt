@@ -72,16 +72,18 @@ fun UserInputPanel(
 	if (currentInputSelector != InputSelector.TEXT) {
 		BackHandler(onBack = dismissKeyboard)
 	}
-    val updatedMessage = prepareInitialMessage(initialText)
-	var textState by remember { mutableStateOf(TextFieldValue(updatedMessage, TextRange(updatedMessage.length))) }
-    LaunchedEffect(Unit) {
-        MessageActionStateHandler.messageUpdatedText.collectLatest {
-            if (it.isNotEmpty()) {
-                textState = TextFieldValue(it, TextRange(it.length))
-                MessageActionStateHandler.messageUpdatedText.emit("")
-            }
-        }
-    }
+	val updatedMessage = prepareInitialMessage(initialText)
+	var textState by remember {
+		mutableStateOf(TextFieldValue(updatedMessage, TextRange(updatedMessage.length)))
+	}
+	LaunchedEffect(Unit) {
+		MessageActionStateHandler.messageUpdatedText.collectLatest {
+			if (it.isNotEmpty()) {
+				textState = TextFieldValue(it, TextRange(it.length))
+				MessageActionStateHandler.messageUpdatedText.emit("")
+			}
+		}
+	}
 
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
@@ -170,17 +172,16 @@ private fun UserInputText(
 		CustomTextFieldValue(
 			value = textFieldValue,
 			onValueChange = {
-                onTextChanged(it)
-                MessageActionStateHandler.onMessageTextChanged(it.text)
-            },
+				onTextChanged(it)
+				MessageActionStateHandler.onMessageTextChanged(it.text)
+			},
 			placeholderText = stringResource(R.string.write_your_message),
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
-			placeHolderTextStyle = MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
-			modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .align(Alignment.CenterStart)
-                .onFocusChanged { state ->
+			textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+			placeHolderTextStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+			modifier =
+			Modifier.fillMaxWidth().padding(12.dp).align(Alignment.CenterStart).onFocusChanged {
+					state ->
 				if (lastFocusState != state.isFocused) {
 					onTextFieldFocused(state.isFocused)
 				}
