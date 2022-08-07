@@ -17,6 +17,9 @@ abstract class BaseChannelDao : BaseDao<ChannelEntity>() {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	protected abstract suspend fun insert(vararg refs: ChannelOperatorsCrossRef)
 
+	@Query("UPDATE channels SET lastMessageId = :lastMessageId WHERE id = :id")
+	abstract suspend fun updateLastMessage(id: String, lastMessageId: String)
+
 	@Query("DELETE FROM channels WHERE id = :id")
 	abstract suspend fun delete(id: String)
 }

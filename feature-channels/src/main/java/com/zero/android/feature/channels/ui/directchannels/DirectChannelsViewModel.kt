@@ -7,10 +7,10 @@ import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.models.Channel
-import com.zero.android.models.Network
 import com.zero.android.models.getTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -27,7 +27,6 @@ constructor(
 	private val searchTriggerUseCase: SearchTriggerUseCase
 ) : BaseViewModel() {
 
-	private lateinit var network: Network
 	val loggedInUserId
 		get() = runBlocking(Dispatchers.IO) { preferences.userId() }
 
@@ -36,8 +35,9 @@ constructor(
 	private val mainDataSource = mutableListOf<Channel>()
 	val showSearchBar: StateFlow<Boolean> = searchTriggerUseCase.showSearchBar
 
-	fun onNetworkUpdated(network: Network) {
-		this.network = network
+	private var channelsJob: Job? = null
+
+	init {
 		loadChannels()
 	}
 
@@ -63,22 +63,19 @@ constructor(
 		ioScope.launch { searchTriggerUseCase.triggerSearch(false) }
 	}
 
-	private fun loadChannels() {
-		ioScope.launch {
-			channelRepository.getDirectChannels().asResult().collect {
-				when (it) {
-					is Result.Success -> {
-						_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Success(it.data)))
-						mainDataSource.apply {
-							clear()
-							addAll(it.data)
-						}
+	private fun loadChannels(search: String? = null) {
+		channelsJob?.cancel()
+		channelsJob =
+			ioScope.launch {
+				channelRepository.getDirectChannels().asResult().collect {
+					when (it) {
+						is Result.Success ->
+							_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Success(it.data)))
+						is Result.Loading ->
+							_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Loading))
+						else -> _uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Error))
 					}
-					is Result.Loading ->
-						_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Loading))
-					else -> _uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Error))
 				}
 			}
-		}
 	}
 }

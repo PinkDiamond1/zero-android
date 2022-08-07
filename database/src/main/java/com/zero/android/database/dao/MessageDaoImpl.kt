@@ -23,6 +23,10 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	abstract fun getByChannel(channelId: String): PagingSource<Int, MessageWithRefs>
 
 	@Transaction
+	@Query("SELECT id FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC LIMIT 1")
+	abstract fun getLatestMessageByChannel(channelId: String): String?
+
+	@Transaction
 	internal open suspend fun upsert(memberDao: MemberDao, vararg data: MessageWithRefs) {
 		for (item in data) {
 			val members = mutableListOf(item.author)

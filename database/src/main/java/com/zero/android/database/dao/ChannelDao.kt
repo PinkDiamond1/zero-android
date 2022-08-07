@@ -18,6 +18,11 @@ constructor(
 
 	fun getDirectChannels() = directChannelDao.getAll()
 
+	fun searchGroupChannels(networkId: String, name: String) =
+		groupChannelDao.searchByNetwork(networkId, name)
+
+	fun searchDirectChannels(name: String) = directChannelDao.search(name)
+
 	fun getGroupChannel(id: String) = groupChannelDao.get(id)
 
 	fun getDirectChannel(id: String) = directChannelDao.get(id)
@@ -27,6 +32,12 @@ constructor(
 
 	suspend fun upsert(vararg data: GroupChannelWithRefs) =
 		groupChannelDao.upsert(messageDao, memberDao, *data)
+
+	internal suspend fun updateLatestMessage(id: String) {
+		messageDao.getLatestMessageByChannel(id)?.let { messageId ->
+			directChannelDao.updateLastMessage(id, messageId)
+		}
+	}
 
 	suspend fun delete(entity: ChannelEntity) = groupChannelDao.delete(entity)
 }

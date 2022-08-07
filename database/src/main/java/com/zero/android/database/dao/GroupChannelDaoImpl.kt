@@ -1,5 +1,6 @@
 package com.zero.android.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -13,7 +14,14 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId")
-	abstract fun getByNetwork(networkId: String): Flow<List<GroupChannelWithRefs>>
+	abstract fun getByNetwork(networkId: String): PagingSource<Int, GroupChannelWithRefs>
+
+	@Transaction
+	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 AND name LIKE :name")
+	abstract fun searchByNetwork(
+		networkId: String,
+		name: String
+	): PagingSource<Int, GroupChannelWithRefs>
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE id = :id AND isDirectChannel = 0")

@@ -1,5 +1,6 @@
 package com.zero.android.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -12,7 +13,11 @@ abstract class DirectChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE isDirectChannel = 1")
-	abstract fun getAll(): Flow<List<DirectChannelWithRefs>>
+	abstract fun getAll(): PagingSource<Int, DirectChannelWithRefs>
+
+	@Transaction
+	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 AND name LIKE :name")
+	abstract fun search(name: String): PagingSource<Int, DirectChannelWithRefs>
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE id = :id AND isDirectChannel = 1")

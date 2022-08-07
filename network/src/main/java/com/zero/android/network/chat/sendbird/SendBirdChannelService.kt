@@ -3,6 +3,7 @@ package com.zero.android.network.chat.sendbird
 import com.sendbird.android.GroupChannel
 import com.sendbird.android.GroupChannelListQuery
 import com.sendbird.android.OpenChannel
+import com.sendbird.android.OpenChannelListQuery
 import com.zero.android.common.extensions.callbackFlowWithAwait
 import com.zero.android.common.extensions.withSameScope
 import com.zero.android.common.system.Logger
@@ -22,6 +23,12 @@ import kotlin.coroutines.resumeWithException
 internal class SendBirdChannelService(private val logger: Logger) :
 	SendBirdBaseService(), ChannelService, ChannelCategoryService {
 
+	private var groupNetworkId: String? = null
+	private var openNetworkId: String? = null
+	private var groupQuery: GroupChannelListQuery? = null
+	private var openQuery: OpenChannelListQuery? = null
+	private var directQuery: GroupChannelListQuery? = null
+
 	override suspend fun getCategories(networkId: String) =
 		flow<List<ChannelCategory>> {
 			getGroupChannels(networkId, ChannelType.GROUP).firstOrNull().let { channels ->
@@ -38,43 +45,70 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			}
 		}
 
-	override suspend fun getGroupChannels(networkId: String, type: ChannelType) =
-		callbackFlowWithAwait {
-			if (type == ChannelType.OPEN) {
-				val query =
+	override suspend fun getGroupChannels(
+		networkId: String,
+		type: ChannelType,
+		before: String?,
+		loadSize: Int,
+		searchName: String?
+	) = callbackFlowWithAwait {
+		if (type == ChannelType.OPEN) {
+			if (openNetworkId != networkId || openQuery != null) {
+				openQuery =
 					OpenChannel.createOpenChannelListQuery().apply {
+						setLimit(100)
 						setCustomTypeFilter(networkId.encodeToNetworkId())
+
+						searchName?.let { setNameKeyword(searchName) }
 					}
-				query.next { channels, e ->
-					if (e != null) {
-						logger.e("Failed to get open channels", e)
-						throw e
-					}
-					trySend(channels.map { it.toApi() })
+			}
+
+			openQuery!!.next { channels, e ->
+				if (e != null) {
+					logger.e("Failed to get open channels", e)
+					throw e
 				}
-			} else if (type == ChannelType.GROUP) {
-				val query =
+				trySend(channels.map { it.toApi() })
+			}
+		} else if (type == ChannelType.GROUP) {
+			if (groupNetworkId != networkId || groupQuery != null) {
+				groupQuery =
 					GroupChannel.createMyGroupChannelListQuery().apply {
 						customTypeStartsWithFilter = networkId.encodeToNetworkId()
+
+						isIncludeEmpty = false
+						limit = 100
+						memberStateFilter = GroupChannelListQuery.MemberStateFilter.ALL
+						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
+
+						searchName?.let { channelNameContainsFilter = searchName }
 					}
-				query.next { channels, e ->
-					if (e != null) {
-						logger.e("Failed to get group channels", e)
-						throw e
-					}
-					trySend(channels.map { it.toGroupApi() })
+			}
+
+			groupQuery!!.next { channels, e ->
+				if (e != null) {
+					logger.e("Failed to get group channels", e)
+					throw e
 				}
+				trySend(channels.map { it.toGroupApi() })
 			}
 		}
+	}
 
-	override suspend fun getDirectChannels() = callbackFlowWithAwait {
-		GroupChannel.createMyGroupChannelListQuery()
-			.apply {
-				isIncludeEmpty = false
-				order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
-				limit = 100
+	override suspend fun getDirectChannels(before: String?, loadSize: Int, searchName: String?) =
+		callbackFlowWithAwait {
+			if (directQuery == null) {
+				directQuery =
+					GroupChannel.createMyGroupChannelListQuery().apply {
+						isIncludeEmpty = false
+						limit = 100
+						memberStateFilter = GroupChannelListQuery.MemberStateFilter.ALL
+						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
+
+						searchName?.let { channelNameContainsFilter = searchName }
+					}
 			}
-			.next { channels, e ->
+			directQuery!!.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get direct channels", e)
 					throw e
@@ -82,7 +116,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 
 				trySend(channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() })
 			}
-	}
+		}
 
 	override suspend fun createChannel(networkId: String, channel: Channel) = callbackFlowWithAwait {
 		if (channel.isGroupChannel()) {

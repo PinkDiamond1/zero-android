@@ -34,7 +34,7 @@ internal fun NavGraphBuilder.appBottomNavGraph(controller: NavController, networ
 	composable(route = FeedDestination.route) { FeedRoute() }
 	composable(route = NotificationsDestination.route) { NotificationsRoute() }
 	composable(route = DirectChannelDestination.route) {
-		DirectChannelsRoute(network = network) {
+		DirectChannelsRoute {
 			controller.navigate(route = "${MessagesDestination.route}/${it.id}/${false}")
 		}
 	}

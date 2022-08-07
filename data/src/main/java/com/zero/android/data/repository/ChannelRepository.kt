@@ -1,5 +1,6 @@
 package com.zero.android.data.repository
 
+import androidx.paging.PagingData
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
@@ -7,9 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChannelRepository {
 
-	suspend fun getDirectChannels(): Flow<List<DirectChannel>>
+	fun getDirectChannels(search: String? = null): Flow<PagingData<DirectChannel>>
 
-	suspend fun getGroupChannels(networkId: String): Flow<List<GroupChannel>>
+	fun getGroupChannels(networkId: String, search: String? = null): Flow<PagingData<GroupChannel>>
 
 	suspend fun getGroupChannel(id: String): Flow<GroupChannel>
 
