@@ -61,7 +61,7 @@ internal class SendBirdProvider(private val logger: Logger) : ChatProvider {
 
 	override suspend fun disconnect(context: Context) =
 		suspendCoroutine<Unit> {
-            SendBird.clearCachedData(context) {}
-            SendBird.disconnect { it.resume(Unit) }
-        }
+			SendBird.clearCachedData(context) {}
+			SendBird.disconnect { it.resume(Unit) }
+		}
 }
