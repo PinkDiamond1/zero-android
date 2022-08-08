@@ -91,7 +91,7 @@ constructor(private val channelDao: ChannelDao, private val channelService: Chan
 		channelService.deleteChannel(channel)
 	}
 
-    override suspend fun markChannelRead(channel: Channel) {
-        channelService.markChannelRead(channel)
-    }
+	override suspend fun markChannelRead(channel: Channel) {
+		channelService.markChannelRead(channel)
+	}
 }

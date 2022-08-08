@@ -189,21 +189,22 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			}
 		}
 
-    override suspend fun markChannelRead(channel: Channel) = suspendCancellableCoroutine<Unit> { coroutine ->
-        withSameScope {
-            if (channel.isGroupChannel()) {
-                groupChannel(channel.id).markAsRead {
-                    if (it == null) {
-                        coroutine.resume(Unit)
-                    } else {
-                        logger.e("Failed to mark channel read", it)
-                        coroutine.resumeWithException(it)
-                    }
-                }
-            } else {
-                val ex = IllegalStateException("Cannot mark open channel read")
-                coroutine.resumeWithException(ex)
-            }
-        }
-    }
+	override suspend fun markChannelRead(channel: Channel) =
+		suspendCancellableCoroutine<Unit> { coroutine ->
+			withSameScope {
+				if (channel.isGroupChannel()) {
+					groupChannel(channel.id).markAsRead {
+						if (it == null) {
+							coroutine.resume(Unit)
+						} else {
+							logger.e("Failed to mark channel read", it)
+							coroutine.resumeWithException(it)
+						}
+					}
+				} else {
+					val ex = IllegalStateException("Cannot mark open channel read")
+					coroutine.resumeWithException(ex)
+				}
+			}
+		}
 }

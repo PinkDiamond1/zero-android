@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +42,7 @@ fun NetworkDrawerContent(
 	drawerState: DrawerState,
 	coroutineScope: CoroutineScope,
 	onNetworkSelected: (Network) -> Unit,
+	onSettingsClicked: () -> Unit,
 	onNavigateToTopLevelDestination: (NavDestination) -> Unit
 ) {
 	LoadingContainer(modifier = modifier.fillMaxSize(), loading = networks is Result.Loading) {
@@ -54,7 +60,7 @@ fun NetworkDrawerContent(
 				},
 				network = currentNetwork!!,
 				onSettingsClick = {
-					coroutineScope.launch { drawerState.close() }
+					onSettingsClicked()
 					/*onNavigateToTopLevelDestination(ProfileDestination)*/
 				},
 				onInviteClick = {
@@ -117,6 +123,7 @@ fun NetworkDrawerContentPreview() = Preview {
 		drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
 		coroutineScope = CoroutineScope(Dispatchers.Default),
 		onNetworkSelected = {},
-		onNavigateToTopLevelDestination = {}
+		onNavigateToTopLevelDestination = {},
+		onSettingsClicked = {}
 	)
 }

@@ -70,7 +70,7 @@ constructor(
 
 			request.firstOrNull()?.let { channel ->
 				_channel.emit(Result.Success(channel))
-                channelRepository.markChannelRead(channel)
+				channelRepository.markChannelRead(channel)
 				configureChat(channel)
 			}
 		}
