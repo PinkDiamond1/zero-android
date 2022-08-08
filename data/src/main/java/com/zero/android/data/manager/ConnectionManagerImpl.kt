@@ -1,5 +1,6 @@
 package com.zero.android.data.manager
 
+import android.content.Context
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.datastore.ChatPreferences
 import com.zero.android.network.chat.ChatProvider
@@ -16,5 +17,5 @@ constructor(
 	override suspend fun connect() =
 		chatProvider.connect(preferences.userId(), chatPreferences.chatToken())
 
-	override suspend fun disconnect() = chatProvider.disconnect()
+	override suspend fun disconnect(context: Context) = chatProvider.disconnect(context)
 }
