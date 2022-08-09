@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.common.navigation.NavDestination
 import com.zero.android.feature.channels.navigation.ChannelsDestination
-import com.zero.android.feature.channels.ui.directchannels.DirectChannelDestination
+import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.feature.feed.navigation.FeedDestination
 import com.zero.android.ui.components.BottomBarDivider
 import com.zero.android.ui.components.CountBadge

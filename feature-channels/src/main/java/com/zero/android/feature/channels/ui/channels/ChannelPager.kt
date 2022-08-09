@@ -14,17 +14,12 @@ import com.zero.android.models.Channel
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ChannelPager(
-	pagerState: PagerState,
-	groupChannelUiState: GroupChannelUiState,
-	onClick: (Channel) -> Unit
-) {
-	val categories =
-		(groupChannelUiState.categoriesUiState as ChannelCategoriesUiState.Success).categories
+fun ChannelPager(pagerState: PagerState, ui: GroupChannelUiState, onClick: (Channel) -> Unit) {
+	val categories = (ui.categoriesUiState as ChannelCategoriesUiState.Success).categories
 	HorizontalPager(state = pagerState, count = categories.size) { index ->
 		Column(modifier = Modifier.fillMaxSize()) {
 			LazyColumn {
-				items(groupChannelUiState.getChannels(categories[index].name)) { channel ->
+				items(ui.getChannels(categories[index].name)) { channel ->
 					ChannelListItem(channel = channel, onClick = onClick)
 				}
 			}

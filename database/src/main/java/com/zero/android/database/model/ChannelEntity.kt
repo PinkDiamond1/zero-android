@@ -63,6 +63,7 @@ data class ChannelEntity(
 fun ChannelEntity.toDirectModel(members: List<Member>, lastMessage: Message? = null) =
 	DirectChannel(
 		id = id,
+		name = name,
 		memberCount = memberCount,
 		coverUrl = coverUrl,
 		createdAt = createdAt,

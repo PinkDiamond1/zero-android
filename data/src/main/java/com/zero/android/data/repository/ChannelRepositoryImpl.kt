@@ -10,6 +10,7 @@ import com.zero.android.common.system.Logger
 import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.conversion.toModel
+import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.chat.DirectChannelsRemoteMediator
 import com.zero.android.data.repository.chat.GroupChannelsRemoteMediator
 import com.zero.android.database.dao.ChannelDao
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ChannelRepositoryImpl
@@ -35,14 +37,18 @@ class ChannelRepositoryImpl
 constructor(
 	private val channelDao: ChannelDao,
 	private val channelService: ChannelService,
-	private val logger: Logger
+	private val logger: Logger,
+	private val preferences: Preferences
 ) : ChannelRepository {
+
+	private val userId = runBlocking { preferences.userId() }
 
 	@OptIn(ExperimentalPagingApi::class)
 	override fun getDirectChannels(search: String?): Flow<PagingData<DirectChannel>> {
 		return Pager(
 			config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
-			remoteMediator = DirectChannelsRemoteMediator(channelDao, channelService, logger),
+			remoteMediator =
+			DirectChannelsRemoteMediator(userId, channelDao, channelService, logger),
 			pagingSourceFactory = {
 				if (search.isNullOrEmpty()) channelDao.getDirectChannels()
 				else channelDao.searchDirectChannels(search)
@@ -99,8 +105,8 @@ constructor(
 		launch {
 			channelService.getChannel(id, type = ChannelType.GROUP).map {
 				it as ApiDirectChannel
-				channelDao.upsert(it.toEntity())
-				trySend(it.toModel())
+				channelDao.upsert(it.toEntity(userId))
+				trySend(it.toModel(userId))
 			}
 		}
 	}

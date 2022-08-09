@@ -8,8 +8,8 @@ import com.zero.android.feature.account.ui.notifications.NotificationsRoute
 import com.zero.android.feature.auth.navigation.AuthDestination
 import com.zero.android.feature.auth.navigation.authGraph
 import com.zero.android.feature.channels.navigation.ChannelsDestination
+import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.feature.channels.ui.channels.ChannelsRoute
-import com.zero.android.feature.channels.ui.directchannels.DirectChannelDestination
 import com.zero.android.feature.channels.ui.directchannels.DirectChannelsRoute
 import com.zero.android.feature.feed.FeedRoute
 import com.zero.android.feature.feed.navigation.FeedDestination

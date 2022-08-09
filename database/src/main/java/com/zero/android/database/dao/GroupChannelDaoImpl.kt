@@ -17,7 +17,9 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 	abstract fun getByNetwork(networkId: String): PagingSource<Int, GroupChannelWithRefs>
 
 	@Transaction
-	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 AND name LIKE :name")
+	@Query(
+		"SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId AND name LIKE :name"
+	)
 	abstract fun searchByNetwork(
 		networkId: String,
 		name: String

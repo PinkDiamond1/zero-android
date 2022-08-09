@@ -1,4 +1,4 @@
-package com.zero.android.feature.channels.ui.directchannels
+package com.zero.android.feature.channels.navigation
 
 import com.zero.android.common.navigation.NavDestination
 

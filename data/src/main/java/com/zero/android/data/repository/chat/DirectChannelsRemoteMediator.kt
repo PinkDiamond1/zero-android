@@ -17,6 +17,7 @@ import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 internal class DirectChannelsRemoteMediator(
+	private val userId: String?,
 	private val channelDao: ChannelDao,
 	private val channelService: ChannelService,
 	private val logger: Logger
@@ -61,7 +62,7 @@ internal class DirectChannelsRemoteMediator(
 					lastChannelId?.let { channelService.getDirectChannels(before = it).firstOrNull() }
 						?: channelService.getDirectChannels(loadSize = INITIAL_LOAD_SIZE).firstOrNull()
 
-				response?.map { it.toEntity() }?.let { channelDao.upsert(*it.toTypedArray()) }
+				response?.map { it.toEntity(userId) }?.let { channelDao.upsert(*it.toTypedArray()) }
 
 				logger.d("Loading Direct Channels: $loadType - $lastChannelId: ${response?.size ?: 0}")
 

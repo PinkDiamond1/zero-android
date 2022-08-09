@@ -8,9 +8,10 @@ import com.zero.android.models.GroupChannel
 import com.zero.android.network.model.ApiDirectChannel
 import com.zero.android.network.model.ApiGroupChannel
 
-internal fun ApiDirectChannel.toModel() =
+internal fun ApiDirectChannel.toModel(loggedInUserId: String?) =
 	DirectChannel(
 		id = id,
+		name = name(loggedInUserId),
 		members = members.map { it.toModel() },
 		memberCount = memberCount,
 		coverUrl = coverUrl,
@@ -52,11 +53,12 @@ internal fun ApiGroupChannel.toModel() =
 		isVideoEnabled = isVideoEnabled
 	)
 
-internal fun ApiDirectChannel.toEntity() =
+internal fun ApiDirectChannel.toEntity(loggedInUserId: String?) =
 	DirectChannelWithRefs(
 		channel =
 		ChannelEntity(
 			id = id,
+			name = name(loggedInUserId),
 			lastMessageId = lastMessage?.id,
 			isDirectChannel = true,
 			memberCount = memberCount,

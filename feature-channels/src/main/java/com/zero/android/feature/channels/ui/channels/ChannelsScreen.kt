@@ -67,9 +67,7 @@ fun ChannelsScreen(
 					}
 				} else {
 					ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
-					ChannelPager(pagerState = pagerState, groupChannelUiState = uiState) {
-						onChannelSelected(it)
-					}
+					ChannelPager(pagerState = pagerState, ui = uiState) { onChannelSelected(it) }
 				}
 			}
 		}

@@ -27,8 +27,7 @@ sealed interface ChannelCategoriesUiState {
 }
 
 sealed interface CategoryChannelsUiState {
-	data class Success(val channels: List<Channel>, val isSearchResult: Boolean = false) :
-		CategoryChannelsUiState
+	data class Success(val isSearchResult: Boolean = false) : CategoryChannelsUiState
 	object Error : CategoryChannelsUiState
 	object Loading : CategoryChannelsUiState
 }

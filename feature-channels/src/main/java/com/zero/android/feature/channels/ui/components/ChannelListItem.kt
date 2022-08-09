@@ -2,7 +2,14 @@ package com.zero.android.feature.channels.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +31,6 @@ import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.enums.MessageStatus
-import com.zero.android.models.getTitle
 import com.zero.android.ui.components.LargeCircularImage
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.UnreadCountText
@@ -59,10 +65,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 				contentDescription = channel.id
 			)
 		} else {
-			NameInitialsView(
-				modifier = imageModifier.size(64.dp),
-				userName = channel.getTitle(loggedInUserId)
-			)
+			NameInitialsView(modifier = imageModifier.size(64.dp), userName = channel.name)
 		}
 		Row(
 			modifier =
@@ -75,7 +78,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 			}
 		) {
 			Text(
-				text = channel.getTitle(loggedInUserId),
+				text = channel.name,
 				color = AppTheme.colors.colorTextPrimary,
 				style = MaterialTheme.typography.bodyLarge,
 				fontWeight = FontWeight.Medium,

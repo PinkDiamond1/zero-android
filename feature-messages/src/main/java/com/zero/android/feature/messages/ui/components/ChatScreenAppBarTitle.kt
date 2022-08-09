@@ -19,17 +19,16 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
-import com.zero.android.models.getTitle
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.theme.customTextStyle
 
 @Composable
-fun ChatScreenAppBarTitle(loggedInUserId: String, channel: Channel, isGroupChannel: Boolean) {
+fun ChatScreenAppBarTitle(channel: Channel, isGroupChannel: Boolean) {
 	Row {
 		IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = {}) {
 			if (isGroupChannel) {
-				NameInitialsView(userName = channel.getTitle(loggedInUserId))
+				NameInitialsView(userName = channel.name)
 			} else {
 				SmallCircularImage(
 					imageUrl = channel.members.firstOrNull()?.profileImage,
@@ -38,7 +37,7 @@ fun ChatScreenAppBarTitle(loggedInUserId: String, channel: Channel, isGroupChann
 			}
 		}
 		Text(
-			channel.getTitle(loggedInUserId).lowercase(),
+			channel.name.lowercase(),
 			modifier = Modifier.align(Alignment.CenterVertically),
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
