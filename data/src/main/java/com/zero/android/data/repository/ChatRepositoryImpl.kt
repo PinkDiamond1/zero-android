@@ -102,11 +102,9 @@ constructor(
 		messageDao.delete(message.id)
 	}
 
-    override suspend fun getChatMembers(filter: String): List<Member> {
-        val filterObject = JSONObject().apply {
-            putOpt("filter", filter)
-        }
-        val networkUsers = messageService.getMembers(filterObject.toString())
-        return networkUsers.body()?.map { it.toMember() } ?: emptyList()
-    }
+	override suspend fun getChatMembers(filter: String): List<Member> {
+		val filterObject = JSONObject().apply { putOpt("filter", filter) }
+		val networkUsers = messageService.getMembers(filterObject.toString())
+		return networkUsers.body()?.map { it.toMember() } ?: emptyList()
+	}
 }

@@ -25,5 +25,5 @@ interface ChatRepository {
 
 	suspend fun removeListener(id: String)
 
-    suspend fun getChatMembers(filter: String): List<Member>
+	suspend fun getChatMembers(filter: String): List<Member>
 }

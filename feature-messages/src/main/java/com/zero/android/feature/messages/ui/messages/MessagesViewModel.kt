@@ -44,9 +44,9 @@ constructor(
 	val messages = chatRepository.messages
 	private val _messagesResult = messages.asResult()
 
-    private val _textSearch = MutableStateFlow("")
-    private val _chatMentionUsers = MutableStateFlow<List<Member>>(emptyList())
-    val chatMentionUsers: StateFlow<List<Member>> = _chatMentionUsers
+	private val _textSearch = MutableStateFlow("")
+	private val _chatMentionUsers = MutableStateFlow<List<Member>>(emptyList())
+	val chatMentionUsers: StateFlow<List<Member>> = _chatMentionUsers
 
 	val uiState: StateFlow<ChatScreenUiState> =
 		combine(_channel, _messagesResult) { channelResult, messagesResult ->
@@ -62,20 +62,18 @@ constructor(
 				)
 			)
 
-    init {
-        viewModelScope.launch {
-            _textSearch.asStateFlow()
-                .debounce(1500)
-                .collectLatest { query ->
-                    val members = chatRepository.getChatMembers(query)
-                    _chatMentionUsers.emit(members.distinct())
-                }
-        }
-    }
+	init {
+		viewModelScope.launch {
+			_textSearch.asStateFlow().debounce(1500).collectLatest { query ->
+				val members = chatRepository.getChatMembers(query)
+				_chatMentionUsers.emit(members.distinct())
+			}
+		}
+	}
 
-    fun onSearchTextChanged(text: String) {
-        _textSearch.value = MessageActionStateHandler.getMentionQuery(text)
-    }
+	fun onSearchTextChanged(text: String) {
+		_textSearch.value = MessageActionStateHandler.getMentionQuery(text)
+	}
 
 	fun loadChannel() {
 		ioScope.launch {

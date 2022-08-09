@@ -120,7 +120,7 @@ fun MessagesRoute(
 		chatUiState.messagesUiState,
 		pagedMessages,
 		recordingState,
-        chatMentionUsers,
+		chatMentionUsers,
 		onNewMessage = { newMessage ->
 			viewModel.sendMessage(
 				MessageUtil.newTextMessage(
@@ -161,10 +161,15 @@ fun MessagesRoute(
 		onEditMessage = { viewModel.updateMessage(it) },
 		onDeleteMessage = { viewModel.deleteMessage(it) },
 		onReplyToMessage = { messageId, reply ->
-			val replyMessage = MessageUtil.newTextMessage(reply, userChannelInfo.first, channelMembers = MessageActionStateHandler.mentionedUsers)
+			val replyMessage =
+				MessageUtil.newTextMessage(
+					reply,
+					userChannelInfo.first,
+					channelMembers = MessageActionStateHandler.mentionedUsers
+				)
 			viewModel.replyToMessage(messageId, replyMessage)
 		},
-        onTextChanged = { viewModel.onSearchTextChanged(it) }
+		onTextChanged = { viewModel.onSearchTextChanged(it) }
 	)
 }
 
@@ -178,7 +183,7 @@ fun MessagesScreen(
 	messagesUiState: MessagesUIState,
 	messages: LazyPagingItems<Message>,
 	isMemoRecording: Boolean,
-    chatMentionUsers: List<Member>,
+	chatMentionUsers: List<Member>,
 	onNewMessage: (String) -> Unit,
 	onPickImage: (Intent) -> Unit,
 	onRecordMemo: () -> Unit,
@@ -186,7 +191,7 @@ fun MessagesScreen(
 	onEditMessage: (Message) -> Unit,
 	onDeleteMessage: (Message) -> Unit,
 	onReplyToMessage: (String, String) -> Unit,
-    onTextChanged: (String) -> Unit,
+	onTextChanged: (String) -> Unit
 ) {
 	val context = LocalContext.current
 	val actionMessage by MessageActionStateHandler.selectedMessage.collectAsState()
@@ -311,9 +316,7 @@ fun MessagesScreen(
 									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
 								},
 								recordMemo = onRecordMemo,
-                                onTextChanged = {
-                                    if (mentionUser) onTextChanged(it)
-                                }
+								onTextChanged = { if (mentionUser) onTextChanged(it) }
 							)
 						} else {
 							UserInputPanel(
@@ -330,9 +333,7 @@ fun MessagesScreen(
 									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
 								},
 								recordMemo = onRecordMemo,
-                                onTextChanged = {
-                                    if (mentionUser) onTextChanged(it)
-                                }
+								onTextChanged = { if (mentionUser) onTextChanged(it) }
 							)
 						}
 					}

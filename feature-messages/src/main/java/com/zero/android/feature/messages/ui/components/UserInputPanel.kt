@@ -63,7 +63,7 @@ fun UserInputPanel(
 	addAttachment: () -> Unit = {},
 	addImage: () -> Unit = {},
 	recordMemo: () -> Unit = {},
-    onTextChanged: (String) -> Unit = {},
+	onTextChanged: (String) -> Unit = {}
 ) {
 	val keyboardController = LocalSoftwareKeyboardController.current
 	var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.TEXT) }
@@ -101,9 +101,9 @@ fun UserInputPanel(
 			modifier = Modifier.fillMaxWidth().weight(1f).align(CenterVertically),
 			textFieldValue = textState,
 			onTextChanged = {
-                textState = it
-                onTextChanged(it.text)
-            },
+				textState = it
+				onTextChanged(it.text)
+			},
 			// Only show the keyboard if there's no input selector and text field has focus
 			keyboardShown = currentInputSelector == InputSelector.TEXT && textFieldFocusState,
 			// Close extended selector if text field receives focus

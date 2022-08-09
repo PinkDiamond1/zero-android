@@ -23,8 +23,8 @@ interface MessageService {
 		@Body body: DeleteMessageRequest
 	): Response<ResponseBody>
 
-    @GET("users/searchInNetworks")
-    suspend fun getMembers(
-        @Query("filter") memberFilter: String
-    ): Response<List<ApiChatMentionMember>>
+	@GET("users/searchInNetworks")
+	suspend fun getMembers(
+		@Query("filter") memberFilter: String
+	): Response<List<ApiChatMentionMember>>
 }
