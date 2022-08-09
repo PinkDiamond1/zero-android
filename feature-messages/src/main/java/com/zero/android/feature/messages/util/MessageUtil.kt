@@ -16,7 +16,7 @@ object MessageUtil {
 			author = Member(authorId),
 			type = MessageType.TEXT,
 			mentionType = MessageMentionType.USER,
-			message = prepareMessage(msg, channelMembers),
+			message = prepareMessage(msg, channelMembers).trim(),
 			createdAt = Calendar.getInstance().timeInMillis,
 			updatedAt = Calendar.getInstance().timeInMillis,
 			status = MessageStatus.SUCCEEDED,

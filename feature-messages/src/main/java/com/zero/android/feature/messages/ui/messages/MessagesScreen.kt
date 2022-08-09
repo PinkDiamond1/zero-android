@@ -300,9 +300,9 @@ fun MessagesScreen(
 								initialText = editableMessage?.message ?: "",
 								onMessageSent = {
 									if (editableMessage != null) {
-										editableMessage?.copy(message = it)?.let(onEditMessage)
+										editableMessage?.copy(message = it.trim())?.let(onEditMessage)
 										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it)
+									} else onNewMessage(it.trim())
 								},
 								addAttachment = {
 									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
@@ -319,9 +319,9 @@ fun MessagesScreen(
 							UserInputPanel(
 								onMessageSent = {
 									if (replyMessage != null) {
-										onReplyToMessage(replyMessage!!.id, it)
+										onReplyToMessage(replyMessage!!.id, it.trim())
 										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it)
+									} else onNewMessage(it.trim())
 								},
 								addAttachment = {
 									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }

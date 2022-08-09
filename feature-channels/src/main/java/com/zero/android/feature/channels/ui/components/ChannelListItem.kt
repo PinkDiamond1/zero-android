@@ -113,7 +113,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 			Modifier.constrainAs(textBottom) {
 				top.linkTo(textTop.bottom, margin = 4.dp)
 				start.linkTo(textTop.start)
-				end.linkTo(unreadCount.start, margin = 12.dp)
+				end.linkTo(dateTime.start, margin = 4.dp)
 				width = Dimension.fillToConstraints
 			},
 			maxLines = 2,
