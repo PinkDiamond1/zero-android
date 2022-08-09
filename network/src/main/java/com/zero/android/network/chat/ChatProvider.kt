@@ -9,5 +9,5 @@ interface ChatProvider {
 
 	suspend fun connect(userId: String, accessToken: String?)
 
-	suspend fun disconnect()
+	suspend fun disconnect(context: Context)
 }

@@ -24,10 +24,10 @@ constructor(
 		data
 			.map { it.message.channelId }
 			.forEach { channelId ->
-                getLatestMessageByChannel(channelId)?.let {
-                    directChannelDao.updateLastMessage(channelId, it)
-                }
-            }
+				getLatestMessageByChannel(channelId)?.let {
+					directChannelDao.updateLastMessage(channelId, it)
+				}
+			}
 	}
 
 	suspend fun update(id: String, text: String) = messageDao.update(id, text)

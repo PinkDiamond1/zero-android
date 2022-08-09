@@ -62,7 +62,7 @@ fun ChannelsScreen(
 					)
 				}
 				if (isSearchResult) {
-                    val channels = uiState.getChannels().collectAsLazyPagingItems().itemSnapshotList.items
+					val channels = uiState.getChannels().collectAsLazyPagingItems().itemSnapshotList.items
 					ChannelSearchResult(channels) {
 						onSearchClosed()
 						onChannelSelected(it)

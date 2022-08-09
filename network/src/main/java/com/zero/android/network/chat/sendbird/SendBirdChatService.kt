@@ -1,7 +1,6 @@
 package com.zero.android.network.chat.sendbird
 
 import com.sendbird.android.FileMessageParams
-import com.sendbird.android.SendBird
 import com.sendbird.android.UserMessageParams
 import com.zero.android.common.extensions.callbackFlowWithAwait
 import com.zero.android.common.extensions.withSameScope
@@ -9,7 +8,6 @@ import com.zero.android.common.system.Logger
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
-import com.zero.android.network.chat.ChatListener
 import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.model.ApiMessage
@@ -23,14 +21,6 @@ internal class SendBirdChatService(
 	private val logger: Logger,
 	private val messages: SendBirdMessages = SendBirdMessages(logger)
 ) : SendBirdBaseService(), ChatService {
-
-	override suspend fun addListener(channelId: String, listener: ChatListener) {
-		SendBird.addChannelHandler(channelId, SendBirdChatListener(listener))
-	}
-
-	override suspend fun removeListener(channelId: String) {
-		SendBird.removeChannelHandler(channelId)
-	}
 
 	override suspend fun getMessages(channel: Channel, loadSize: Int) =
 		callbackFlowWithAwait<List<ApiMessage>> {

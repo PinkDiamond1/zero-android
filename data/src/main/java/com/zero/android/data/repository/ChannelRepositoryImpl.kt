@@ -117,4 +117,8 @@ constructor(
 		channelDao.delete(ChannelEntity(id = channel.id, isDirectChannel = channel is DirectChannel))
 		channelService.deleteChannel(channel)
 	}
+
+	override suspend fun markChannelRead(channel: Channel) {
+		channelService.markChannelRead(channel)
+	}
 }

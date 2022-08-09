@@ -20,13 +20,13 @@ fun ChannelPager(pagerState: PagerState, ui: GroupChannelUiState, onClick: (Chan
 	val categories = (ui.categoriesUiState as ChannelCategoriesUiState.Success).categories
 	HorizontalPager(state = pagerState, count = categories.size) { index ->
 		Column(modifier = Modifier.fillMaxSize()) {
-            val channels = ui.getChannels(categories[index].name).collectAsLazyPagingItems()
+			val channels = ui.getChannels(categories[index].name).collectAsLazyPagingItems()
 			LazyColumn {
 				items(channels) { channel ->
-                    if (channel != null) {
-                        ChannelListItem(channel = channel, onClick = onClick)
-                    }
-                }
+					if (channel != null) {
+						ChannelListItem(channel = channel, onClick = onClick)
+					}
+				}
 			}
 		}
 	}

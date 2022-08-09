@@ -1,12 +1,25 @@
 package com.zero.android.network.chat.conversion
 
-import com.sendbird.android.*
 import com.sendbird.android.BaseChannel.ChannelType.GROUP
+import com.sendbird.android.BaseMessage
+import com.sendbird.android.BaseMessageParams
+import com.sendbird.android.FileMessage
+import com.sendbird.android.FileMessageParams
+import com.sendbird.android.MessageRetrievalParams
+import com.sendbird.android.ReactionEvent
 import com.sendbird.android.ReactionEvent.ReactionEventAction
+import com.sendbird.android.UserMessage
+import com.sendbird.android.UserMessageParams
 import com.sendbird.android.constant.StringSet.value
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.FileThumbnail
-import com.zero.android.models.enums.*
+import com.zero.android.models.enums.MessageMentionType
+import com.zero.android.models.enums.MessageStatus
+import com.zero.android.models.enums.MessageType
+import com.zero.android.models.enums.toMessageMentionType
+import com.zero.android.models.enums.toMessageReactionAction
+import com.zero.android.models.enums.toMessageStatus
+import com.zero.android.models.enums.toMessageType
 import com.zero.android.network.model.ApiFileData
 import com.zero.android.network.model.ApiFileThumbnail
 import com.zero.android.network.model.ApiMessage
@@ -14,13 +27,16 @@ import com.zero.android.network.model.ApiMessageReaction
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-internal fun BaseMessage.toApi(channelId: String = channelUrl): ApiMessage {
+internal fun BaseMessage.toApi(
+	channelId: String = channelUrl,
+	mParentMessageId: Long? = null
+): ApiMessage {
 	val data =
 		if (this is FileMessage && data.isNotEmpty()) {
 			Json { ignoreUnknownKeys = true }.decodeFromString<ApiFileData?>(data)
 		} else null
 	return ApiMessage(
-		id = messageId.toString(),
+		id = mParentMessageId?.toString() ?: messageId.toString(),
 		type = if (this is FileMessage) data?.type.toMessageType() else customType.toMessageType(),
 		mentionType = mentionType.toType(),
 		channelId = channelId,
@@ -29,7 +45,7 @@ internal fun BaseMessage.toApi(channelId: String = channelUrl): ApiMessage {
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		message = message,
-		parentMessage = parentMessage?.toApi(channelId),
+		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		fileUrl = (this as? FileMessage)?.url,
 		fileName = (this as? FileMessage)?.name
 	)
@@ -47,7 +63,7 @@ internal fun UserMessage.toApi(channelId: String = channelUrl) =
 		updatedAt = updatedAt,
 		status = sendingStatus.toType(),
 		data = data,
-		parentMessage = parentMessage?.toApi(channelId),
+		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		isMuted = isSilent,
 		message = message
 	)
@@ -64,7 +80,7 @@ internal fun FileMessage.toApi(channelId: String = channelUrl) =
 		updatedAt = updatedAt,
 		status = sendingStatus.toType(),
 		data = data,
-		parentMessage = parentMessage?.toApi(channelId),
+		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		isMuted = isSilent,
 		fileUrl = url,
 		fileName = name,

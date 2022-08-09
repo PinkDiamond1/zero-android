@@ -103,10 +103,13 @@ constructor(
 
 	private fun loadChannels(search: String? = null) {
 		ioScope.launch {
-			channelRepository.getGroupChannels(network.id, search = search)
-                .cachedIn(ioScope).asResult().collect {
-				if (search.isNullOrEmpty()) _channels.emit(it) else _filteredChannels.emit(it)
-			}
+			channelRepository
+				.getGroupChannels(network.id, search = search)
+				.cachedIn(ioScope)
+				.asResult()
+				.collect {
+					if (search.isNullOrEmpty()) _channels.emit(it) else _filteredChannels.emit(it)
+				}
 		}
 	}
 }

@@ -11,7 +11,15 @@ import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.enums.ChannelType
-import com.zero.android.network.chat.conversion.*
+import com.zero.android.network.chat.conversion.encodeToNetworkId
+import com.zero.android.network.chat.conversion.isGroupChannel
+import com.zero.android.network.chat.conversion.isOpenChannel
+import com.zero.android.network.chat.conversion.networkId
+import com.zero.android.network.chat.conversion.toApi
+import com.zero.android.network.chat.conversion.toDirectApi
+import com.zero.android.network.chat.conversion.toGroupApi
+import com.zero.android.network.chat.conversion.toOpenParams
+import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.service.ChannelCategoryService
 import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.flow.firstOrNull
@@ -74,6 +82,9 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			if (groupNetworkId != networkId || groupQuery != null) {
 				groupQuery =
 					GroupChannel.createMyGroupChannelListQuery().apply {
+						limit = 100
+						isIncludeEmpty = false
+						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 						customTypeStartsWithFilter = networkId.encodeToNetworkId()
 
 						isIncludeEmpty = false
@@ -219,6 +230,25 @@ internal class SendBirdChannelService(private val logger: Logger) :
 							coroutine.resumeWithException(it)
 						}
 					}
+				}
+			}
+		}
+
+	override suspend fun markChannelRead(channel: Channel) =
+		suspendCancellableCoroutine<Unit> { coroutine ->
+			withSameScope {
+				if (channel.isGroupChannel()) {
+					groupChannel(channel.id).markAsRead {
+						if (it == null) {
+							coroutine.resume(Unit)
+						} else {
+							logger.e("Failed to mark channel read", it)
+							coroutine.resumeWithException(it)
+						}
+					}
+				} else {
+					val ex = IllegalStateException("Cannot mark open channel read")
+					coroutine.resumeWithException(ex)
 				}
 			}
 		}

@@ -36,7 +36,7 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 		}
 	}
 
-	suspend fun userId() = dataStore.data.map { preferences -> preferences[USER_ID] }.first()!!
+	suspend fun userId() = dataStore.data.map { preferences -> preferences[USER_ID] }.first() ?: ""
 
 	suspend fun setUserId(id: String) {
 		dataStore.edit { preferences -> preferences[USER_ID] = id }

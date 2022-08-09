@@ -8,7 +8,6 @@ import androidx.paging.map
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
-import com.zero.android.data.repository.chat.MessageListener
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.toModel
@@ -39,11 +38,6 @@ constructor(
 ) : ChatRepository {
 
 	override val messages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
-
-	override suspend fun addListener(id: String) =
-		chatService.addListener(id, MessageListener(messageDao))
-
-	override suspend fun removeListener(id: String) = chatService.removeListener(id)
 
 	@OptIn(ExperimentalPagingApi::class)
 	override suspend fun getMessages(channel: Channel) {
