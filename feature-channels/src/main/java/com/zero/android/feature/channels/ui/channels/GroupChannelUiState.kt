@@ -1,7 +1,8 @@
 package com.zero.android.feature.channels.ui.channels
 
+import androidx.paging.PagingData
+import androidx.paging.filter
 import com.zero.android.feature.channels.model.ChannelTab
-import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
 
 data class GroupChannelUiState(
@@ -11,12 +12,11 @@ data class GroupChannelUiState(
 	private val allChannels =
 		if (categoryChannelsUiState is CategoryChannelsUiState.Success) {
 			categoryChannelsUiState.channels
-		} else emptyList()
-	private val groupedChannels = allChannels.groupBy { (it as GroupChannel).category }
+		} else PagingData.empty()
 
-	fun getChannels(category: String): List<Channel> {
+	fun getChannels(category: String): PagingData<GroupChannel> {
 		return if (category.equals("All", true)) allChannels
-		else groupedChannels[category] ?: emptyList()
+		else allChannels.filter { it.category == category }
 	}
 }
 
@@ -27,7 +27,9 @@ sealed interface ChannelCategoriesUiState {
 }
 
 sealed interface CategoryChannelsUiState {
-	data class Success(val isSearchResult: Boolean = false) : CategoryChannelsUiState
+	data class Success(val channels: PagingData<GroupChannel>, val isSearchResult: Boolean = false) :
+		CategoryChannelsUiState
+
 	object Error : CategoryChannelsUiState
 	object Loading : CategoryChannelsUiState
 }

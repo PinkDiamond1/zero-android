@@ -1,6 +1,7 @@
 package com.zero.android.feature.channels.ui.channels
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
@@ -11,13 +12,11 @@ import com.zero.android.feature.channels.model.ChannelTab
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Network
-import com.zero.android.models.getTitle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,9 +32,9 @@ constructor(
 
 	private lateinit var network: Network
 	private val _categories = MutableStateFlow<Result<List<ChannelCategory>>>(Result.Loading)
-	private val _channels = MutableStateFlow<Result<List<GroupChannel>>>(Result.Loading)
+	private val _channels = MutableStateFlow<Result<PagingData<GroupChannel>>>(Result.Loading)
 	private val _filteredChannels =
-		MutableStateFlow<Result<List<GroupChannel>?>>(Result.Success(null))
+		MutableStateFlow<Result<PagingData<GroupChannel>?>>(Result.Success(null))
 
 	val showSearchBar: StateFlow<Boolean> = searchTriggerUseCase.showSearchBar
 	val uiState: StateFlow<GroupChannelUiState> =
@@ -52,18 +51,8 @@ constructor(
 						addAll(categoriesResult.data)
 					}
 				val channels = channelsResult.data
-				val channelGroups = channels.groupBy { it.category }
-				val channelTabs =
-					categories.map { category ->
-						val unreadGroupMessagesCount =
-							when {
-								category.equals("All", true) -> {
-									channels.count { it.unreadMessageCount > 0 }
-								}
-								else -> channelGroups[category]?.count { it.unreadMessageCount > 0 } ?: 0
-							}
-						ChannelTab(category.hashCode().toLong(), category, unreadGroupMessagesCount)
-					}
+
+				val channelTabs = categories.map { ChannelTab(it.hashCode().toLong(), it) }
 				GroupChannelUiState(
 					ChannelCategoriesUiState.Success(channelTabs),
 					if (filteredChannelResult is Result.Success &&
@@ -96,19 +85,7 @@ constructor(
 		loadChannels()
 	}
 
-	fun filterChannels(query: String) {
-		ioScope.launch {
-			val mainUiState = _channels.firstOrNull()
-			if (mainUiState is Result.Success) {
-				if (query.isEmpty()) {
-					_filteredChannels.emit(Result.Success(null))
-				} else {
-					val filteredList = mainUiState.data.filter { it.getTitle().contains(query, true) }
-					_filteredChannels.emit(Result.Success(filteredList))
-				}
-			}
-		}
-	}
+	fun filterChannels(query: String) = loadChannels(search = query)
 
 	fun onSearchClosed() {
 		ioScope.launch {
@@ -123,9 +100,11 @@ constructor(
 		}
 	}
 
-	private fun loadChannels() {
+	private fun loadChannels(search: String? = null) {
 		ioScope.launch {
-			channelRepository.getGroupChannels(network.id).asResult().collect { _channels.emit(it) }
+			channelRepository.getGroupChannels(network.id, search = search).asResult().collect {
+				if (search.isNullOrEmpty()) _channels.emit(it) else _filteredChannels.emit(it)
+			}
 		}
 	}
 }

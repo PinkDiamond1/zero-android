@@ -25,17 +25,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
-import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
-fun ChannelSearchResult(channels: List<Channel>, onClick: (Channel) -> Unit) {
+fun ChannelSearchResult(channels: List<GroupChannel>, onClick: (GroupChannel) -> Unit) {
 	val categorisedChannels =
-		(channels as List<GroupChannel>).groupBy {
-			if (it.category.isNullOrEmpty()) "Other" else it.category
-		}
+		channels.groupBy { if (it.category.isNullOrEmpty()) "Other" else it.category }
 	Column(modifier = Modifier.fillMaxSize()) {
 		Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
 			categorisedChannels.forEach { entry ->
@@ -55,7 +52,11 @@ fun ChannelSearchResult(channels: List<Channel>, onClick: (Channel) -> Unit) {
 }
 
 @Composable
-fun ChannelSearchItem(header: String, channels: List<GroupChannel>, onClick: (Channel) -> Unit) {
+fun ChannelSearchItem(
+	header: String,
+	channels: List<GroupChannel>,
+	onClick: (GroupChannel) -> Unit
+) {
 	Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
 		Row(
 			modifier = Modifier.fillMaxWidth(),
