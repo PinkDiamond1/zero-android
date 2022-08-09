@@ -3,6 +3,7 @@ package com.zero.android.data.repository
 import androidx.paging.PagingData
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
+import com.zero.android.models.Member
 import com.zero.android.models.Message
 import kotlinx.coroutines.flow.Flow
 
@@ -23,4 +24,6 @@ interface ChatRepository {
 	suspend fun addListener(id: String)
 
 	suspend fun removeListener(id: String)
+
+    suspend fun getChatMembers(filter: String): List<Member>
 }

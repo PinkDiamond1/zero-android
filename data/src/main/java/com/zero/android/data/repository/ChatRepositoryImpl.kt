@@ -1,10 +1,6 @@
 package com.zero.android.data.repository
 
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.paging.*
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
@@ -14,9 +10,11 @@ import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
+import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.model.ApiMessage
+import com.zero.android.network.model.toMember
 import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
@@ -103,4 +101,12 @@ constructor(
 		chatService.deleteMessage(channel, message)
 		messageDao.delete(message.id)
 	}
+
+    override suspend fun getChatMembers(filter: String): List<Member> {
+        val filterObject = JSONObject().apply {
+            putOpt("filter", filter)
+        }
+        val networkUsers = messageService.getMembers(filterObject.toString())
+        return networkUsers.body()?.map { it.toMember() } ?: emptyList()
+    }
 }
