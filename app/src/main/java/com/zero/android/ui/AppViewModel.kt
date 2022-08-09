@@ -42,4 +42,9 @@ constructor(
 			connectionManager.connect()
 			loading.emit(false)
 		}
+
+	override fun onCleared() {
+		runBlocking { connectionManager.clear() }
+		super.onCleared()
+	}
 }

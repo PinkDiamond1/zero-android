@@ -30,7 +30,7 @@ constructor(private val channelDao: ChannelDao, private val channelService: Chan
 			channelDao
 				.getDirectChannels()
 				.mapNotNull { channels -> channels.map { it.toModel() } }
-				.collectLatest { send(it) }
+				.collect { send(it) }
 		}
 		launch {
 			channelService.getDirectChannels().firstOrNull()?.let { channels ->
@@ -44,7 +44,7 @@ constructor(private val channelDao: ChannelDao, private val channelService: Chan
 			channelDao
 				.getGroupChannels(networkId)
 				.mapNotNull { channels -> channels.map { it.toModel() } }
-				.collectLatest { trySend(it) }
+				.collect { trySend(it) }
 		}
 		launch {
 			channelService.getGroupChannels(networkId, ChannelType.GROUP).firstOrNull()?.let { channels ->

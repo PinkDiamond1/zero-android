@@ -1,4 +1,4 @@
-package com.zero.android.network.chat
+package com.zero.android.network
 
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiChannel
@@ -7,7 +7,7 @@ import com.zero.android.network.model.ApiMember
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.model.events.ApiMessageReactionEvent
 
-interface ChatListener {
+interface SocketListener {
 	fun onMessageReceived(channel: ApiChannel, message: ApiMessage)
 
 	fun onMentionReceived(channel: ApiChannel, message: ApiMessage) {}

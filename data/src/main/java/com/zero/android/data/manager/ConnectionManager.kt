@@ -5,4 +5,6 @@ interface ConnectionManager {
 	suspend fun connect()
 
 	suspend fun disconnect()
+
+	suspend fun clear()
 }

@@ -10,12 +10,12 @@ import com.sendbird.android.ReactionEvent
 import com.sendbird.android.SendBird
 import com.sendbird.android.ThreadInfoUpdateEvent
 import com.sendbird.android.User
-import com.zero.android.network.chat.ChatListener
+import com.zero.android.network.SocketListener
 import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toType
 import com.zero.android.network.model.events.ApiMessageReactionEvent
 
-class SendBirdChatListener(private val listener: ChatListener) : SendBird.ChannelHandler() {
+class SendBirdSocketHandler(private val listener: SocketListener) : SendBird.ChannelHandler() {
 	override fun onMessageReceived(p0: BaseChannel, p1: BaseMessage) {
 		listener.onMessageReceived(p0.toApi(), p1.toApi())
 	}
