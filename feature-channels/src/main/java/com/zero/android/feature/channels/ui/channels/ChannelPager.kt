@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -18,10 +20,13 @@ fun ChannelPager(pagerState: PagerState, ui: GroupChannelUiState, onClick: (Chan
 	val categories = (ui.categoriesUiState as ChannelCategoriesUiState.Success).categories
 	HorizontalPager(state = pagerState, count = categories.size) { index ->
 		Column(modifier = Modifier.fillMaxSize()) {
+            val channels = ui.getChannels(categories[index].name).collectAsLazyPagingItems()
 			LazyColumn {
-				items(ui.getChannels(categories[index].name)) { channel ->
-					ChannelListItem(channel = channel, onClick = onClick)
-				}
+				items(channels) { channel ->
+                    if (channel != null) {
+                        ChannelListItem(channel = channel, onClick = onClick)
+                    }
+                }
 			}
 		}
 	}

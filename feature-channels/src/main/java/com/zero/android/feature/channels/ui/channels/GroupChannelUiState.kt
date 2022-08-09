@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import androidx.paging.filter
 import com.zero.android.feature.channels.model.ChannelTab
 import com.zero.android.models.GroupChannel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 data class GroupChannelUiState(
 	val categoriesUiState: ChannelCategoriesUiState,
@@ -14,9 +15,9 @@ data class GroupChannelUiState(
 			categoryChannelsUiState.channels
 		} else PagingData.empty()
 
-	fun getChannels(category: String): PagingData<GroupChannel> {
-		return if (category.equals("All", true)) allChannels
-		else allChannels.filter { it.category == category }
+	fun getChannels(category: String = "All"): MutableStateFlow<PagingData<GroupChannel>> {
+		return if (category.equals("All", true)) MutableStateFlow(allChannels)
+		else MutableStateFlow(allChannels.filter { it.category == category })
 	}
 }
 

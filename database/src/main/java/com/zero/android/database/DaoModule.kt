@@ -43,6 +43,6 @@ object DaoModule {
 		)
 
 	@Provides
-	fun provideMessageDao(database: AppDatabase, channelDao: ChannelDao) =
-		MessageDao(database.messageDao(), database.memberDao(), channelDao)
+	fun provideMessageDao(database: AppDatabase) =
+		MessageDao(database.messageDao(), database.memberDao(), database.directChannelDao())
 }

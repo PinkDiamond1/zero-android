@@ -1,7 +1,5 @@
 package com.zero.android.models.fake
 
-import com.zero.android.models.DirectChannel
-import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.Network
@@ -21,31 +19,6 @@ object FakeModel {
 		)
 
 	fun networks() = listOf(Network("one"), Network("two"), Network("three"))
-
-	fun DirectChannel(id: String = "url", unread: Int = 1) =
-		DirectChannel(
-			id = id,
-			createdAt = 0,
-			memberCount = 2,
-			members = listOf(Member("one"), Member("two")),
-			unreadMessageCount = unread
-		)
-
-	fun GroupChannel(id: String = "url", name: String = "Channel Name", unread: Int = 1) =
-		GroupChannel(
-			id = id,
-			name = name,
-			networkId = "",
-			createdAt = 0,
-			memberCount = 2,
-			members = listOf(Member("one"), Member("two")),
-			operators = listOf(Member("one")),
-			unreadMessageCount = unread
-		)
-
-	fun groupChannels() = listOf(GroupChannel("one"), GroupChannel("two"))
-
-	fun directChannels() = listOf(DirectChannel("one"), DirectChannel("two"))
 
 	fun Member(
 		id: String = "id",

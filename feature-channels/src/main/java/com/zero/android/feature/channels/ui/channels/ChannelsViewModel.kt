@@ -2,6 +2,7 @@ package com.zero.android.feature.channels.ui.channels
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
@@ -102,7 +103,8 @@ constructor(
 
 	private fun loadChannels(search: String? = null) {
 		ioScope.launch {
-			channelRepository.getGroupChannels(network.id, search = search).asResult().collect {
+			channelRepository.getGroupChannels(network.id, search = search)
+                .cachedIn(ioScope).asResult().collect {
 				if (search.isNullOrEmpty()) _channels.emit(it) else _filteredChannels.emit(it)
 			}
 		}

@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.zero.android.common.R
@@ -61,7 +62,8 @@ fun ChannelsScreen(
 					)
 				}
 				if (isSearchResult) {
-					ChannelSearchResult(uiState.categoryChannelsUiState.channels) {
+                    val channels = uiState.getChannels().collectAsLazyPagingItems().itemSnapshotList.items
+					ChannelSearchResult(channels) {
 						onSearchClosed()
 						onChannelSelected(it)
 					}

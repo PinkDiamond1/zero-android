@@ -9,7 +9,7 @@ class MessageDao
 constructor(
 	private val messageDao: MessageDaoImpl,
 	private val memberDao: MemberDao,
-	private val channelDao: ChannelDao
+	private val directChannelDao: DirectChannelDaoImpl
 ) {
 
 	fun get(id: String) = messageDao.get(id)
@@ -23,7 +23,11 @@ constructor(
 
 		data
 			.map { it.message.channelId }
-			.forEach { channelId -> channelDao.updateLatestMessage(channelId) }
+			.forEach { channelId ->
+                getLatestMessageByChannel(channelId)?.let {
+                    directChannelDao.updateLastMessage(channelId, it)
+                }
+            }
 	}
 
 	suspend fun update(id: String, text: String) = messageDao.update(id, text)
