@@ -105,7 +105,7 @@ constructor(
 		ioScope.launch {
 			channelRepository
 				.getGroupChannels(network.id, search = search)
-				.cachedIn(ioScope)
+				.cachedIn(viewModelScope)
 				.asResult()
 				.collect {
 					if (search.isNullOrEmpty()) _channels.emit(it) else _filteredChannels.emit(it)

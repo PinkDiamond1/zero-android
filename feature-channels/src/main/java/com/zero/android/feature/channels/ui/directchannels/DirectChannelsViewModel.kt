@@ -1,6 +1,8 @@
 package com.zero.android.feature.channels.ui.directchannels
 
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
@@ -51,21 +53,25 @@ constructor(
 		channelsJob?.cancel()
 		channelsJob =
 			ioScope.launch {
-				channelRepository.getDirectChannels(search = search).asResult().collect {
-					when (it) {
-						is Result.Success -> {
-							channels.emit(it.data)
-							_uiState.emit(
-								DirectChannelScreenUiState(
-									DirectChannelUiState.Success(isSearchResult = !search.isNullOrEmpty())
+				channelRepository
+					.getDirectChannels(search = search)
+					.cachedIn(viewModelScope)
+					.asResult()
+					.collect {
+						when (it) {
+							is Result.Success -> {
+								channels.emit(it.data)
+								_uiState.emit(
+									DirectChannelScreenUiState(
+										DirectChannelUiState.Success(isSearchResult = !search.isNullOrEmpty())
+									)
 								)
-							)
+							}
+							is Result.Loading ->
+								_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Loading))
+							else -> _uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Error))
 						}
-						is Result.Loading ->
-							_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Loading))
-						else -> _uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Error))
 					}
-				}
 			}
 	}
 }

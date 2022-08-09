@@ -34,8 +34,8 @@ constructor(
 		groupChannelDao.upsert(messageDao, memberDao, *data)
 
 	internal suspend fun updateLatestMessage(id: String) {
-		messageDao.getLatestMessageByChannel(id)?.let { messageId ->
-			directChannelDao.updateLastMessage(id, messageId)
+		messageDao.getLatestMessageByChannel(id)?.let { meta ->
+			directChannelDao.updateLastMessage(id, meta.id, meta.createdAt)
 		}
 	}
 

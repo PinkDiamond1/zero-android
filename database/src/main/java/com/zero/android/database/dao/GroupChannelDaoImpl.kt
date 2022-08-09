@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.Flow
 abstract class GroupChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
-	@Query("SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId")
+	@Query(
+		"SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId ORDER BY updatedAt DESC"
+	)
 	abstract fun getByNetwork(networkId: String): PagingSource<Int, GroupChannelWithRefs>
 
 	@Transaction
 	@Query(
-		"SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId AND name LIKE :name"
+		"SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId AND name LIKE '%'||:name||'%'"
 	)
 	abstract fun searchByNetwork(
 		networkId: String,

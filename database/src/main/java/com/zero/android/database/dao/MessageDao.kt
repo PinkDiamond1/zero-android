@@ -25,7 +25,7 @@ constructor(
 			.map { it.message.channelId }
 			.forEach { channelId ->
 				getLatestMessageByChannel(channelId)?.let {
-					directChannelDao.updateLastMessage(channelId, it)
+					directChannelDao.updateLastMessage(channelId, it.id, it.createdAt)
 				}
 			}
 	}

@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.Flow
 abstract class DirectChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
-	@Query("SELECT * FROM channels WHERE isDirectChannel = 1")
+	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 ORDER BY updatedAt DESC")
 	abstract fun getAll(): PagingSource<Int, DirectChannelWithRefs>
 
 	@Transaction
-	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 AND name LIKE :name")
+	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 AND name LIKE '%'||:name||'%'")
 	abstract fun search(name: String): PagingSource<Int, DirectChannelWithRefs>
 
 	@Transaction
