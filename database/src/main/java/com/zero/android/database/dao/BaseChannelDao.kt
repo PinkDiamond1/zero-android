@@ -20,8 +20,7 @@ abstract class BaseChannelDao : BaseDao<ChannelEntity>() {
 	@Query(
 		"""
 		UPDATE channels 
-		SET lastMessageId = :lastMessageId, 
-		updatedAt = :lastMessageTimestamp
+		SET lastMessageId = :lastMessageId, lastMessageTime = :lastMessageTimestamp
 		WHERE id = :id
 		"""
 	)

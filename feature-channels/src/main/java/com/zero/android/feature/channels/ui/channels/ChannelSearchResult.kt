@@ -24,13 +24,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
 import com.zero.android.common.R
 import com.zero.android.models.GroupChannel
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
-fun ChannelSearchResult(channels: List<GroupChannel>, onClick: (GroupChannel) -> Unit) {
+fun ChannelSearchResult(
+	channelList: LazyPagingItems<GroupChannel>,
+	onClick: (GroupChannel) -> Unit
+) {
+	val channels = channelList.itemSnapshotList.items // TODO: optimize & use LazyPagingItems directly
 	val categorisedChannels =
 		channels.groupBy { if (it.category.isNullOrEmpty()) "Other" else it.category }
 	Column(modifier = Modifier.fillMaxSize()) {

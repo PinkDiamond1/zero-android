@@ -60,20 +60,21 @@ constructor(
 	@OptIn(ExperimentalPagingApi::class)
 	override fun getGroupChannels(
 		networkId: String,
+		category: String?,
 		search: String?
 	): Flow<PagingData<GroupChannel>> {
 		return Pager(
 			config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
 			remoteMediator =
 			GroupChannelsRemoteMediator(
-				networkId,
+				networkId = networkId,
 				channelDao,
 				channelService,
 				logger,
 				search = search
 			),
 			pagingSourceFactory = {
-				if (search.isNullOrEmpty()) channelDao.getGroupChannels(networkId)
+				if (search.isNullOrEmpty()) channelDao.getGroupChannels(networkId, category)
 				else channelDao.searchGroupChannels(networkId, search)
 			}
 		)

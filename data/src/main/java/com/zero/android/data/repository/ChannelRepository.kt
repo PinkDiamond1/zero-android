@@ -10,7 +10,11 @@ interface ChannelRepository {
 
 	fun getDirectChannels(search: String? = null): Flow<PagingData<DirectChannel>>
 
-	fun getGroupChannels(networkId: String, search: String? = null): Flow<PagingData<GroupChannel>>
+	fun getGroupChannels(
+		networkId: String,
+		category: String? = null,
+		search: String? = null
+	): Flow<PagingData<GroupChannel>>
 
 	suspend fun getGroupChannel(id: String): Flow<GroupChannel>
 

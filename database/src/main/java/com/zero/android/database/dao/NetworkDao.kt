@@ -21,8 +21,8 @@ abstract class NetworkDao : BaseDao<NetworkEntity>() {
 	@Query(
 		"""
 		SELECT DISTINCT category from channels 
-		WHERE networkId = :id 
-		AND isDirectChannel = 0 
+		WHERE isDirectChannel = 0 
+		AND networkId = :id 
 		AND category IS NOT NULL AND category != '' 
 		ORDER BY category
 		"""

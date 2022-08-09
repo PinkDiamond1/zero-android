@@ -3,6 +3,7 @@ package com.zero.android.database.dao
 import com.zero.android.database.model.ChannelEntity
 import com.zero.android.database.model.DirectChannelWithRefs
 import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.models.ChannelCategory
 import javax.inject.Inject
 
 class ChannelDao
@@ -14,7 +15,9 @@ constructor(
 	private val messageDao: MessageDao
 ) {
 
-	fun getGroupChannels(networkId: String) = groupChannelDao.getByNetwork(networkId)
+	fun getGroupChannels(networkId: String, category: ChannelCategory? = null) =
+		if (category.isNullOrEmpty()) groupChannelDao.getByNetwork(networkId)
+		else groupChannelDao.getByNetworkAndCategory(networkId, category)
 
 	fun getDirectChannels() = directChannelDao.getAll()
 

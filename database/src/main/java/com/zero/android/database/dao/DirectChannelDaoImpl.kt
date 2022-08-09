@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class DirectChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
-	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 ORDER BY updatedAt DESC")
+	@Query("SELECT * FROM channels WHERE isDirectChannel = 1 ORDER BY lastMessageTime DESC")
 	abstract fun getAll(): PagingSource<Int, DirectChannelWithRefs>
 
 	@Transaction

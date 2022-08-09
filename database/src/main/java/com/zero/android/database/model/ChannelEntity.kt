@@ -40,7 +40,7 @@ data class ChannelEntity(
 	val memberCount: Int = 0,
 	val coverUrl: String? = null,
 	val createdAt: Long = 0,
-	val updatedAt: Long = 0,
+	val lastMessageTime: Long = 0,
 	val isTemporary: Boolean = false,
 	val unreadMentionCount: Int = 0,
 	val unreadMessageCount: Int = 0,
