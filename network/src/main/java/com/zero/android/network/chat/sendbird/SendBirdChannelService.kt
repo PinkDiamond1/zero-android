@@ -10,7 +10,15 @@ import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.enums.ChannelType
-import com.zero.android.network.chat.conversion.*
+import com.zero.android.network.chat.conversion.encodeToNetworkId
+import com.zero.android.network.chat.conversion.isGroupChannel
+import com.zero.android.network.chat.conversion.isOpenChannel
+import com.zero.android.network.chat.conversion.networkId
+import com.zero.android.network.chat.conversion.toApi
+import com.zero.android.network.chat.conversion.toDirectApi
+import com.zero.android.network.chat.conversion.toGroupApi
+import com.zero.android.network.chat.conversion.toOpenParams
+import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.service.ChannelCategoryService
 import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.flow.firstOrNull
@@ -43,6 +51,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			if (type == ChannelType.OPEN) {
 				val query =
 					OpenChannel.createOpenChannelListQuery().apply {
+						setLimit(100)
 						setCustomTypeFilter(networkId.encodeToNetworkId())
 					}
 				query.next { channels, e ->
@@ -55,6 +64,9 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			} else if (type == ChannelType.GROUP) {
 				val query =
 					GroupChannel.createMyGroupChannelListQuery().apply {
+						limit = 100
+						isIncludeEmpty = false
+						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 						customTypeStartsWithFilter = networkId.encodeToNetworkId()
 					}
 				query.next { channels, e ->
@@ -70,9 +82,9 @@ internal class SendBirdChannelService(private val logger: Logger) :
 	override suspend fun getDirectChannels() = callbackFlowWithAwait {
 		GroupChannel.createMyGroupChannelListQuery()
 			.apply {
+				limit = 100
 				isIncludeEmpty = false
 				order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
-				limit = 100
 			}
 			.next { channels, e ->
 				if (e != null) {
