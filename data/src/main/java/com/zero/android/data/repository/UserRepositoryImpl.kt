@@ -1,5 +1,6 @@
 package com.zero.android.data.repository
 
+import android.content.Context
 import com.zero.android.common.system.Logger
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.conversion.toModel
@@ -46,9 +47,9 @@ constructor(
 		}
 	}
 
-	override suspend fun logout() {
+	override suspend fun logout(context: Context) {
 		dataCleaner.clean()
-		connectionManager.disconnect()
+		connectionManager.disconnect(context)
 	}
 
 	private suspend fun refreshChatAccessToken(accessToken: String) {

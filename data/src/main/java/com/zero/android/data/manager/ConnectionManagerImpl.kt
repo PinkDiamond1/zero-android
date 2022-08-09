@@ -1,5 +1,6 @@
 package com.zero.android.data.manager
 
+import android.content.Context
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.datastore.ChatPreferences
 import com.zero.android.network.SocketProvider
@@ -21,8 +22,8 @@ constructor(
 		socketProvider.startListening(socketListener)
 	}
 
-	override suspend fun disconnect() {
-		chatProvider.disconnect()
+	override suspend fun disconnect(context: Context) {
+		chatProvider.disconnect(context)
 		clear()
 	}
 

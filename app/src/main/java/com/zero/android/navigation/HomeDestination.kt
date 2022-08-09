@@ -11,5 +11,5 @@ object HomeDestination : NavDestination {
 }
 
 internal fun NavGraphBuilder.homeGraph(onLogout: () -> Unit) {
-	composable(route = HomeDestination.route) { HomeRoute() }
+	composable(route = HomeDestination.route) { HomeRoute(onLogout = onLogout) }
 }
