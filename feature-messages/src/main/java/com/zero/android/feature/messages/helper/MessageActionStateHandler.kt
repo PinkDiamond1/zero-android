@@ -20,8 +20,12 @@ object MessageActionStateHandler {
 
 	private val _mentionUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
 	val mentionUser: StateFlow<Boolean> = _mentionUser
-	val messageLastText = MutableStateFlow("")
+	private val messageLastText = MutableStateFlow("")
 	val messageUpdatedText = MutableStateFlow("")
+
+	private val _mentionedUsers = mutableListOf<Member>()
+	val mentionedUsers: List<Member>
+		get() = _mentionedUsers
 
 	val isActionModeStarted: Boolean
 		get() = _selectedMessage.value != null
@@ -85,6 +89,7 @@ object MessageActionStateHandler {
 	}
 
 	fun onUserMentionSelected(member: Member) {
+		_mentionedUsers.add(member)
 		ioScope.launch {
 			val lastMessage = messageLastText.value
 			val newMessageText = buildString {
@@ -95,5 +100,9 @@ object MessageActionStateHandler {
 			messageUpdatedText.emit(newMessageText)
 			_mentionUser.emit(false)
 		}
+	}
+
+	fun getMentionQuery(text: String): String {
+		return text.split("@").lastOrNull()?.split(" ")?.firstOrNull()?.trim() ?: ""
 	}
 }

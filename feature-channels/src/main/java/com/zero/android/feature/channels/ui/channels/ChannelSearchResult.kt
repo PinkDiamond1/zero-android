@@ -86,7 +86,7 @@ fun ChannelSearchItem(
 				itemContent = { channel ->
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier.clickable { onClick(channel) }
+						modifier = Modifier.fillMaxWidth().clickable { onClick(channel) }
 					) {
 						NameInitialsView(modifier = Modifier.size(32.dp), userName = channel.name)
 						Spacer(modifier = Modifier.size(8.dp))
@@ -116,6 +116,7 @@ fun ChannelSearchItem(
 							)
 						}
 					}
+					Spacer(modifier = Modifier.size(6.dp))
 				}
 			)
 		}

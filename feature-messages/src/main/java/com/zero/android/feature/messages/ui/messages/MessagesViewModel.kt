@@ -8,23 +8,30 @@ import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.ChatRepository
+import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.navigation.MessagesDestination
 import com.zero.android.feature.messages.util.MessageUtil
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
+import com.zero.android.models.Member
 import com.zero.android.models.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class MessagesViewModel
 @Inject
@@ -45,6 +52,10 @@ constructor(
 	val messages = chatRepository.messages
 	private val _messagesResult = messages.asResult()
 
+	private val _textSearch = MutableStateFlow("")
+	private val _chatMentionUsers = MutableStateFlow<List<Member>>(emptyList())
+	val chatMentionUsers: StateFlow<List<Member>> = _chatMentionUsers
+
 	val uiState: StateFlow<ChatScreenUiState> =
 		combine(_channel, _messagesResult) { channelResult, messagesResult ->
 			ChatScreenUiState(channelUiState = channelResult, messagesUiState = messagesResult)
@@ -58,6 +69,19 @@ constructor(
 					messagesUiState = Result.Loading
 				)
 			)
+
+	init {
+		viewModelScope.launch {
+			_textSearch.asStateFlow().debounce(1500).collectLatest { query ->
+				val members = chatRepository.getChatMembers(query)
+				_chatMentionUsers.emit(members.distinct())
+			}
+		}
+	}
+
+	fun onSearchTextChanged(text: String) {
+		_textSearch.value = MessageActionStateHandler.getMentionQuery(text)
+	}
 
 	fun loadChannel() {
 		ioScope.launch {

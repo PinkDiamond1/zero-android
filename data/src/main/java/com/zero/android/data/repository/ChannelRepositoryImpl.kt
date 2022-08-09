@@ -9,7 +9,6 @@ import com.zero.android.common.extensions.channelFlowWithAwait
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
-import com.zero.android.data.conversion.toModel
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.chat.DirectChannelsRemoteMediator
 import com.zero.android.data.repository.chat.GroupChannelsRemoteMediator
@@ -107,7 +106,6 @@ constructor(
 			channelService.getChannel(id, type = ChannelType.GROUP).map {
 				it as ApiDirectChannel
 				channelDao.upsert(it.toEntity(userId))
-				trySend(it.toModel(userId))
 			}
 		}
 	}

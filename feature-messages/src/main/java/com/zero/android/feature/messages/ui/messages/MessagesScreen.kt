@@ -41,6 +41,7 @@ import com.zero.android.feature.messages.ui.components.UserInputPanel
 import com.zero.android.feature.messages.ui.voicememo.MemoRecorderViewModel
 import com.zero.android.feature.messages.ui.voicememo.RecordMemoView
 import com.zero.android.feature.messages.util.MessageUtil
+import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.components.AppBar
@@ -59,6 +60,7 @@ fun MessagesRoute(
 ) {
 	val chatUiState: ChatScreenUiState by viewModel.uiState.collectAsState()
 	val recordingState: Boolean by recordMemoViewModel.recordingState.collectAsState()
+	val chatMentionUsers: List<Member> by viewModel.chatMentionUsers.collectAsState()
 	val userChannelInfo = viewModel.loggedInUserId to viewModel.isGroupChannel
 	val context = LocalContext.current
 
@@ -118,15 +120,13 @@ fun MessagesRoute(
 		chatUiState.messagesUiState,
 		pagedMessages,
 		recordingState,
+		chatMentionUsers,
 		onNewMessage = { newMessage ->
-			val channelUiState = chatUiState.channelUiState
-			val members =
-				if (channelUiState is Result.Success) channelUiState.data.members else emptyList()
 			viewModel.sendMessage(
 				MessageUtil.newTextMessage(
 					msg = newMessage,
 					authorId = userChannelInfo.first,
-					channelMembers = members
+					channelMembers = MessageActionStateHandler.mentionedUsers
 				)
 			)
 		},
@@ -161,13 +161,15 @@ fun MessagesRoute(
 		onEditMessage = { viewModel.updateMessage(it) },
 		onDeleteMessage = { viewModel.deleteMessage(it) },
 		onReplyToMessage = { messageId, reply ->
-			val channelUiState = chatUiState.channelUiState
-			val members =
-				if (channelUiState is Result.Success) channelUiState.data.members else emptyList()
 			val replyMessage =
-				MessageUtil.newTextMessage(reply, userChannelInfo.first, channelMembers = members)
+				MessageUtil.newTextMessage(
+					reply,
+					userChannelInfo.first,
+					channelMembers = MessageActionStateHandler.mentionedUsers
+				)
 			viewModel.replyToMessage(messageId, replyMessage)
-		}
+		},
+		onTextChanged = { viewModel.onSearchTextChanged(it) }
 	)
 }
 
@@ -181,13 +183,15 @@ fun MessagesScreen(
 	messagesUiState: MessagesUIState,
 	messages: LazyPagingItems<Message>,
 	isMemoRecording: Boolean,
+	chatMentionUsers: List<Member>,
 	onNewMessage: (String) -> Unit,
 	onPickImage: (Intent) -> Unit,
 	onRecordMemo: () -> Unit,
 	onSendMemo: () -> Unit,
 	onEditMessage: (Message) -> Unit,
 	onDeleteMessage: (Message) -> Unit,
-	onReplyToMessage: (String, String) -> Unit
+	onReplyToMessage: (String, String) -> Unit,
+	onTextChanged: (String) -> Unit
 ) {
 	val context = LocalContext.current
 	val actionMessage by MessageActionStateHandler.selectedMessage.collectAsState()
@@ -280,8 +284,7 @@ fun MessagesScreen(
 					)
 					BottomBarDivider()
 					if (mentionUser) {
-						val chatMembers =
-							chatChannelUiState.data.members.filter { it.id != userChannelInfo.first }
+						val chatMembers = chatMentionUsers.filter { it.id != userChannelInfo.first }
 						MentionUsersList(
 							membersList = chatMembers,
 							onMemberSelected = { MessageActionStateHandler.onUserMentionSelected(it) }
@@ -298,9 +301,9 @@ fun MessagesScreen(
 								initialText = editableMessage?.message ?: "",
 								onMessageSent = {
 									if (editableMessage != null) {
-										editableMessage?.copy(message = it)?.let(onEditMessage)
+										editableMessage?.copy(message = it.trim())?.let(onEditMessage)
 										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it)
+									} else onNewMessage(it.trim())
 								},
 								addAttachment = {
 									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
@@ -308,15 +311,16 @@ fun MessagesScreen(
 								addImage = {
 									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
 								},
-								recordMemo = onRecordMemo
+								recordMemo = onRecordMemo,
+								onTextChanged = { if (mentionUser) onTextChanged(it) }
 							)
 						} else {
 							UserInputPanel(
 								onMessageSent = {
 									if (replyMessage != null) {
-										onReplyToMessage(replyMessage!!.id, it)
+										onReplyToMessage(replyMessage!!.id, it.trim())
 										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it)
+									} else onNewMessage(it.trim())
 								},
 								addAttachment = {
 									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
@@ -324,7 +328,8 @@ fun MessagesScreen(
 								addImage = {
 									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
 								},
-								recordMemo = onRecordMemo
+								recordMemo = onRecordMemo,
+								onTextChanged = { if (mentionUser) onTextChanged(it) }
 							)
 						}
 					}
