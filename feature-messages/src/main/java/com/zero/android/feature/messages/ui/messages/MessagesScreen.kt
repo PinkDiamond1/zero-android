@@ -218,11 +218,7 @@ fun MessagesScreen(
 				},
 				title = {
 					if (actionMessage == null) {
-						ChatScreenAppBarTitle(
-							userChannelInfo.first,
-							chatChannelUiState.data,
-							userChannelInfo.second
-						)
+						ChatScreenAppBarTitle(chatChannelUiState.data, userChannelInfo.second)
 					}
 				},
 				actions = {

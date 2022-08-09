@@ -5,7 +5,6 @@ import com.zero.android.database.dao.DirectChannelDaoImpl
 import com.zero.android.database.dao.GroupChannelDaoImpl
 import com.zero.android.database.dao.MemberDao
 import com.zero.android.database.dao.MessageDao
-import com.zero.android.database.dao.MessageDaoImpl
 import com.zero.android.database.dao.NetworkDao
 import com.zero.android.database.dao.ProfileDao
 import com.zero.android.database.dao.UserDao
@@ -44,9 +43,6 @@ object DaoModule {
 		)
 
 	@Provides
-	fun provideMessageDaoInterface(database: AppDatabase): MessageDaoImpl = database.messageDao()
-
-	@Provides
 	fun provideMessageDao(database: AppDatabase) =
-		MessageDao(database.messageDao(), database.memberDao())
+		MessageDao(database.messageDao(), database.memberDao(), database.directChannelDao())
 }

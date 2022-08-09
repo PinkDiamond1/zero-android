@@ -15,7 +15,7 @@ import com.zero.android.models.enums.ChannelType
 
 @Entity(
 	tableName = "channels",
-	indices = [Index("networkId"), Index("authorId")],
+	indices = [Index("networkId"), Index("authorId"), Index("name")],
 	foreignKeys =
 	[
 		ForeignKey(
@@ -34,11 +34,13 @@ import com.zero.android.models.enums.ChannelType
 )
 data class ChannelEntity(
 	@PrimaryKey override val id: String,
+	val name: String = "",
 	val lastMessageId: String? = null,
 	val authorId: String? = null,
 	val memberCount: Int = 0,
 	val coverUrl: String? = null,
 	val createdAt: Long = 0,
+	val lastMessageTime: Long = 0,
 	val isTemporary: Boolean = false,
 	val unreadMentionCount: Int = 0,
 	val unreadMessageCount: Int = 0,
@@ -47,7 +49,6 @@ data class ChannelEntity(
 	val accessCode: String? = null,
 	val networkId: String? = null,
 	val category: ChannelCategory? = null,
-	val name: String = "",
 	val isSuper: Boolean = false,
 	val isPublic: Boolean = false,
 	val isDiscoverable: Boolean = false,
@@ -63,6 +64,7 @@ data class ChannelEntity(
 fun ChannelEntity.toDirectModel(members: List<Member>, lastMessage: Message? = null) =
 	DirectChannel(
 		id = id,
+		name = name,
 		memberCount = memberCount,
 		coverUrl = coverUrl,
 		createdAt = createdAt,

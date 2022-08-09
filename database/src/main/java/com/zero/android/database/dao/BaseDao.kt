@@ -41,5 +41,5 @@ abstract class BaseDao<T : BaseEntity> {
 
 	@Delete abstract suspend fun delete(item: List<T>)
 
-	@Transaction open suspend fun transaction(block: () -> Unit) = block()
+	@Transaction open suspend fun transaction(block: suspend () -> Unit) = block()
 }

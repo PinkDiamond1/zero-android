@@ -2,18 +2,30 @@ package com.zero.android.feature.channels.ui.channels
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import com.zero.android.common.R
+import com.zero.android.common.ui.Result
+import com.zero.android.feature.channels.model.ChannelTab
 import com.zero.android.models.Channel
+import com.zero.android.models.ChannelCategory
+import com.zero.android.models.GroupChannel
 import com.zero.android.models.Network
 import com.zero.android.ui.components.SearchView
 import com.zero.android.ui.extensions.Preview
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun ChannelsRoute(
@@ -21,13 +33,21 @@ fun ChannelsRoute(
 	viewModel: ChannelsViewModel = hiltViewModel(),
 	onChannelSelected: (Channel) -> Unit
 ) {
-	val uiState: GroupChannelUiState by viewModel.uiState.collectAsState()
 	val showSearch: Boolean by viewModel.showSearchBar.collectAsState()
+
+	val categoriesUiState by viewModel.categoriesState.collectAsState()
+	val lazyFilteredItems = viewModel.filteredPager.collectAsLazyPagingItems()
+	val isSearchState by viewModel.searchState.collectAsState()
+
+	val pagers by viewModel.pagers.collectAsState()
 
 	LaunchedEffect(network?.id) { network?.let { viewModel.onNetworkUpdated(it) } }
 	ChannelsScreen(
-		uiState,
+		categoriesUiState,
+		pagers,
+		lazyFilteredItems,
 		showSearch,
+		isSearchState,
 		onChannelSelected,
 		onChannelSearched = { viewModel.filterChannels(it) },
 		onSearchClosed = viewModel::onSearchClosed
@@ -37,8 +57,11 @@ fun ChannelsRoute(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ChannelsScreen(
-	uiState: GroupChannelUiState,
+	categoriesUiState: Result<List<ChannelCategory>>,
+	pagers: Map<ChannelCategory, Flow<PagingData<GroupChannel>>>,
+	filteredChannels: LazyPagingItems<GroupChannel>,
 	showSearchBar: Boolean = false,
+	isSearchState: Boolean = false,
 	onChannelSelected: (Channel) -> Unit,
 	onChannelSearched: (String) -> Unit,
 	onSearchClosed: () -> Unit
@@ -46,11 +69,9 @@ fun ChannelsScreen(
 	val coroutineScope = rememberCoroutineScope()
 	val pagerState = rememberPagerState(initialPage = 0)
 
-	if (uiState.categoriesUiState is ChannelCategoriesUiState.Success &&
-		uiState.categoryChannelsUiState is CategoryChannelsUiState.Success
-	) {
-		val tabs = uiState.categoriesUiState.categories
-		val isSearchResult = uiState.categoryChannelsUiState.isSearchResult
+	if (categoriesUiState is Result.Success) {
+		val categories = categoriesUiState.data
+		val tabs = categories.map { ChannelTab(0, it, 0) }
 		if (tabs.isNotEmpty()) {
 			Column(modifier = Modifier.fillMaxWidth()) {
 				if (showSearchBar) {
@@ -60,14 +81,14 @@ fun ChannelsScreen(
 						onSearchCancelled = { onSearchClosed() }
 					)
 				}
-				if (isSearchResult) {
-					ChannelSearchResult(uiState.categoryChannelsUiState.channels) {
+				if (isSearchState) {
+					ChannelSearchResult(filteredChannels) {
 						onSearchClosed()
 						onChannelSelected(it)
 					}
 				} else {
 					ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
-					ChannelPager(pagerState = pagerState, groupChannelUiState = uiState) {
+					ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
 						onChannelSelected(it)
 					}
 				}

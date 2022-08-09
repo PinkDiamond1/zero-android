@@ -64,6 +64,8 @@ data class MessageEntity(
 	val reactions: List<MessageReaction> = emptyList()
 ) : BaseEntity
 
+data class MessageMeta(@PrimaryKey val id: String, val createdAt: Long)
+
 fun MessageEntity.toModel(author: Member) =
 	Message(
 		id = id,

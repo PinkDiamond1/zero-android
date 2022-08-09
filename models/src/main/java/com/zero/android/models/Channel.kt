@@ -6,6 +6,7 @@ import com.zero.android.models.enums.ChannelType
 
 interface Channel {
 	val id: String
+	val name: String
 	val members: List<Member>
 	val memberCount: Int
 	val coverUrl: String?
@@ -23,6 +24,7 @@ typealias ChannelCategory = String
 
 data class DirectChannel(
 	override val id: String,
+	override val name: String,
 	override val members: List<Member>,
 	override val memberCount: Int,
 	override val coverUrl: String? = null,
@@ -40,7 +42,7 @@ data class GroupChannel(
 	override val id: String,
 	val networkId: String,
 	val category: ChannelCategory? = null,
-	val name: String,
+	override val name: String,
 	val operators: List<Member>,
 	override val members: List<Member>,
 	override val memberCount: Int,
@@ -70,15 +72,4 @@ data class GroupChannel(
 
 	val hasTelegramChannel: Boolean
 		get() = telegramChatId != null
-}
-
-fun Channel.getTitle(loggedInUserId: String? = null): String {
-	return if (this is GroupChannel) this.name
-	else {
-		(this as DirectChannel)
-			.members
-			.filter { it.id != loggedInUserId }
-			.joinToString { it.name ?: "" }
-			.trim()
-	}
 }

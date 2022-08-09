@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageMentionCrossRef
+import com.zero.android.database.model.MessageMeta
 import com.zero.android.database.model.MessageWithRefs
 import kotlinx.coroutines.flow.Flow
 
@@ -21,6 +22,12 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	@Transaction
 	@Query("SELECT * FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC")
 	abstract fun getByChannel(channelId: String): PagingSource<Int, MessageWithRefs>
+
+	@Transaction
+	@Query(
+		"SELECT id, createdAt FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC LIMIT 1"
+	)
+	abstract fun getLatestMessageByChannel(channelId: String): MessageMeta?
 
 	@Transaction
 	internal open suspend fun upsert(memberDao: MemberDao, vararg data: MessageWithRefs) {

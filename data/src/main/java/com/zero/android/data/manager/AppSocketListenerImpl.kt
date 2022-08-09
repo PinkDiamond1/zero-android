@@ -1,6 +1,7 @@
 package com.zero.android.data.manager
 
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.delegates.Preferences
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.network.SocketListener
@@ -11,16 +12,23 @@ import com.zero.android.network.model.ApiMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class AppSocketListenerImpl
 @Inject
-constructor(private val messageDao: MessageDao, private val channelDao: ChannelDao) :
-	SocketListener {
+constructor(
+	private val preferences: Preferences,
+	private val messageDao: MessageDao,
+	private val channelDao: ChannelDao
+) : SocketListener {
+
+	val userId
+		get() = runBlocking(Dispatchers.IO) { preferences.userId() }
 
 	override fun onMessageReceived(channel: ApiChannel, message: ApiMessage) {
 		CoroutineScope(Dispatchers.IO).launch {
-			if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity())
+			if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity(userId))
 			else if (channel is ApiGroupChannel) channelDao.upsert(channel.toEntity())
 			messageDao.upsert(message.toEntity())
 		}
@@ -28,7 +36,7 @@ constructor(private val messageDao: MessageDao, private val channelDao: ChannelD
 
 	override fun onMessageUpdated(channel: ApiChannel, message: ApiMessage) {
 		CoroutineScope(Dispatchers.IO).launch {
-			if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity())
+			if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity(userId))
 			else if (channel is ApiGroupChannel) channelDao.upsert(channel.toEntity())
 			messageDao.upsert(message.toEntity())
 		}

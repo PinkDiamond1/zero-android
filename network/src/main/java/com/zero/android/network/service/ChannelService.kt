@@ -11,10 +11,17 @@ interface ChannelService {
 
 	suspend fun getGroupChannels(
 		networkId: String,
-		type: ChannelType = ChannelType.GROUP
+		type: ChannelType = ChannelType.GROUP,
+		before: String? = null,
+		loadSize: Int = 1,
+		searchName: String? = null
 	): Flow<List<ApiGroupChannel>>
 
-	suspend fun getDirectChannels(): Flow<List<ApiDirectChannel>>
+	suspend fun getDirectChannels(
+		before: String? = null,
+		loadSize: Int = 1,
+		searchName: String? = null
+	): Flow<List<ApiDirectChannel>>
 
 	suspend fun createChannel(networkId: String, channel: Channel): Flow<ApiChannel>
 

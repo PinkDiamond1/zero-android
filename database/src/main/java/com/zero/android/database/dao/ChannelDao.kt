@@ -3,6 +3,7 @@ package com.zero.android.database.dao
 import com.zero.android.database.model.ChannelEntity
 import com.zero.android.database.model.DirectChannelWithRefs
 import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.models.ChannelCategory
 import javax.inject.Inject
 
 class ChannelDao
@@ -14,9 +15,16 @@ constructor(
 	private val messageDao: MessageDao
 ) {
 
-	fun getGroupChannels(networkId: String) = groupChannelDao.getByNetwork(networkId)
+	fun getGroupChannels(networkId: String, category: ChannelCategory? = null) =
+		if (category.isNullOrEmpty()) groupChannelDao.getByNetwork(networkId)
+		else groupChannelDao.getByNetworkAndCategory(networkId, category)
 
 	fun getDirectChannels() = directChannelDao.getAll()
+
+	fun searchGroupChannels(networkId: String, name: String) =
+		groupChannelDao.searchByNetwork(networkId, name)
+
+	fun searchDirectChannels(name: String) = directChannelDao.search(name)
 
 	fun getGroupChannel(id: String) = groupChannelDao.get(id)
 
@@ -27,6 +35,12 @@ constructor(
 
 	suspend fun upsert(vararg data: GroupChannelWithRefs) =
 		groupChannelDao.upsert(messageDao, memberDao, *data)
+
+	internal suspend fun updateLatestMessage(id: String) {
+		messageDao.getLatestMessageByChannel(id)?.let { meta ->
+			directChannelDao.updateLastMessage(id, meta.id, meta.createdAt)
+		}
+	}
 
 	suspend fun delete(entity: ChannelEntity) = groupChannelDao.delete(entity)
 }

@@ -37,7 +37,11 @@ data class ApiDirectChannel(
 	override val unreadMessageCount: Int = 0,
 	@Serializable(AlertTypeSerializer::class) override val alerts: AlertType = AlertType.ALL,
 	override val accessCode: String? = null
-) : ApiChannel
+) : ApiChannel {
+
+	fun name(loggedInUserId: String?) =
+		members.filter { it.id != loggedInUserId }.joinToString { it.nickname ?: "" }.trim()
+}
 
 @Serializable
 data class ApiGroupChannel(

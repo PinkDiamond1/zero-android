@@ -1,19 +1,57 @@
 package com.zero.android.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.zero.android.database.model.ChannelMembersCrossRef
 import com.zero.android.database.model.ChannelOperatorsCrossRef
 import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.models.ChannelCategory
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class GroupChannelDaoImpl : BaseChannelDao() {
 
 	@Transaction
-	@Query("SELECT * FROM channels WHERE isDirectChannel = 0 AND networkId = :networkId")
-	abstract fun getByNetwork(networkId: String): Flow<List<GroupChannelWithRefs>>
+	@Query(
+		"""
+		SELECT * FROM channels 
+		WHERE isDirectChannel = 0 
+		AND networkId = :networkId 
+		ORDER BY lastMessageTime DESC    
+		"""
+	)
+	abstract fun getByNetwork(networkId: String): PagingSource<Int, GroupChannelWithRefs>
+
+	@Transaction
+	@Query(
+		"""
+		SELECT * FROM channels 
+		WHERE isDirectChannel = 0 
+		AND networkId = :networkId 
+		AND category = :category 
+		ORDER BY lastMessageTime DESC    
+		"""
+	)
+	abstract fun getByNetworkAndCategory(
+		networkId: String,
+		category: ChannelCategory
+	): PagingSource<Int, GroupChannelWithRefs>
+
+	@Transaction
+	@Query(
+		"""
+		SELECT * FROM channels 
+		WHERE isDirectChannel = 0
+		AND networkId = :networkId 
+		AND name LIKE '%'||:name||'%'
+		"""
+	)
+	abstract fun searchByNetwork(
+		networkId: String,
+		name: String
+	): PagingSource<Int, GroupChannelWithRefs>
 
 	@Transaction
 	@Query("SELECT * FROM channels WHERE id = :id AND isDirectChannel = 0")

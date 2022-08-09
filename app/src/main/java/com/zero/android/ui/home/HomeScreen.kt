@@ -46,7 +46,7 @@ import com.zero.android.common.R
 import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
-import com.zero.android.feature.channels.ui.directchannels.DirectChannelDestination
+import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
 import com.zero.android.ui.appbar.AppBottomBar
