@@ -1,17 +1,14 @@
 package com.zero.android.feature.messages.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -89,16 +86,21 @@ fun UserInputPanel(
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
 
-	Row(modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()) {
-		IconButton(
-			modifier = Modifier.align(CenterVertically),
-			onClick = {
-				currentInputSelector = InputSelector.ATTACHMENT
-				addAttachment()
-			}
-		) { Icon(imageVector = Icons.Filled.Add, contentDescription = "cd_add_attachment") }
+	Row(
+        modifier = modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
+        verticalAlignment = CenterVertically
+    ) {
+        Spacer(modifier = Modifier.size(8.dp))
+        Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = "cd_add_attachment",
+            modifier = Modifier.clickable {
+                currentInputSelector = InputSelector.ATTACHMENT
+                addAttachment()
+            }
+        )
 		UserInputText(
-			modifier = Modifier.fillMaxWidth().weight(1f).align(CenterVertically),
+			modifier = Modifier.weight(1f),
 			textFieldValue = textState,
 			onTextChanged = {
 				textState = it
@@ -122,27 +124,24 @@ fun UserInputPanel(
 				}
 			}
 		)
-		IconButton(
-			modifier = Modifier.align(CenterVertically),
-			onClick = {
-				currentInputSelector = InputSelector.IMAGE
-				addImage()
-			}
-		) {
-			Icon(
-				painter = painterResource(R.drawable.ic_camera),
-				contentDescription = "cd_add_attachment"
-			)
-		}
-		IconButton(
-			modifier = Modifier.align(CenterVertically),
-			onClick = {
-				currentInputSelector = InputSelector.VOICE_MEMO
-				recordMemo()
-			}
-		) {
-			Icon(painter = painterResource(R.drawable.ic_mic), contentDescription = "cd_record_audio")
-		}
+        Icon(
+            painter = painterResource(R.drawable.ic_camera),
+            contentDescription = "cd_add_attachment",
+            modifier = Modifier.clickable {
+                currentInputSelector = InputSelector.IMAGE
+                addImage()
+            }
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        Icon(
+            painter = painterResource(R.drawable.ic_mic),
+            contentDescription = "cd_record_audio",
+            modifier = Modifier.clickable {
+                currentInputSelector = InputSelector.VOICE_MEMO
+                recordMemo()
+            }
+        )
+        Spacer(modifier = Modifier.size(8.dp))
 	}
 }
 
@@ -184,13 +183,16 @@ private fun UserInputText(
 			placeHolderTextStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			modifier =
-			Modifier.fillMaxWidth().padding(12.dp).align(Alignment.CenterStart).onFocusChanged {
-					state ->
-				if (lastFocusState != state.isFocused) {
-					onTextFieldFocused(state.isFocused)
-				}
-				lastFocusState = state.isFocused
-			},
+            Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .align(Alignment.CenterStart)
+                .onFocusChanged { state ->
+                    if (lastFocusState != state.isFocused) {
+                        onTextFieldFocused(state.isFocused)
+                    }
+                    lastFocusState = state.isFocused
+                },
 			shape = RoundedCornerShape(24.dp),
 			keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Send),
 			keyboardActions = KeyboardActions(onSend = { onMessageSent(textFieldValue.text) })

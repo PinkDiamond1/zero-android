@@ -25,11 +25,12 @@ fun ReplyMessage(
 	modifier: Modifier = Modifier.fillMaxWidth(),
 	message: Message,
 	showCloseButton: Boolean = true,
+    color: Color = Color.Transparent,
 	onCloseView: () -> Unit = {}
 ) {
 	Surface(
 		modifier = if (showCloseButton) modifier.padding(6.dp) else modifier,
-		color = Color.Transparent
+		color = color
 	) {
 		Row(
 			modifier =

@@ -2,11 +2,7 @@ package com.zero.android.feature.channels.ui.channels
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +19,7 @@ import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Network
+import com.zero.android.ui.components.FadeExpandAnimation
 import com.zero.android.ui.components.SearchView
 import com.zero.android.ui.extensions.Preview
 import kotlinx.coroutines.flow.Flow
@@ -74,24 +71,23 @@ fun ChannelsScreen(
 		val tabs = categories.map { ChannelTab(0, it, 0) }
 		if (tabs.isNotEmpty()) {
 			Column(modifier = Modifier.fillMaxWidth()) {
-				if (showSearchBar) {
-					SearchView(
-						placeHolder = stringResource(R.string.search_channels),
-						onValueChanged = { onChannelSearched(it) },
-						onSearchCancelled = { onSearchClosed() }
-					)
-				}
-				if (isSearchState) {
-					ChannelSearchResult(filteredChannels) {
-						onSearchClosed()
-						onChannelSelected(it)
-					}
-				} else {
-					ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
-					ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
-						onChannelSelected(it)
-					}
-				}
+                FadeExpandAnimation(visible = showSearchBar) {
+                    SearchView(
+                        placeHolder = stringResource(R.string.search_channels),
+                        onValueChanged = { onChannelSearched(it) },
+                        onSearchCancelled = { onSearchClosed() }
+                    )
+                }
+                FadeExpandAnimation(visible = isSearchState) {
+                    ChannelSearchResult(filteredChannels) {
+                        onSearchClosed()
+                        onChannelSelected(it)
+                    }
+                }
+                ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
+                ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
+                    onChannelSelected(it)
+                }
 			}
 		}
 	}

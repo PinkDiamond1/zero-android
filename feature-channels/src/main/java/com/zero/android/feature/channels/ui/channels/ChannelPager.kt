@@ -15,6 +15,7 @@ import com.zero.android.feature.channels.ui.components.ChannelListItem
 import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.GroupChannel
+import com.zero.android.ui.components.InstantAnimation
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalPagerApi::class)
@@ -25,11 +26,13 @@ fun ChannelPager(
 	categories: List<ChannelCategory>,
 	onClick: (Channel) -> Unit
 ) {
-	HorizontalPager(state = pagerState, count = categories.size) { index ->
-		Column(modifier = Modifier.fillMaxSize()) {
-			pagers[categories[index]]?.let { PagedChannels(pagedData = it, onClick = onClick) }
-		}
-	}
+	InstantAnimation {
+        HorizontalPager(state = pagerState, count = categories.size) { index ->
+            Column(modifier = Modifier.fillMaxSize()) {
+                pagers[categories[index]]?.let { PagedChannels(pagedData = it, onClick = onClick) }
+            }
+        }
+    }
 }
 
 @Composable

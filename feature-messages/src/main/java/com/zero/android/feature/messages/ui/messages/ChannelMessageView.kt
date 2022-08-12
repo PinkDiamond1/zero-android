@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -19,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
-import com.zero.android.common.extensions.toMessageDateFormat
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
 import com.zero.android.feature.messages.ui.components.ChatBubbleSpacing
@@ -33,11 +33,11 @@ import com.zero.android.ui.theme.AppTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChannelMessage(
-	msg: Message,
-	isUserMe: Boolean,
-	isFirstMessageByAuthor: Boolean,
-	chatAttachmentViewModel: ChatAttachmentViewModel,
-	onAuthorClick: (Member) -> Unit
+    msg: Message,
+    isUserMe: Boolean,
+    isFirstMessageByAuthor: Boolean,
+    chatAttachmentViewModel: ChatAttachmentViewModel,
+    onAuthorClick: (Member) -> Unit
 ) {
 	val currentSelectedMessage: Message? by MessageActionStateHandler.selectedMessage.collectAsState()
 	val modifier =
@@ -108,6 +108,13 @@ fun CMAuthorAndTextMessage(
 						authorClicked = authorClicked,
 						chatAttachmentViewModel = chatAttachmentViewModel
 					)
+                    val messageDate = message.createdAt.toDate()
+                    Text(
+                        text = messageDate.format("hh:mm aa"),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.align(Alignment.End),
+                        color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
+                    )
 				}
 			}
 		}
@@ -126,13 +133,13 @@ private fun AuthorNameTimestamp(isUserMe: Boolean, msg: Message) {
 			Modifier.alignBy(LastBaseline)
 				.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
 		)
-		Spacer(modifier = Modifier.width(8.dp))
+		/*Spacer(modifier = Modifier.width(8.dp))
 		val messageDate = msg.createdAt.toDate()
 		Text(
 			text = "${messageDate.toMessageDateFormat()} at ${messageDate.format("hh:mm aa")}",
 			style = MaterialTheme.typography.bodySmall,
 			modifier = Modifier.alignBy(LastBaseline),
 			color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
-		)
+		)*/
 	}
 }

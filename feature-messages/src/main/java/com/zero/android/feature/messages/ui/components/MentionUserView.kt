@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,11 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun MentionUsersList(membersList: List<Member>, onMemberSelected: (Member) -> Unit) {
-	LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 150.dp)) {
+	LazyColumn(modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(max = 150.dp)
+        .background(color = AppTheme.colors.surfaceInverse)
+    ) {
 		items(membersList) { member ->
 			Column(modifier = Modifier.clickable { onMemberSelected(member) }) {
 				Row(

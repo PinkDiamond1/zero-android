@@ -24,6 +24,9 @@ import com.zero.android.common.R
 import com.zero.android.feature.channels.ui.components.ChannelListItem
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
+import com.zero.android.ui.components.FadeAnimation
+import com.zero.android.ui.components.FadeExpandAnimation
+import com.zero.android.ui.components.InstantAnimation
 import com.zero.android.ui.components.SearchView
 import com.zero.android.ui.extensions.Preview
 
@@ -61,29 +64,37 @@ fun DirectChannelsScreen(
 	val directChannelsUiState = uiState.directChannelsUiState as? DirectChannelUiState.Success
 
 	Column(modifier = Modifier.fillMaxWidth()) {
-		if (showSearchBar) {
-			SearchView(
-				placeHolder = stringResource(R.string.search_channels),
-				onValueChanged = { onChannelSearched(it) },
-				onSearchCancelled = { onSearchClosed() }
-			)
-		}
-		if (directChannelsUiState != null) {
-			DirectChannelsList(channels, loggedInUser, onChannelSelected)
-		}
+		FadeExpandAnimation(visible = showSearchBar) {
+            SearchView(
+                placeHolder = stringResource(R.string.search_channels),
+                onValueChanged = { onChannelSearched(it) },
+                onSearchCancelled = { onSearchClosed() }
+            )
+        }
+        if (directChannelsUiState != null) {
+            DirectChannelsList(channels, loggedInUser, onChannelSelected)
+        }
+        SearchResultCount(
+            show = directChannelsUiState?.isSearchResult == true,
+            itemCount = channels.itemCount
+        )
+    }
+}
 
-		if (directChannelsUiState?.isSearchResult == true) {
-			Text(
-				text = "${channels.itemCount} results found",
-				modifier =
-				Modifier.fillMaxWidth()
-					.padding(vertical = 10.dp)
-					.background(MaterialTheme.colorScheme.primary),
-				textAlign = TextAlign.Center,
-				style = MaterialTheme.typography.labelMedium
-			)
-		}
-	}
+@Composable
+fun ColumnScope.SearchResultCount(show: Boolean, itemCount: Int){
+    FadeAnimation(visible = show) {
+        Text(
+            text = "$itemCount results found",
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp)
+                .background(MaterialTheme.colorScheme.primary),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
 }
 
 @Composable
@@ -92,12 +103,15 @@ fun ColumnScope.DirectChannelsList(
 	loggedInUser: String,
 	onChannelSelected: (Channel) -> Unit
 ) {
-	LazyColumn(modifier = Modifier.weight(1f)) {
-		items(channels) { channel ->
-			channel ?: return@items
-			ChannelListItem(loggedInUser, channel) { onChannelSelected(it) }
-		}
-	}
+	val modifier = Modifier.weight(1f)
+    InstantAnimation(modifier = modifier) {
+        LazyColumn(modifier = modifier) {
+            items(channels) { channel ->
+                channel ?: return@items
+                ChannelListItem(loggedInUser, channel) { onChannelSelected(it) }
+            }
+        }
+    }
 }
 
 @Preview @Composable

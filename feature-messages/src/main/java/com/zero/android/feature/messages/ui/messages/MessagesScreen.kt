@@ -6,7 +6,8 @@ import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -20,10 +21,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
@@ -45,8 +49,9 @@ import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.components.AppBar
-import com.zero.android.ui.components.Background
 import com.zero.android.ui.components.BottomBarDivider
+import com.zero.android.ui.components.FadeExpandAnimation
+import com.zero.android.ui.components.FadeSlideAnimation
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -274,66 +279,90 @@ fun MessagesScreen(
 			)
 		}
 		Scaffold(topBar = { topBar() }) {
-			Background {
-				Column {
-					MessagesContent(
-						modifier = Modifier.weight(1f),
-						userChannelInfo = userChannelInfo,
-						uiState = messagesUiState,
-						messages = messages
-					)
-					BottomBarDivider()
-					if (mentionUser) {
-						val chatMembers = chatMentionUsers.filter { it.id != userChannelInfo.first }
-						MentionUsersList(
-							membersList = chatMembers,
-							onMemberSelected = { MessageActionStateHandler.onUserMentionSelected(it) }
-						)
-					}
-					replyMessage?.let {
-						ReplyMessage(message = it) { MessageActionStateHandler.closeActionMode() }
-					}
-					if (isMemoRecording) {
-						RecordMemoView(onCancel = onRecordMemo, onSendMemo = onSendMemo)
-					} else {
-						if (editableMessage != null) {
-							UserInputPanel(
-								initialText = editableMessage?.message ?: "",
-								onMessageSent = {
-									if (editableMessage != null) {
-										editableMessage?.copy(message = it.trim())?.let(onEditMessage)
-										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it.trim())
-								},
-								addAttachment = {
-									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
-								},
-								addImage = {
-									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
-								},
-								recordMemo = onRecordMemo,
-								onTextChanged = { if (mentionUser) onTextChanged(it) }
-							)
-						} else {
-							UserInputPanel(
-								onMessageSent = {
-									if (replyMessage != null) {
-										onReplyToMessage(replyMessage!!.id, it.trim())
-										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it.trim())
-								},
-								addAttachment = {
-									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
-								},
-								addImage = {
-									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
-								},
-								recordMemo = onRecordMemo,
-								onTextChanged = { if (mentionUser) onTextChanged(it) }
-							)
-						}
-					}
-				}
+			Box(Modifier.padding(it)) {
+                MessagesContent(
+                    modifier = Modifier.fillMaxWidth(),
+                    userChannelInfo = userChannelInfo,
+                    uiState = messagesUiState,
+                    messages = messages
+                )
+                Column(Modifier.align(Alignment.BottomCenter)) {
+                    BottomBarDivider()
+                    FadeSlideAnimation(visible = mentionUser) {
+                        val chatMembers =
+                            chatMentionUsers.filter { it.id != userChannelInfo.first }
+                        MentionUsersList(
+                            membersList = chatMembers,
+                            onMemberSelected = {
+                                MessageActionStateHandler.onUserMentionSelected(
+                                    it
+                                )
+                            }
+                        )
+                    }
+                    FadeExpandAnimation(visible = replyMessage != null) {
+                        replyMessage?.let {
+                            ReplyMessage(message = it, color = AppTheme.colors.surfaceInverse) { MessageActionStateHandler.closeActionMode() }
+                        }
+                    }
+                    FadeSlideAnimation(visible = isMemoRecording) {
+                        RecordMemoView(onCancel = onRecordMemo, onSendMemo = onSendMemo)
+                    }
+                    if (!isMemoRecording) {
+                        Box(modifier = Modifier.height(IntrinsicSize.Max)){
+                            Box(modifier = Modifier
+                                .align(Alignment.Center)
+                                .blur(20.dp)
+                                .fillMaxHeight()
+                            ){
+                                Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.surfaceInverse.copy(0.8f)))
+                            }
+                            if (editableMessage != null) {
+                                UserInputPanel(
+                                    modifier = Modifier.align(Alignment.BottomCenter),
+                                    initialText = editableMessage?.message ?: "",
+                                    onMessageSent = {
+                                        if (editableMessage != null) {
+                                            editableMessage?.copy(message = it.trim())
+                                                ?.let(onEditMessage)
+                                            MessageActionStateHandler.closeActionMode()
+                                        } else onNewMessage(it.trim())
+                                    },
+                                    addAttachment = {
+                                        context.getActivity()
+                                            ?.let { showImagePicker(false, it, onPickImage) }
+                                    },
+                                    addImage = {
+                                        context.getActivity()
+                                            ?.let { showImagePicker(true, it, onPickImage) }
+                                    },
+                                    recordMemo = onRecordMemo,
+                                    onTextChanged = { if (mentionUser) onTextChanged(it) }
+                                )
+                            } else {
+                                UserInputPanel(
+                                    modifier = Modifier.align(Alignment.BottomCenter),
+                                    onMessageSent = {
+                                        if (replyMessage != null) {
+                                            onReplyToMessage(replyMessage!!.id, it.trim())
+                                            MessageActionStateHandler.closeActionMode()
+                                        } else onNewMessage(it.trim())
+                                    },
+                                    addAttachment = {
+                                        context.getActivity()
+                                            ?.let { showImagePicker(false, it, onPickImage) }
+                                    },
+                                    addImage = {
+                                        context.getActivity()
+                                            ?.let { showImagePicker(true, it, onPickImage) }
+                                    },
+                                    recordMemo = onRecordMemo,
+                                    onTextChanged = { if (mentionUser) onTextChanged(it) }
+                                )
+                            }
+                        }
+                    }
+                }
 			}
 		}
 	}

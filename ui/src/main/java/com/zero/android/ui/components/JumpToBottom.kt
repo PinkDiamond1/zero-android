@@ -33,9 +33,9 @@ fun JumpToBottom(enabled: Boolean, onClicked: () -> Unit, modifier: Modifier = M
 	val bottomOffset by
 	transition.animateDp(label = "") {
 		if (it == Visibility.GONE) {
-			(-32).dp
+			(-96).dp
 		} else {
-			32.dp
+			96.dp
 		}
 	}
 	if (bottomOffset > 0.dp) {
