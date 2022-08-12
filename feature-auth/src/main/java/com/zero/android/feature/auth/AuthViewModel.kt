@@ -5,7 +5,7 @@ import com.auth0.android.lock.AuthenticationCallback
 import com.auth0.android.result.Credentials
 import com.zero.android.common.system.Logger
 import com.zero.android.common.ui.base.BaseViewModel
-import com.zero.android.data.repository.UserRepository
+import com.zero.android.data.manager.AuthManager
 import com.zero.android.feature.auth.extensions.toAuthCredentials
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -17,8 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel
 @Inject
-constructor(private val userRepository: UserRepository, private val logger: Logger) :
-	BaseViewModel() {
+constructor(private val authManager: AuthManager, private val logger: Logger) : BaseViewModel() {
 
 	enum class AuthScreenUIState {
 		LOGIN,
@@ -38,7 +37,7 @@ constructor(private val userRepository: UserRepository, private val logger: Logg
 
 	private fun onAuth(credentials: Credentials) {
 		CoroutineScope(Dispatchers.IO).launch {
-			userRepository.login(credentials.toAuthCredentials())
+			authManager.login(credentials.toAuthCredentials())
 			uiState.emit(AuthScreenUIState.LOGIN)
 		}
 	}

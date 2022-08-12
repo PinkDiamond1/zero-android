@@ -1,5 +1,7 @@
 package com.zero.android.data.di
 
+import com.zero.android.data.repository.AuthRepository
+import com.zero.android.data.repository.AuthRepositoryImpl
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.ChannelRepositoryImpl
 import com.zero.android.data.repository.ChatRepository
@@ -18,6 +20,8 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 interface RepositoryModule {
+
+	@Binds fun bindAuthRepository(authRepository: AuthRepositoryImpl): AuthRepository
 
 	@Binds fun bindUserRepository(userRepository: UserRepositoryImpl): UserRepository
 

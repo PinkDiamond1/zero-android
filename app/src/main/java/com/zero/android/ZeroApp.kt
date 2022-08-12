@@ -2,8 +2,8 @@ package com.zero.android
 
 import android.app.Application
 import com.zero.android.common.system.Logger
+import com.zero.android.common.system.PushNotifications
 import com.zero.android.network.NetworkInitializer
-import com.zero.android.system.notifications.PushNotifications
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

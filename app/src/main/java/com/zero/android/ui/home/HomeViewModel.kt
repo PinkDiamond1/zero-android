@@ -7,8 +7,8 @@ import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
+import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.repository.NetworkRepository
-import com.zero.android.data.repository.UserRepository
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.models.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ class HomeViewModel
 @Inject
 constructor(
 	private val networkRepository: NetworkRepository,
-	private val userRepository: UserRepository,
+	private val authManager: AuthManager,
 	private val searchTriggerUseCase: SearchTriggerUseCase
 ) : BaseViewModel() {
 
@@ -77,7 +77,7 @@ constructor(
 	fun logout(context: Context, onLogout: () -> Unit) {
 		viewModelScope.launch {
 			withContext(Dispatchers.IO) {
-				userRepository.logout(context)
+				authManager.logout(context)
 				withContext(Dispatchers.Main) { onLogout() }
 			}
 		}

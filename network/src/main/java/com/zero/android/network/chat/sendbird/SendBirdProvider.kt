@@ -3,7 +3,6 @@ package com.zero.android.network.chat.sendbird
 import android.content.Context
 import com.sendbird.android.SendBird
 import com.sendbird.android.SendBirdException
-import com.sendbird.android.SendBirdPushHandler
 import com.sendbird.android.SendBirdPushHelper
 import com.sendbird.android.handlers.InitResultHandler
 import com.zero.android.common.system.Logger
@@ -20,8 +19,11 @@ import kotlin.coroutines.suspendCoroutine
 
 internal class SendBirdProvider
 @Inject
-constructor(@ApplicationContext private val context: Context, private val logger: Logger) :
-	ChatProvider {
+constructor(
+	@ApplicationContext private val context: Context,
+	private val logger: Logger,
+	private val fcmService: SendBirdFCMService = SendBirdFCMService(logger)
+) : ChatProvider {
 
 	override fun initialize() {
 		SendBird.init(
@@ -56,6 +58,7 @@ constructor(@ApplicationContext private val context: Context, private val logger
 						// Proceed in offline mode with the data stored in the local database.
 						// Later, connection will be made automatically
 						// and can be notified through the ConnectionHandler.onReconnectSucceeded().
+						registerNotificationHandler()
 						it.resume(Unit)
 					} else {
 						// Proceed in online mode.
@@ -71,8 +74,9 @@ constructor(@ApplicationContext private val context: Context, private val logger
 
 	override suspend fun disconnect(context: Context) =
 		suspendCoroutine<Unit> { coroutine ->
+			logger.d("Disconnecting from SendBird")
 			CoroutineScope(Dispatchers.IO).launch {
-				unregisterPushHandler()
+				unregisterNotificationHandler()
 				SendBird.unregisterPushTokenAllForCurrentUser {
 					SendBird.clearCachedData(context) {}
 					SendBird.disconnect { coroutine.resume(Unit) }
@@ -80,23 +84,31 @@ constructor(@ApplicationContext private val context: Context, private val logger
 			}
 		}
 
-	override suspend fun registerDevice(deviceToken: String) =
-		suspendCoroutine<Boolean> {
-			SendBird.registerPushTokenForCurrentUser(deviceToken, true) { status, e ->
-				if (e != null) {
-					it.resumeWithException(e)
-				} else {
-					it.resume(status == SendBird.PushTokenRegistrationStatus.SUCCESS)
+	override suspend fun registerDevice() =
+		suspendCoroutine<Unit> {
+			CoroutineScope(Dispatchers.IO).launch {
+				val deviceToken = SendBirdFCMService.getPushToken()
+
+				logger.i("SendBird Push Token: $deviceToken")
+				SendBird.registerPushTokenForCurrentUser(deviceToken, true) { _, e ->
+					if (e != null) {
+						logger.e(e)
+						it.resumeWithException(e)
+					} else {
+						it.resume(Unit)
+					}
 				}
 			}
 		}
 
-	private fun registerPushHandler(handler: SendBirdPushHandler) {
-		SendBirdPushHelper.registerPushHandler(handler)
+	override fun registerNotificationHandler() {
+		logger.d("Registering to SendBird Notifications")
+		SendBirdPushHelper.registerPushHandler(fcmService)
 	}
 
-	private suspend fun unregisterPushHandler() =
+	private suspend fun unregisterNotificationHandler() =
 		suspendCoroutine<Boolean> {
+			logger.d("Unregistering from SendBird Notifications")
 			SendBirdPushHelper.unregisterPushHandler(
 				true,
 				object : SendBirdPushHelper.OnPushRequestCompleteListener {

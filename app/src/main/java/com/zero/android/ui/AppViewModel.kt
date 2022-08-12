@@ -3,9 +3,11 @@ package com.zero.android.ui
 import com.zero.android.common.extensions.emitInScope
 import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.base.BaseViewModel
+import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.feature.auth.navigation.AuthDestination
+import com.zero.android.models.AuthCredentials
 import com.zero.android.navigation.HomeDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +22,7 @@ class AppViewModel
 @Inject
 constructor(
 	private val preferences: AppPreferences,
+	private val authManager: AuthManager,
 	private val connectionManager: ConnectionManager
 ) : BaseViewModel() {
 
@@ -31,15 +34,16 @@ constructor(
 	}
 
 	private fun checkAuthOnLaunch() {
-		val isLoggedIn = runBlocking(Dispatchers.IO) { preferences.authCredentials() != null }
+		val authCredentials = runBlocking(Dispatchers.IO) { preferences.authCredentials() }
+		val isLoggedIn = authCredentials != null
 		startDestination = if (isLoggedIn) HomeDestination else AuthDestination
 
-		if (isLoggedIn) onLoggedIn() else loading.emitInScope(false)
+		if (isLoggedIn) onLoggedIn(authCredentials!!) else loading.emitInScope(false)
 	}
 
-	private fun onLoggedIn() =
+	private fun onLoggedIn(authCredentials: AuthCredentials) =
 		CoroutineScope(Dispatchers.IO).launch {
-			connectionManager.connect()
+			authManager.onLogin(authCredentials)
 			loading.emit(false)
 		}
 

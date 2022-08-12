@@ -3,6 +3,8 @@ package com.zero.android.data.di
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.delegates.PreferencesImpl
 import com.zero.android.data.manager.AppSocketListenerImpl
+import com.zero.android.data.manager.AuthManager
+import com.zero.android.data.manager.AuthManagerImpl
 import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.data.manager.ConnectionManagerImpl
 import com.zero.android.data.manager.DataCleaner
@@ -24,4 +26,6 @@ interface DataModule {
 	@Binds fun providePreferences(preferences: PreferencesImpl): Preferences
 
 	@Binds fun provideAppSocketListener(socket: AppSocketListenerImpl): SocketListener
+
+	@Binds fun provideAuthManager(preferences: AuthManagerImpl): AuthManager
 }

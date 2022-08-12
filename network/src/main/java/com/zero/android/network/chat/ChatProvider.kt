@@ -10,5 +10,7 @@ interface ChatProvider {
 
 	suspend fun disconnect(context: Context)
 
-	suspend fun registerDevice(deviceToken: String): Boolean
+	suspend fun registerDevice()
+
+	fun registerNotificationHandler()
 }
