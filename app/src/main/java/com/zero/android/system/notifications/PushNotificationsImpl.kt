@@ -4,6 +4,7 @@ import android.content.Context
 import com.onesignal.OneSignal
 import com.zero.android.BuildConfig
 import com.zero.android.data.delegates.Preferences
+import com.zero.android.network.chat.ChatProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
 import javax.inject.Inject
@@ -12,7 +13,8 @@ class PushNotificationsImpl
 @Inject
 constructor(
 	@ApplicationContext private val context: Context,
-	private val preferences: Preferences
+	private val preferences: Preferences,
+	private val chatProvider: ChatProvider
 ) : PushNotifications {
 
 	override fun initialize() {
@@ -24,5 +26,6 @@ constructor(
 
 	override suspend fun subscribe(deviceToken: String) {
 		OneSignal.sendTags(JSONObject(mapOf("user_id" to preferences.userId())))
+		chatProvider.registerDevice(deviceToken)
 	}
 }

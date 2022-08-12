@@ -3,11 +3,16 @@ package com.zero.android.network.chat.sendbird
 import android.content.Context
 import com.sendbird.android.SendBird
 import com.sendbird.android.SendBirdException
+import com.sendbird.android.SendBirdPushHandler
+import com.sendbird.android.SendBirdPushHelper
 import com.sendbird.android.handlers.InitResultHandler
 import com.zero.android.common.system.Logger
 import com.zero.android.network.BuildConfig
 import com.zero.android.network.chat.ChatProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -65,8 +70,45 @@ constructor(@ApplicationContext private val context: Context, private val logger
 		}
 
 	override suspend fun disconnect(context: Context) =
-		suspendCoroutine<Unit> {
-			SendBird.clearCachedData(context) {}
-			SendBird.disconnect { it.resume(Unit) }
+		suspendCoroutine<Unit> { coroutine ->
+			CoroutineScope(Dispatchers.IO).launch {
+				unregisterPushHandler()
+				SendBird.unregisterPushTokenAllForCurrentUser {
+					SendBird.clearCachedData(context) {}
+					SendBird.disconnect { coroutine.resume(Unit) }
+				}
+			}
+		}
+
+	override suspend fun registerDevice(deviceToken: String) =
+		suspendCoroutine<Boolean> {
+			SendBird.registerPushTokenForCurrentUser(deviceToken, true) { status, e ->
+				if (e != null) {
+					it.resumeWithException(e)
+				} else {
+					it.resume(status == SendBird.PushTokenRegistrationStatus.SUCCESS)
+				}
+			}
+		}
+
+	private fun registerPushHandler(handler: SendBirdPushHandler) {
+		SendBirdPushHelper.registerPushHandler(handler)
+	}
+
+	private suspend fun unregisterPushHandler() =
+		suspendCoroutine<Boolean> {
+			SendBirdPushHelper.unregisterPushHandler(
+				true,
+				object : SendBirdPushHelper.OnPushRequestCompleteListener {
+					override fun onComplete(p0: Boolean, p1: String?) {
+						it.resume(true)
+					}
+
+					override fun onError(e: SendBirdException?) {
+						e?.let { error -> logger.e(error) }
+						it.resume(false)
+					}
+				}
+			)
 		}
 }

@@ -9,4 +9,6 @@ interface ChatProvider {
 	suspend fun connect(userId: String, accessToken: String?)
 
 	suspend fun disconnect(context: Context)
+
+	suspend fun registerDevice(deviceToken: String): Boolean
 }
