@@ -1,12 +1,11 @@
 package com.zero.android.network
 
-import android.content.Context
 import com.zero.android.network.chat.ChatProvider
-import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class NetworkInitializer(private val chatProvider: ChatProvider) {
+class NetworkInitializer @Inject constructor(private val chatProvider: ChatProvider) {
 
-	fun initialize(@ApplicationContext context: Context) {
-		chatProvider.initialize(context)
+	fun initialize() {
+		chatProvider.initialize()
 	}
 }

@@ -7,13 +7,18 @@ import com.sendbird.android.handlers.InitResultHandler
 import com.zero.android.common.system.Logger
 import com.zero.android.network.BuildConfig
 import com.zero.android.network.chat.ChatProvider
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-internal class SendBirdProvider(private val logger: Logger) : ChatProvider {
+internal class SendBirdProvider
+@Inject
+constructor(@ApplicationContext private val context: Context, private val logger: Logger) :
+	ChatProvider {
 
-	override fun initialize(context: Context) {
+	override fun initialize() {
 		SendBird.init(
 			BuildConfig.SEND_BIRD_ID,
 			context,

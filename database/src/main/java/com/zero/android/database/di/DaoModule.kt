@@ -1,5 +1,6 @@
-package com.zero.android.database
+package com.zero.android.database.di
 
+import com.zero.android.database.AppDatabase
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.DirectChannelDaoImpl
 import com.zero.android.database.dao.GroupChannelDaoImpl

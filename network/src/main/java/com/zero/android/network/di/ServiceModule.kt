@@ -1,6 +1,7 @@
-package com.zero.android.network
+package com.zero.android.network.di
 
 import com.zero.android.common.system.Logger
+import com.zero.android.network.Retrofit
 import com.zero.android.network.chat.sendbird.SendBirdChannelService
 import com.zero.android.network.chat.sendbird.SendBirdChatService
 import com.zero.android.network.service.AccessService

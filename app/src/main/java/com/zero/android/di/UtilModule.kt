@@ -1,4 +1,4 @@
-package com.zero.android.di.module
+package com.zero.android.di
 
 import com.zero.android.common.system.Logger
 import com.zero.android.system.logger.ConsoleLogger
@@ -13,5 +13,5 @@ import javax.inject.Singleton
 object UtilModule {
 
 	@Singleton @Provides
-	fun logger(): Logger = ConsoleLogger()
+	fun provideLogger(): Logger = ConsoleLogger()
 }

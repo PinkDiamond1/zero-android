@@ -1,11 +1,10 @@
 package com.zero.android.network.chat
 
 import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 interface ChatProvider {
 
-	fun initialize(@ApplicationContext context: Context)
+	fun initialize()
 
 	suspend fun connect(userId: String, accessToken: String?)
 

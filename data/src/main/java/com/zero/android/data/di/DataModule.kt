@@ -1,4 +1,4 @@
-package com.zero.android.data
+package com.zero.android.data.di
 
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.delegates.PreferencesImpl

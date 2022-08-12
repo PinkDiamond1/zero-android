@@ -1,6 +1,8 @@
-package com.zero.android.database
+package com.zero.android.database.di
 
 import android.content.Context
+import com.zero.android.database.AppDatabase
+import com.zero.android.database.DatabaseCleaner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.zero.android.data
+package com.zero.android.data.di
 
 import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.common.usecases.SearchTriggerUseCaseImpl

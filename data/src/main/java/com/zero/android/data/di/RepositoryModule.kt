@@ -1,4 +1,4 @@
-package com.zero.android.data
+package com.zero.android.data.di
 
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.ChannelRepositoryImpl
