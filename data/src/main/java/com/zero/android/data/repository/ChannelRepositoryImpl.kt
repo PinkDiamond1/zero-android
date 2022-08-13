@@ -35,103 +35,98 @@ import javax.inject.Inject
 class ChannelRepositoryImpl
 @Inject
 constructor(
-    private val channelDao: ChannelDao,
-    private val channelService: ChannelService,
-    private val logger: Logger,
-    private val preferences: Preferences
+	private val channelDao: ChannelDao,
+	private val channelService: ChannelService,
+	private val logger: Logger,
+	private val preferences: Preferences
 ) : ChannelRepository {
 
-    private val userId = runBlocking { preferences.userId() }
+	private val userId = runBlocking { preferences.userId() }
 
-    @OptIn(ExperimentalPagingApi::class)
-    override fun getDirectChannels(search: String?): Flow<PagingData<DirectChannel>> {
-        return Pager(
-            config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
-            remoteMediator =
-            DirectChannelsRemoteMediator(userId, channelDao, channelService, logger),
-            pagingSourceFactory = {
-                if (search.isNullOrEmpty()) channelDao.getDirectChannels()
-                else channelDao.searchDirectChannels(search)
-            }
-        )
-            .flow.map { data -> data.map { it.toModel() } }
-    }
+	@OptIn(ExperimentalPagingApi::class)
+	override fun getDirectChannels(search: String?): Flow<PagingData<DirectChannel>> {
+		return Pager(
+			config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
+			remoteMediator =
+			DirectChannelsRemoteMediator(userId, channelDao, channelService, logger),
+			pagingSourceFactory = {
+				if (search.isNullOrEmpty()) channelDao.getDirectChannels()
+				else channelDao.searchDirectChannels(search)
+			}
+		)
+			.flow.map { data -> data.map { it.toModel() } }
+	}
 
-    @OptIn(ExperimentalPagingApi::class)
-    override fun getGroupChannels(
-        networkId: String,
-        category: String?,
-        search: String?
-    ): Flow<PagingData<GroupChannel>> {
-        return Pager(
-            config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
-            remoteMediator =
-            GroupChannelsRemoteMediator(
-                networkId = networkId,
-                channelDao,
-                channelService,
-                logger,
-                search = search
-            ),
-            pagingSourceFactory = {
-                if (search.isNullOrEmpty()) channelDao.getGroupChannels(networkId, category)
-                else channelDao.searchGroupChannels(networkId, search)
-            }
-        )
-            .flow.map { data -> data.map { it.toModel() } }
-    }
+	@OptIn(ExperimentalPagingApi::class)
+	override fun getGroupChannels(
+		networkId: String,
+		category: String?,
+		search: String?
+	): Flow<PagingData<GroupChannel>> {
+		return Pager(
+			config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
+			remoteMediator =
+			GroupChannelsRemoteMediator(
+				networkId = networkId,
+				channelDao,
+				channelService,
+				logger,
+				search = search
+			),
+			pagingSourceFactory = {
+				if (search.isNullOrEmpty()) channelDao.getGroupChannels(networkId, category)
+				else channelDao.searchGroupChannels(networkId, search)
+			}
+		)
+			.flow.map { data -> data.map { it.toModel() } }
+	}
 
-    override suspend fun getGroupChannel(id: String) = channelFlowWithAwait {
-        launch(Dispatchers.Unconfined) {
-            channelDao
-                .getGroupChannel(id)
-                .mapNotNull { channel -> channel?.toModel() }
-                .collect { trySend(it) }
-        }
-        launch {
-            channelService.getChannel(id, type = ChannelType.GROUP).let {
-                it as ApiGroupChannel
-                channelDao.upsert(it.toEntity())
-            }
-        }
-    }
+	override suspend fun getGroupChannel(id: String) = channelFlowWithAwait {
+		launch(Dispatchers.Unconfined) {
+			channelDao
+				.getGroupChannel(id)
+				.mapNotNull { channel -> channel?.toModel() }
+				.collect { trySend(it) }
+		}
+		launch {
+			channelService.getChannel(id, type = ChannelType.GROUP).let {
+				it as ApiGroupChannel
+				channelDao.upsert(it.toEntity())
+			}
+		}
+	}
 
-    override suspend fun getDirectChannel(id: String) = channelFlowWithAwait {
-        launch(Dispatchers.Unconfined) {
-            channelDao
-                .getDirectChannel(id)
-                .mapNotNull { channel -> channel?.toModel() }
-                .collectLatest { trySend(it) }
-        }
-        launch {
-            channelService.getChannel(id, type = ChannelType.GROUP).let {
-                it as ApiDirectChannel
-                channelDao.upsert(it.toEntity(userId))
-            }
-        }
-    }
+	override suspend fun getDirectChannel(id: String) = channelFlowWithAwait {
+		launch(Dispatchers.Unconfined) {
+			channelDao
+				.getDirectChannel(id)
+				.mapNotNull { channel -> channel?.toModel() }
+				.collectLatest { trySend(it) }
+		}
+		launch {
+			channelService.getChannel(id, type = ChannelType.GROUP).let {
+				it as ApiDirectChannel
+				channelDao.upsert(it.toEntity(userId))
+			}
+		}
+	}
 
-    override suspend fun updateChannel(channel: Channel) {
-        channelService.updateChannel(channel)
-    }
+	override suspend fun updateChannel(channel: Channel) {
+		channelService.updateChannel(channel)
+	}
 
-    override suspend fun updateNotifications(channel: Channel, alertType: AlertType) {
-        channelService.updateNotifications(channel, alertType)
-    }
+	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) {
+		channelService.updateNotificationSettings(channel, alertType)
+	}
 
-    override suspend fun joinChannel(channel: Channel) = channelService.joinChannel(channel)
+	override suspend fun joinChannel(channel: Channel) = channelService.joinChannel(channel)
 
-    override suspend fun deleteChannel(channel: Channel) {
-        channelDao.delete(
-            ChannelEntity(
-                id = channel.id,
-                isDirectChannel = channel is DirectChannel
-            )
-        )
-        channelService.deleteChannel(channel)
-    }
+	override suspend fun deleteChannel(channel: Channel) {
+		channelDao.delete(ChannelEntity(id = channel.id, isDirectChannel = channel is DirectChannel))
+		channelService.deleteChannel(channel)
+	}
 
-    override suspend fun markChannelRead(channel: Channel) {
-        channelService.markChannelRead(channel)
-    }
+	override suspend fun markChannelRead(channel: Channel) {
+		channelService.markChannelRead(channel)
+	}
 }

@@ -1,7 +1,6 @@
 package com.zero.android.network.chat.sendbird
 
 import android.content.Context
-import android.text.TextUtils
 import com.google.firebase.messaging.RemoteMessage
 import com.sendbird.android.SendBirdException
 import com.sendbird.android.SendBirdPushHandler
@@ -13,6 +12,7 @@ import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 internal class SendBirdFCMService @Inject constructor(private val logger: Logger) :
 	SendBirdPushHandler() {
@@ -30,8 +30,6 @@ internal class SendBirdFCMService @Inject constructor(private val logger: Logger
 				val sendbird = remoteMessage.data["sendbird"]?.let { JSONObject(it) }
 				val channel = sendbird?.get("channel") as JSONObject?
 
-				// If you want to customize a notification with the received FCM message,
-				// write your method like the sendNotification() below.
 				sendNotification(
 					context,
 					remoteMessage.data["push_title"],
@@ -62,13 +60,15 @@ internal class SendBirdFCMService @Inject constructor(private val logger: Logger
 		suspend fun getPushToken() =
 			suspendCancellableCoroutine<String> { coroutine ->
 				val token = pushToken.get()
-				if (!TextUtils.isEmpty(token)) {
+				if (!token.isNullOrEmpty()) {
 					return@suspendCancellableCoroutine coroutine.resume(token)
 				}
 				SendBirdPushHelper.getPushToken { newToken: String?, e: SendBirdException? ->
 					if (e == null) {
-						newToken?.let { coroutine.resume(it) }
 						pushToken.set(newToken)
+						newToken?.let { coroutine.resume(it) }
+					} else {
+						coroutine.resumeWithException(e)
 					}
 				}
 			}

@@ -10,31 +10,31 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChannelService {
 
-    suspend fun getGroupChannels(
-        networkId: String,
-        type: ChannelType = ChannelType.GROUP,
-        before: String? = null,
-        loadSize: Int = 1,
-        searchName: String? = null
-    ): Flow<List<ApiGroupChannel>>
+	suspend fun getGroupChannels(
+		networkId: String,
+		type: ChannelType = ChannelType.GROUP,
+		before: String? = null,
+		loadSize: Int = 1,
+		searchName: String? = null
+	): Flow<List<ApiGroupChannel>>
 
-    suspend fun getDirectChannels(
-        before: String? = null,
-        loadSize: Int = 1,
-        searchName: String? = null
-    ): Flow<List<ApiDirectChannel>>
+	suspend fun getDirectChannels(
+		before: String? = null,
+		loadSize: Int = 1,
+		searchName: String? = null
+	): Flow<List<ApiDirectChannel>>
 
-    suspend fun getChannel(url: String, type: ChannelType = ChannelType.GROUP): ApiChannel
+	suspend fun getChannel(url: String, type: ChannelType = ChannelType.GROUP): ApiChannel
 
-    suspend fun createChannel(networkId: String, channel: Channel): ApiChannel
+	suspend fun createChannel(networkId: String, channel: Channel): ApiChannel
 
-    suspend fun updateChannel(channel: Channel): ApiChannel
+	suspend fun updateChannel(channel: Channel): ApiChannel
 
-    suspend fun updateNotifications(channel: Channel, alertType: AlertType)
+	suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType)
 
-    suspend fun joinChannel(channel: Channel)
+	suspend fun joinChannel(channel: Channel)
 
-    suspend fun deleteChannel(channel: Channel)
+	suspend fun deleteChannel(channel: Channel)
 
-    suspend fun markChannelRead(channel: Channel)
+	suspend fun markChannelRead(channel: Channel)
 }

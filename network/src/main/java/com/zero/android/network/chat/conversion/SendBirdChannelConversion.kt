@@ -164,4 +164,5 @@ internal fun BaseChannel.ChannelType.toType() = value().toChannelType()
 
 internal fun GroupChannel.PushTriggerOption.toType() = name.lowercase().toAlertType()
 
-internal fun AlertType.toOption() = GroupChannel.PushTriggerOption.values().find { it.name.lowercase() == serializedName }
+internal fun AlertType.toOption() =
+	GroupChannel.PushTriggerOption.values().find { it.name.lowercase() == serializedName }

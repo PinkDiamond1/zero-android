@@ -90,7 +90,7 @@ constructor(
 				val deviceToken = SendBirdFCMService.getPushToken()
 
 				logger.i("SendBird Push Token: $deviceToken")
-				SendBird.registerPushTokenForCurrentUser(deviceToken, true) { _, e ->
+				SendBird.registerPushTokenForCurrentUser(deviceToken) { _, e ->
 					if (e != null) {
 						logger.e(e)
 						it.resumeWithException(e)
