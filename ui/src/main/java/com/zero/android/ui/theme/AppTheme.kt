@@ -14,7 +14,8 @@ private val DarkColorScheme =
 		tertiary = Teal200,
 		background = Black,
 		error = Red300,
-		outline = LavenderIndigo
+		outline = LavenderIndigo,
+        inversePrimary = Blue300
 	)
 
 private val LightColorScheme =
@@ -24,8 +25,9 @@ private val LightColorScheme =
 		tertiary = Teal200,
 		background = White,
 		error = Red300,
-		outline = LavenderIndigo
-	)
+		outline = LavenderIndigo,
+        inversePrimary = Blue300
+    )
 
 private val DarkExtendedColorPalette =
 	ExtendedColor(

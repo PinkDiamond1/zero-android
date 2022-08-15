@@ -11,15 +11,9 @@ android {
 	buildTypes {
 		debug {
 			def properties = getEnv("development")
-			resValue "string", "com_auth0_client_id", properties['com_auth0_client_id']
-			resValue "string", "com_auth0_domain", properties['com_auth0_domain']
-			buildConfigField "String", "AUTH0_AUDIENCE", "\"${properties["com_auth0_audience"]}\""
 		}
 		release {
 			def properties = getEnv("production")
-			resValue "string", "com_auth0_client_id", properties['com_auth0_client_id']
-			resValue "string", "com_auth0_domain", properties['com_auth0_domain']
-			buildConfigField "String", "AUTH0_AUDIENCE", "\"${properties["com_auth0_audience"]}\""
 		}
 	}
 }
@@ -30,6 +24,5 @@ dependencies {
 	implementation project(":models")
 
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
-
-	implementation "com.auth0.android:lock:${versions.lock}"
+	implementation "androidx.compose.material:material-icons-extended:${versions.compose}"
 }

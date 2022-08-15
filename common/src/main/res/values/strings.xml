@@ -19,4 +19,38 @@
     <string name="alert_type_all">All</string>
     <string name="alert_type_mentions_only">Mentions Only</string>
     <string name="alert_type_off">Off</string>
+
+    <string name="email_id">Email ID</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="or_continue_with">or continue with</string>
+    <string name="not_a_member">Not a Member?</string>
+    <string name="create_an_account">Create an Account</string>
+    <string name="forgot_password">Forgot Password?</string>
+
+    <string name="reset_password">Reset Password</string>
+    <string name="reset_password_description">Enter your ZERO account email and we’ll email you a reset password link</string>
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="reset_password_success">An email containing a reset password link has been emailed to:</string>
+
+    <string name="create_account">Create Account</string>
+    <string name="member_name">Member Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="weak">Weak</string>
+    <string name="acceptable">Acceptable</string>
+    <string name="strong">Strong</string>
+    <string name="password_strength">Password Strength:</string>
+    <string name="password_validation">Password must consist of 8 characters including 1 number, 1 uppercase letter and 1 symbol.</string>
+
+    <string name="email_required">Email is required</string>
+    <string name="email_invalid">Email is invalid</string>
+    <string name="password_required">Password is required</string>
+
+    <string name="field_required">Field is required</string>
+    <string name="name_required">Name is required</string>
+    <string name="password_mismatch_error">Password doesn\'t match</string>
+
+    <string name="ok">Ok</string>
+    <string name="error">Error</string>
+
 </resources>

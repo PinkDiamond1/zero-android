@@ -2,18 +2,11 @@ package com.zero.android.network.di
 
 import com.zero.android.common.system.Logger
 import com.zero.android.network.Retrofit
+import com.zero.android.network.auth.AuthService
+import com.zero.android.network.auth.AuthServiceImpl
 import com.zero.android.network.chat.sendbird.SendBirdChannelService
 import com.zero.android.network.chat.sendbird.SendBirdChatService
-import com.zero.android.network.service.AccessService
-import com.zero.android.network.service.AccountService
-import com.zero.android.network.service.ChannelCategoryService
-import com.zero.android.network.service.ChannelService
-import com.zero.android.network.service.ChatMediaService
-import com.zero.android.network.service.ChatService
-import com.zero.android.network.service.MessageService
-import com.zero.android.network.service.NetworkService
-import com.zero.android.network.service.ProfileService
-import com.zero.android.network.service.UserService
+import com.zero.android.network.service.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -65,4 +58,8 @@ object ServiceModule {
 	@Provides
 	fun provideChatMediaService(retrofit: Retrofit): ChatMediaService =
 		retrofit.base.create(ChatMediaService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideAuthService(logger: Logger): AuthService = AuthServiceImpl(logger)
 }

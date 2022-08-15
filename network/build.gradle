@@ -12,12 +12,20 @@ android {
 	buildTypes {
 		debug {
 			def properties = getEnv("development")
+			resValue "string", "com_auth0_domain", properties['com_auth0_domain']
+			buildConfigField "String", "AUTH0_CLIENT_ID", "\"${properties["com_auth0_client_id"]}\""
+			buildConfigField "String", "AUTH0_DOMAIN", "\"${properties["com_auth0_domain"]}\""
+			buildConfigField "String", "AUTH0_AUDIENCE", "\"${properties["com_auth0_audience"]}\""
 			buildConfigField "String", "BASE_URL", "\"${properties["base_url"]}\""
 			buildConfigField "String", "BASE_API_URL", "\"${properties["api_url"]}\""
 			buildConfigField "String", "SEND_BIRD_ID", "\"${properties["sendbird_id"]}\""
 		}
 		release {
 			def properties = getEnv("production")
+			resValue "string", "com_auth0_domain", properties['com_auth0_domain']
+			buildConfigField "String", "AUTH0_CLIENT_ID", "\"${properties["com_auth0_client_id"]}\""
+			buildConfigField "String", "AUTH0_DOMAIN", "\"${properties["com_auth0_domain"]}\""
+			buildConfigField "String", "AUTH0_AUDIENCE", "\"${properties["com_auth0_audience"]}\""
 			buildConfigField "String", "BASE_URL", "\"${properties["base_url"]}\""
 			buildConfigField "String", "BASE_API_URL", "\"${properties["api_url"]}\""
 			buildConfigField "String", "SEND_BIRD_ID", "\"${properties["sendbird_id"]}\""
@@ -45,4 +53,6 @@ dependencies {
 
 	// Misc
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.json}"
+
+	implementation 'com.auth0.android:auth0:2.8.0'
 }

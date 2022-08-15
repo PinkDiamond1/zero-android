@@ -6,6 +6,8 @@ import androidx.navigation.navigation
 import com.zero.android.feature.account.navigation.NotificationsDestination
 import com.zero.android.feature.account.ui.notifications.NotificationsRoute
 import com.zero.android.feature.auth.navigation.AuthDestination
+import com.zero.android.feature.auth.navigation.ForgotPasswordDestination
+import com.zero.android.feature.auth.navigation.RegisterDestination
 import com.zero.android.feature.auth.navigation.authGraph
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.DirectChannelDestination
@@ -23,7 +25,12 @@ import com.zero.android.navigation.extensions.composable
 
 internal fun NavGraphBuilder.appGraph(controller: NavController) {
 	navigation(startDestination = AuthDestination.route, route = AppGraph.AUTH) {
-		authGraph(onLogin = { controller.navigate(HomeDestination.route) { asRoot() } })
+		authGraph(
+            onLogin = { controller.navigate(HomeDestination.route) { asRoot() } },
+            onForgotPassword = { controller.navigate(ForgotPasswordDestination.route) },
+            onRegister = { controller.navigate(RegisterDestination.route) },
+            onBackPress = { controller.navigateUp() }
+        )
 	}
 	navigation(startDestination = HomeDestination.route, route = AppGraph.MAIN) {
 		chatGraph(onBackClick = { controller.navigateUp() })

@@ -22,6 +22,7 @@ val OuterSpace = Color(0xFF484848)
 val White = Color(0xFFFFFFFF)
 val EmeraldGreen = Color(0xFF58C573)
 val Red300 = Color(0xFFF6677C)
+val Blue300 = Color(0xFF52CBFF)
 val BlueViolet = Color(0xFF50207B)
 val LavenderIndigo = Color(0xFFB14EFF)
 

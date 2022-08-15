@@ -7,17 +7,16 @@ import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.data.manager.AuthManager
+import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.NetworkRepository
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.models.Network
 import com.zero.android.models.enums.AlertType
 import com.zero.android.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +25,7 @@ class HomeViewModel
 constructor(
 	private val networkRepository: NetworkRepository,
 	private val authManager: AuthManager,
+    private val authRepository: AuthRepository,
 	private val searchTriggerUseCase: SearchTriggerUseCase
 ) : BaseViewModel() {
 
@@ -91,7 +91,10 @@ constructor(
 	fun logout(context: Context, onLogout: () -> Unit) {
 		viewModelScope.launch {
 			withContext(Dispatchers.IO) {
-				authManager.logout(context)
+                awaitAll(
+                    async { authRepository.revokeToken() },
+                    async { authManager.logout(context) }
+                )
 				withContext(Dispatchers.Main) { onLogout() }
 			}
 		}

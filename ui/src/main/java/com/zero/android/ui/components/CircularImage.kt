@@ -89,3 +89,19 @@ fun LargeCircularImage(
 		modifier = modifier.size(64.dp).clip(CircleShape)
 	)
 }
+
+@Composable
+fun CircularImage(
+    modifier: Modifier = Modifier,
+    imageUrl: String? = null,
+    @DrawableRes placeHolder: Int,
+    contentDescription: String = ""
+) {
+    AsyncImage(
+        model = imageUrl,
+        placeholder = painterResource(placeHolder),
+        error = painterResource(placeHolder),
+        contentDescription = contentDescription,
+        modifier = modifier.clip(CircleShape)
+    )
+}
