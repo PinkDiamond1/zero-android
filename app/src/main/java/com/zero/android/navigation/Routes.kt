@@ -2,7 +2,6 @@ package com.zero.android.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import com.zero.android.feature.account.navigation.NotificationsDestination
 import com.zero.android.feature.account.ui.notifications.NotificationsRoute
 import com.zero.android.feature.auth.navigation.AuthDestination
@@ -18,6 +17,7 @@ import com.zero.android.feature.messages.navigation.chatGraph
 import com.zero.android.feature.people.MembersRoute
 import com.zero.android.feature.people.navigation.MembersDestination
 import com.zero.android.models.Network
+import com.zero.android.navigation.extensions.composable
 
 internal fun NavGraphBuilder.onboardGraph(controller: NavController) {
 	authGraph(onLogin = { controller.navigate(HomeDestination.route) { popUpTo(0) } })
@@ -25,18 +25,16 @@ internal fun NavGraphBuilder.onboardGraph(controller: NavController) {
 }
 
 internal fun NavGraphBuilder.appBottomNavGraph(controller: NavController, network: Network?) {
-	composable(route = ChannelsDestination.route) {
+	composable(ChannelsDestination) {
 		ChannelsRoute(network = network) {
-			controller.navigate(route = "${MessagesDestination.route}/${it.id}/${true}")
+			controller.navigate(route = MessagesDestination.route(it.id, true))
 		}
 	}
-	composable(route = MembersDestination.route) { MembersRoute() }
-	composable(route = FeedDestination.route) { FeedRoute() }
-	composable(route = NotificationsDestination.route) { NotificationsRoute() }
-	composable(route = DirectChannelDestination.route) {
-		DirectChannelsRoute {
-			controller.navigate(route = "${MessagesDestination.route}/${it.id}/${false}")
-		}
+	composable(DirectChannelDestination) {
+		DirectChannelsRoute { controller.navigate(route = MessagesDestination.route(it.id, false)) }
 	}
+	composable(MembersDestination) { MembersRoute() }
+	composable(FeedDestination) { FeedRoute() }
+	composable(NotificationsDestination) { NotificationsRoute() }
 	chatGraph(onBackClick = { controller.navigateUp() })
 }

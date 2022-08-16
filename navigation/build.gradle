@@ -5,3 +5,10 @@ plugins {
 }
 
 apply from: "../module.gradle"
+
+dependencies {
+	implementation project(":common")
+
+	// UI
+	implementation "androidx.navigation:navigation-compose:${versions.navigation}"
+}

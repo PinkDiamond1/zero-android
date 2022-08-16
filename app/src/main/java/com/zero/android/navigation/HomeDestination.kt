@@ -1,14 +1,14 @@
 package com.zero.android.navigation
 
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import com.zero.android.navigation.extensions.composable
 import com.zero.android.ui.home.HomeRoute
 
-object HomeDestination : NavDestination {
+object HomeDestination : NavDestination() {
 	override val route = "home_route"
 	override val destination = "home_destination"
 }
 
 internal fun NavGraphBuilder.homeGraph(onLogout: () -> Unit) {
-	composable(route = HomeDestination.route) { HomeRoute(onLogout = onLogout) }
+	composable(HomeDestination) { HomeRoute(onLogout = onLogout) }
 }
