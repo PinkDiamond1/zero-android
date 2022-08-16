@@ -1,4 +1,4 @@
-package com.zero.android.common.navigation
+package com.zero.android.navigation
 
 interface NavDestination {
 	/**

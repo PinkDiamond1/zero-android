@@ -43,12 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.zero.android.common.R
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
+import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.appbar.HOME_DESTINATIONS
@@ -81,7 +81,7 @@ fun HomeRoute(viewModel: HomeViewModel = hiltViewModel(), onLogout: () -> Unit) 
 fun HomeScreen(
 	modifier: Modifier = Modifier,
 	viewModel: HomeViewModel,
-	currentScreen: NavDestination,
+	currentScreen: com.zero.android.navigation.NavDestination,
 	currentNetwork: Network?,
 	networks: Result<List<Network>>,
 	onNetworkSelected: (Network) -> Unit,

@@ -2,7 +2,6 @@ package com.zero.android.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.ui.home.HomeRoute
 
 object HomeDestination : NavDestination {

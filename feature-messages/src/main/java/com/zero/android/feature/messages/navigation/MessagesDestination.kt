@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.feature.messages.ui.messages.MessagesRoute
+import com.zero.android.navigation.NavDestination
 
 object MessagesDestination : NavDestination {
 	override val route = "messages_route"

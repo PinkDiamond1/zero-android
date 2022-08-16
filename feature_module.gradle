@@ -9,6 +9,7 @@ android {
 dependencies {
 	implementation project(":common")
 	implementation project(":ui")
+	implementation project(":navigation")
 	implementation project(":models")
 	implementation project(":data")
 

@@ -2,8 +2,8 @@ package com.zero.android.feature.auth.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.feature.auth.AuthRoute
+import com.zero.android.navigation.NavDestination
 
 object AuthDestination : NavDestination {
 	override val route = "login_route"

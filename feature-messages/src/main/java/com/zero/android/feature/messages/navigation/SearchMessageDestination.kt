@@ -1,6 +1,6 @@
 package com.zero.android.feature.messages.navigation
 
-import com.zero.android.common.navigation.NavDestination
+import com.zero.android.navigation.NavDestination
 
 object SearchMessageDestination : NavDestination {
 	override val route = "search_message_route"

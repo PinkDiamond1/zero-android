@@ -1,7 +1,6 @@
 package com.zero.android.ui
 
 import com.zero.android.common.extensions.emitInScope
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
@@ -9,6 +8,7 @@ import com.zero.android.datastore.AppPreferences
 import com.zero.android.feature.auth.navigation.AuthDestination
 import com.zero.android.models.AuthCredentials
 import com.zero.android.navigation.HomeDestination
+import com.zero.android.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
