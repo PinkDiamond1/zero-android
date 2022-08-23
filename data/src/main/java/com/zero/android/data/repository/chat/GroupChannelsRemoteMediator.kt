@@ -11,7 +11,6 @@ import com.zero.android.data.conversion.toEntity
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.model.GroupChannelWithRefs
 import com.zero.android.network.service.ChannelService
-import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -61,25 +60,24 @@ internal class GroupChannelsRemoteMediator(
 			try {
 				val response =
 					lastChannelId?.let {
-						channelService
-							.getGroupChannels(networkId = networkId, before = it, searchName = search)
-							.firstOrNull()
+						channelService.getGroupChannels(
+							networkId = networkId,
+							before = it,
+							searchName = search
+						)
 					}
-						?: channelService
-							.getGroupChannels(
-								networkId = networkId,
-								loadSize = INITIAL_LOAD_SIZE,
-								searchName = search
-							)
-							.firstOrNull()
+						?: channelService.getGroupChannels(
+							networkId = networkId,
+							loadSize = INITIAL_LOAD_SIZE,
+							searchName = search
+						)
 
-				response?.map { it.toEntity() }?.let { channelDao.upsert(*it.toTypedArray()) }
+				response.map { it.toEntity() }.let { channelDao.upsert(*it.toTypedArray()) }
 
-				logger.d("Loading Group Channels: $loadType - $lastChannelId: ${response?.size ?: 0}")
+				logger.d("Loading Group Channels: $loadType - $lastChannelId: ${response.size}")
 
 				MediatorResult.Success(
-					endOfPaginationReached =
-					response.isNullOrEmpty() || response.size < CHANNELS_PAGE_LIMIT
+					endOfPaginationReached = response.isEmpty() || response.size < CHANNELS_PAGE_LIMIT
 				)
 			} catch (e: Exception) {
 				logger.e(e)

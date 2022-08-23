@@ -4,7 +4,6 @@ import com.sendbird.android.GroupChannel
 import com.sendbird.android.GroupChannelListQuery
 import com.sendbird.android.OpenChannel
 import com.sendbird.android.OpenChannelListQuery
-import com.zero.android.common.extensions.callbackFlowWithAwait
 import com.zero.android.common.extensions.withSameScope
 import com.zero.android.common.system.Logger
 import com.zero.android.models.Channel
@@ -25,8 +24,7 @@ import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.service.ChannelCategoryService
 import com.zero.android.network.service.ChannelService
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -42,18 +40,17 @@ internal class SendBirdChannelService(private val logger: Logger) :
 	private var directQuery: GroupChannelListQuery? = null
 
 	override suspend fun getCategories(networkId: String) =
-		flow<List<ChannelCategory>> {
-			getGroupChannels(networkId, ChannelType.GROUP).firstOrNull().let { channels ->
-				if (channels.isNullOrEmpty()) emit(emptyList())
-				else {
-					emit(
-						channels
-							.filter { !it.category.isNullOrEmpty() }
-							.map { it.category!! }
-							.distinct()
-							.sorted()
-					)
-				}
+		suspendCancellableCoroutine<List<ChannelCategory>> { coroutine ->
+			val channels = runBlocking { getGroupChannels(networkId, ChannelType.GROUP) }
+			if (channels.isEmpty()) coroutine.resume(emptyList())
+			else {
+				coroutine.resume(
+					channels
+						.filter { !it.category.isNullOrEmpty() }
+						.map { it.category!! }
+						.distinct()
+						.sorted()
+				)
 			}
 		}
 
@@ -63,7 +60,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		before: String?,
 		loadSize: Int,
 		searchName: String?
-	) = callbackFlowWithAwait {
+	) = suspendCancellableCoroutine { coroutine ->
 		if (type == ChannelType.OPEN) {
 			if (openNetworkId != networkId || openQuery != null) {
 				openQuery =
@@ -78,9 +75,10 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			openQuery!!.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get open channels", e)
-					throw e
+					coroutine.resumeWithException(e)
+				} else {
+					coroutine.resume(channels.map { it.toApi() })
 				}
-				trySend(channels.map { it.toApi() })
 			}
 		} else if (type == ChannelType.GROUP) {
 			if (groupNetworkId != networkId || groupQuery != null) {
@@ -99,15 +97,16 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			groupQuery!!.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get group channels", e)
-					throw e
+					coroutine.resumeWithException(e)
+				} else {
+					coroutine.resume(channels.map { it.toGroupApi() })
 				}
-				trySend(channels.map { it.toGroupApi() })
 			}
 		}
 	}
 
 	override suspend fun getDirectChannels(before: String?, loadSize: Int, searchName: String?) =
-		callbackFlowWithAwait {
+		suspendCancellableCoroutine { coroutine ->
 			if (directQuery == null) {
 				directQuery =
 					GroupChannel.createMyGroupChannelListQuery().apply {
@@ -122,10 +121,12 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			directQuery!!.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get direct channels", e)
-					throw e
+					coroutine.resumeWithException(e)
+				} else {
+					coroutine.resume(
+						channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() }
+					)
 				}
-
-				trySend(channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() })
 			}
 		}
 
@@ -201,10 +202,21 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		}
 	}
 
+	override suspend fun updateNotificationSettings(networkId: String, alertType: AlertType) =
+		suspendCancellableCoroutine { coroutine ->
+			withSameScope {
+				getGroupChannels(networkId).forEach {
+					groupChannel(it.id).setMyPushTriggerOption(alertType.toOption()) { e ->
+						if (e != null) coroutine.resumeWithException(e) else coroutine.resume(Unit)
+					}
+				}
+			}
+		}
+
 	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) =
 		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
-				(getChannel(channel) as GroupChannel).setMyPushTriggerOption(alertType.toOption()) {
+				groupChannel(channel.id).setMyPushTriggerOption(alertType.toOption()) {
 					if (it != null) coroutine.resumeWithException(it) else coroutine.resume(Unit)
 				}
 			}

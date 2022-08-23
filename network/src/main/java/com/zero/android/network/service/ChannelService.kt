@@ -6,7 +6,6 @@ import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiDirectChannel
 import com.zero.android.network.model.ApiGroupChannel
-import kotlinx.coroutines.flow.Flow
 
 interface ChannelService {
 
@@ -16,13 +15,13 @@ interface ChannelService {
 		before: String? = null,
 		loadSize: Int = 1,
 		searchName: String? = null
-	): Flow<List<ApiGroupChannel>>
+	): List<ApiGroupChannel>
 
 	suspend fun getDirectChannels(
 		before: String? = null,
 		loadSize: Int = 1,
 		searchName: String? = null
-	): Flow<List<ApiDirectChannel>>
+	): List<ApiDirectChannel>
 
 	suspend fun getChannel(url: String, type: ChannelType = ChannelType.GROUP): ApiChannel
 
@@ -31,6 +30,8 @@ interface ChannelService {
 	suspend fun updateChannel(channel: Channel): ApiChannel
 
 	suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType)
+
+	suspend fun updateNotificationSettings(networkId: String, alertType: AlertType)
 
 	suspend fun joinChannel(channel: Channel)
 

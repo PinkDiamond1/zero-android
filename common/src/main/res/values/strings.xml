@@ -15,4 +15,8 @@
     <string name="search_channels">Search Channels…</string>
     <string name="search">Search…</string>
     <string name="cancel">Cancel</string>
+
+    <string name="alert_type_all">All</string>
+    <string name="alert_type_mentions_only">Mentions Only</string>
+    <string name="alert_type_off">Off</string>
 </resources>

@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
@@ -32,7 +30,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,12 +41,14 @@ import com.zero.android.common.R
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.DirectChannelDestination
+import com.zero.android.feature.channels.ui.components.ChannelNotificationSettingsView
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
 import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.components.Background
+import com.zero.android.ui.components.dialog.BottomSheetLayout
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -204,25 +203,35 @@ fun HomeScreen(
 	}
 
 	val bottomState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+	val selectedNetworkSetting by viewModel.selectedNetworkSetting.collectAsState()
 	val context = LocalContext.current
 
-	ModalBottomSheetLayout(
-		sheetState = bottomState,
-		modifier = Modifier.shadow(shape = RoundedCornerShape(8.dp), elevation = 2.dp),
-		sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-		sheetContentColor = MaterialTheme.colorScheme.surfaceVariant,
-		sheetContent = {
-			Box(
-				modifier =
-				Modifier.padding(16.dp).fillMaxWidth().clickable {
-					viewModel.logout(context = context, onLogout = onLogout)
-				}
-			) {
-				Text(
-					text = stringResource(R.string.logout),
-					style = MaterialTheme.typography.bodyLarge,
-					color = AppTheme.colors.colorTextPrimary
+	BottomSheetLayout(
+		state = bottomState,
+		content = {
+			if (selectedNetworkSetting != null) {
+				ChannelNotificationSettingsView(
+					onItemSelected = { alertType ->
+						selectedNetworkSetting?.let {
+							viewModel.updateNetworkNotificationSetting(it, alertType)
+						}
+						coroutineScope.launch { bottomState.hide() }
+					},
+					onCancelled = { coroutineScope.launch { bottomState.hide() } }
 				)
+			} else {
+				Box(
+					modifier =
+					Modifier.padding(16.dp).fillMaxWidth().clickable {
+						viewModel.logout(context = context, onLogout = onLogout)
+					}
+				) {
+					Text(
+						text = stringResource(R.string.logout),
+						style = MaterialTheme.typography.bodyLarge,
+						color = AppTheme.colors.colorTextPrimary
+					)
+				}
 			}
 		}
 	) {
@@ -250,8 +259,14 @@ fun HomeScreen(
 						onNetworkSelected(it)
 						coroutineScope.launch { scaffoldState.drawerState.close() }
 					},
-					onNavigateToTopLevelDestination = onNavigateToRootDestination,
-					onSettingsClicked = { coroutineScope.launch { bottomState.show() } }
+					onNavigateToRootDestination = onNavigateToRootDestination,
+					onSettingsClicked = { coroutineScope.launch { bottomState.show() } },
+					onNetworkSettingsClick = {
+						coroutineScope.launch {
+							viewModel.onNetworkSettingSelected(it)
+							bottomState.show()
+						}
+					}
 				)
 			},
 			drawerGesturesEnabled = scaffoldState.drawerState.isOpen

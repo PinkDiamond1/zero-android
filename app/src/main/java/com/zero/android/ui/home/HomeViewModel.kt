@@ -10,6 +10,7 @@ import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.repository.NetworkRepository
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.models.Network
+import com.zero.android.models.enums.AlertType
 import com.zero.android.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +34,8 @@ constructor(
 	private var allNetworks: List<Network>? = null
 	val selectedNetwork = MutableStateFlow<Network?>(null)
 	val networks = MutableStateFlow<Result<List<Network>>>(Result.Loading)
+
+	val selectedNetworkSetting = MutableStateFlow<Network?>(null)
 
 	init {
 		loadNetworks()
@@ -67,6 +70,17 @@ constructor(
 			allNetworks?.let { allNetworks ->
 				networks.emit(Result.Success(allNetworks.filter { it.id != network.id }))
 			}
+		}
+	}
+
+	fun onNetworkSettingSelected(network: Network) {
+		viewModelScope.launch { selectedNetworkSetting.emit(network) }
+	}
+
+	fun updateNetworkNotificationSetting(network: Network, alertType: AlertType) {
+		ioScope.launch {
+			networkRepository.updateNotificationSettings(networkId = network.id, alertType = alertType)
+			selectedNetworkSetting.emit(null)
 		}
 	}
 

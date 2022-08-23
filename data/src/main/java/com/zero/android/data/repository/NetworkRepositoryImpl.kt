@@ -6,7 +6,9 @@ import com.zero.android.database.dao.NetworkDao
 import com.zero.android.database.model.toModel
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.models.ChannelCategory
+import com.zero.android.models.enums.AlertType
 import com.zero.android.network.service.ChannelCategoryService
+import com.zero.android.network.service.ChannelService
 import com.zero.android.network.service.NetworkService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -19,7 +21,8 @@ constructor(
 	private val networkDao: NetworkDao,
 	private val preferences: AppPreferences,
 	private val networkService: NetworkService,
-	private val categoryService: ChannelCategoryService
+	private val categoryService: ChannelCategoryService,
+	private val channelService: ChannelService
 ) : NetworkRepository {
 
 	override suspend fun getNetworks() = flow {
@@ -33,8 +36,14 @@ constructor(
 
 	override suspend fun getCategories(networkId: String): Flow<List<ChannelCategory>> = flow {
 		networkDao.getCategories(networkId).firstOrNull()?.let { emit(it) }
-		categoryService.getCategories(networkId).firstOrNull()?.let {
-			emit(it)
-		} // TODO: remove this after data loading after login
+		emit(
+			categoryService.getCategories(
+				networkId
+			)
+		) // TODO: remove this after data loading after login
+	}
+
+	override suspend fun updateNotificationSettings(networkId: String, alertType: AlertType) {
+		channelService.updateNotificationSettings(networkId, alertType)
 	}
 }
