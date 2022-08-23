@@ -42,10 +42,11 @@ constructor(
 	private val channelRepository: ChannelRepository
 ) : BaseViewModel() {
 
-	private val channelId: String = checkNotNull(savedStateHandle[MessagesDestination.channelIdArg])
-	val isGroupChannel: Boolean = checkNotNull(savedStateHandle[MessagesDestination.channelTypeArg])
-	val loggedInUserId
-		get() = runBlocking(Dispatchers.IO) { preferences.userId() }
+	private val channelId: String = checkNotNull(savedStateHandle[MessagesDestination.ARG_CHANNEL_ID])
+	val isGroupChannel: Boolean =
+		checkNotNull(savedStateHandle[MessagesDestination.ARG_IS_GROUP_CHANNEL])
+
+	val loggedInUserId = runBlocking(Dispatchers.IO) { preferences.userId() }
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 

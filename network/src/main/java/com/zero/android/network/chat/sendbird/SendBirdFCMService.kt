@@ -57,20 +57,19 @@ internal class SendBirdFCMService @Inject constructor(private val logger: Logger
 
 		private val pushToken: AtomicReference<String> = AtomicReference()
 
-		suspend fun getPushToken() =
-			suspendCancellableCoroutine<String> { coroutine ->
-				val token = pushToken.get()
-				if (!token.isNullOrEmpty()) {
-					return@suspendCancellableCoroutine coroutine.resume(token)
-				}
-				SendBirdPushHelper.getPushToken { newToken: String?, e: SendBirdException? ->
-					if (e == null) {
-						pushToken.set(newToken)
-						newToken?.let { coroutine.resume(it) }
-					} else {
-						coroutine.resumeWithException(e)
-					}
+		suspend fun getPushToken() = suspendCancellableCoroutine { coroutine ->
+			val token = pushToken.get()
+			if (!token.isNullOrEmpty()) {
+				return@suspendCancellableCoroutine coroutine.resume(token)
+			}
+			SendBirdPushHelper.getPushToken { newToken: String?, e: SendBirdException? ->
+				if (e == null) {
+					pushToken.set(newToken)
+					newToken?.let { coroutine.resume(it) }
+				} else {
+					coroutine.resumeWithException(e)
 				}
 			}
+		}
 	}
 }

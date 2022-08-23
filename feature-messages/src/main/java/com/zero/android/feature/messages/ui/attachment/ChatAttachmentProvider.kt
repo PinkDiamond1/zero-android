@@ -1,12 +1,17 @@
-package com.zero.android.feature.messages.chatattachment
+package com.zero.android.feature.messages.ui.attachment
 
 import android.net.Uri
 import com.zero.android.common.extensions.downloadFile
 import com.zero.android.common.extensions.toUrl
 import com.zero.android.data.repository.mediaplayer.MediaPlayerRepository
 import com.zero.android.feature.messages.ui.components.VoiceMessageState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 

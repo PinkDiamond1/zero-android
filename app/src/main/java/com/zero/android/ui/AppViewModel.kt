@@ -5,10 +5,8 @@ import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.datastore.AppPreferences
-import com.zero.android.feature.auth.navigation.AuthDestination
 import com.zero.android.models.AuthCredentials
-import com.zero.android.navigation.HomeDestination
-import com.zero.android.navigation.NavDestination
+import com.zero.android.navigation.AppGraph
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +25,7 @@ constructor(
 ) : BaseViewModel() {
 
 	val loading = MutableStateFlow(true)
-	lateinit var startDestination: NavDestination
+	lateinit var startDestination: String
 
 	init {
 		checkAuthOnLaunch()
@@ -36,7 +34,7 @@ constructor(
 	private fun checkAuthOnLaunch() {
 		val authCredentials = runBlocking(Dispatchers.IO) { preferences.authCredentials() }
 		val isLoggedIn = authCredentials != null
-		startDestination = if (isLoggedIn) HomeDestination else AuthDestination
+		startDestination = if (isLoggedIn) AppGraph.MAIN else AppGraph.AUTH
 
 		if (isLoggedIn) onLoggedIn(authCredentials!!) else loading.emitInScope(false)
 	}

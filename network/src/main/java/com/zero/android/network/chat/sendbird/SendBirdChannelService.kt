@@ -184,26 +184,25 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			}
 		}
 
-	override suspend fun updateChannel(channel: Channel) =
-		suspendCoroutine<ApiChannel> { coroutine ->
-			val params =
-				when (channel) {
-					is DirectChannel -> channel.toParams()
-					is com.zero.android.models.GroupChannel -> channel.toParams()
-					else -> throw IllegalStateException()
-				}
+	override suspend fun updateChannel(channel: Channel) = suspendCoroutine { coroutine ->
+		val params =
+			when (channel) {
+				is DirectChannel -> channel.toParams()
+				is com.zero.android.models.GroupChannel -> channel.toParams()
+				else -> throw IllegalStateException()
+			}
 
-			withSameScope {
-				(getChannel(channel) as GroupChannel).let {
-					it.updateChannel(params) { channel, e ->
-						if (e == null) coroutine.resume(channel.toApi()) else coroutine.resumeWithException(e)
-					}
+		withSameScope {
+			(getChannel(channel) as GroupChannel).let {
+				it.updateChannel(params) { channel, e ->
+					if (e == null) coroutine.resume(channel.toApi()) else coroutine.resumeWithException(e)
 				}
 			}
 		}
+	}
 
 	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) =
-		suspendCancellableCoroutine<Unit> { coroutine ->
+		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
 				(getChannel(channel) as GroupChannel).setMyPushTriggerOption(alertType.toOption()) {
 					if (it != null) coroutine.resumeWithException(it) else coroutine.resume(Unit)
@@ -211,64 +210,62 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			}
 		}
 
-	override suspend fun joinChannel(channel: Channel) =
-		suspendCancellableCoroutine<Unit> { coroutine ->
-			withSameScope {
-				if (channel.isGroupChannel()) {
-					val accessCode =
-						when (channel) {
-							is DirectChannel -> channel.accessCode
-							is com.zero.android.models.GroupChannel -> channel.accessCode
-							else -> throw IllegalStateException()
-						}
-					groupChannel(channel.id).join(accessCode) {
-						if (it == null) {
-							coroutine.resume(Unit)
-						} else {
-							logger.e("Failed to join channel", it)
-							coroutine.resumeWithException(it)
-						}
+	override suspend fun joinChannel(channel: Channel) = suspendCancellableCoroutine { coroutine ->
+		withSameScope {
+			if (channel.isGroupChannel()) {
+				val accessCode =
+					when (channel) {
+						is DirectChannel -> channel.accessCode
+						is com.zero.android.models.GroupChannel -> channel.accessCode
+						else -> throw IllegalStateException()
 					}
-				} else if (channel.isOpenChannel()) {
-					openChannel(channel.id).enter {
-						if (it == null) {
-							coroutine.resume(Unit)
-						} else {
-							logger.e("Failed to join channel", it)
-							coroutine.resumeWithException(it)
-						}
+				groupChannel(channel.id).join(accessCode) {
+					if (it == null) {
+						coroutine.resume(Unit)
+					} else {
+						logger.e("Failed to join channel", it)
+						coroutine.resumeWithException(it)
+					}
+				}
+			} else if (channel.isOpenChannel()) {
+				openChannel(channel.id).enter {
+					if (it == null) {
+						coroutine.resume(Unit)
+					} else {
+						logger.e("Failed to join channel", it)
+						coroutine.resumeWithException(it)
 					}
 				}
 			}
 		}
+	}
 
-	override suspend fun deleteChannel(channel: Channel) =
-		suspendCancellableCoroutine<Unit> { coroutine ->
-			withSameScope {
-				if (channel.isGroupChannel()) {
-					groupChannel(channel.id).delete {
-						if (it == null) {
-							coroutine.resume(Unit)
-						} else {
-							logger.e("Failed to join channel", it)
-							coroutine.resumeWithException(it)
-						}
+	override suspend fun deleteChannel(channel: Channel) = suspendCancellableCoroutine { coroutine ->
+		withSameScope {
+			if (channel.isGroupChannel()) {
+				groupChannel(channel.id).delete {
+					if (it == null) {
+						coroutine.resume(Unit)
+					} else {
+						logger.e("Failed to join channel", it)
+						coroutine.resumeWithException(it)
 					}
-				} else if (channel.isOpenChannel()) {
-					openChannel(channel.id).delete {
-						if (it == null) {
-							coroutine.resume(Unit)
-						} else {
-							logger.e("Failed to join channel", it)
-							coroutine.resumeWithException(it)
-						}
+				}
+			} else if (channel.isOpenChannel()) {
+				openChannel(channel.id).delete {
+					if (it == null) {
+						coroutine.resume(Unit)
+					} else {
+						logger.e("Failed to join channel", it)
+						coroutine.resumeWithException(it)
 					}
 				}
 			}
 		}
+	}
 
 	override suspend fun markChannelRead(channel: Channel) =
-		suspendCancellableCoroutine<Unit> { coroutine ->
+		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
 				if (channel.isGroupChannel()) {
 					groupChannel(channel.id).markAsRead {

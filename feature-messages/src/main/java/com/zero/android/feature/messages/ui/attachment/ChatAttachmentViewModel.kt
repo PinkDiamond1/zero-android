@@ -1,4 +1,4 @@
-package com.zero.android.feature.messages.chatattachment
+package com.zero.android.feature.messages.ui.attachment
 
 import androidx.paging.compose.LazyPagingItems
 import com.zero.android.common.extensions.isValidUrl

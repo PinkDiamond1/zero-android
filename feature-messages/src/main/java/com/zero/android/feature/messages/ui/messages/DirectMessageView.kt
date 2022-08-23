@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
-import com.zero.android.feature.messages.chatattachment.ChatAttachmentViewModel
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
+import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
 import com.zero.android.feature.messages.ui.components.ChatBubbleSpacing
 import com.zero.android.feature.messages.ui.components.MessageContent
 import com.zero.android.feature.messages.ui.components.ReplyMessage
