@@ -73,7 +73,7 @@ constructor(
 		}
 	}
 
-	fun onNetworkSettingSelected(network: Network) {
+	fun onNetworkSettingSelected(network: Network?) {
 		viewModelScope.launch { selectedNetworkSetting.emit(network) }
 	}
 

@@ -207,9 +207,11 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			withSameScope {
 				getGroupChannels(networkId).forEach {
 					groupChannel(it.id).setMyPushTriggerOption(alertType.toOption()) { e ->
-						if (e != null) coroutine.resumeWithException(e) else coroutine.resume(Unit)
+						if (e != null) logger.e(e)
 					}
 				}
+
+				coroutine.resume(Unit)
 			}
 		}
 

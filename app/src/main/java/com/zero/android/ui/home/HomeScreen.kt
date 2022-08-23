@@ -260,7 +260,10 @@ fun HomeScreen(
 						coroutineScope.launch { scaffoldState.drawerState.close() }
 					},
 					onNavigateToRootDestination = onNavigateToRootDestination,
-					onSettingsClicked = { coroutineScope.launch { bottomState.show() } },
+					onSettingsClicked = {
+						viewModel.onNetworkSettingSelected(null)
+						coroutineScope.launch { bottomState.show() }
+					},
 					onNetworkSettingsClick = {
 						coroutineScope.launch {
 							viewModel.onNetworkSettingSelected(it)
