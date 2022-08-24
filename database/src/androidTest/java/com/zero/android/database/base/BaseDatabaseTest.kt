@@ -25,7 +25,7 @@ abstract class BaseDatabaseTest {
 		val context = ApplicationProvider.getApplicationContext<Context>()
 		db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
-		messageDao = MessageDao(db.messageDao(), db.memberDao())
+		messageDao = MessageDao(db.messageDao(), db.memberDao(), db.directChannelDao())
 		channelDao = ChannelDao(db.directChannelDao(), db.groupChannelDao(), db.memberDao(), messageDao)
 	}
 

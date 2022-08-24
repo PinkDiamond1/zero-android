@@ -97,7 +97,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 					)
 					Spacer(modifier = Modifier.padding(4.dp))
 				}
-				if ((channel as GroupChannel).hasDiscordChannel) {
+				if (channel.hasDiscordChannel) {
 					Image(
 						painter = painterResource(R.drawable.ic_discord),
 						contentDescription = "",

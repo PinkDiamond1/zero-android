@@ -77,7 +77,7 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 
 			upsert(item.channel)
 
-			item.lastMessage?.let { messageDao.upsert(it) }
+			item.lastMessage?.let { messageDao.upsert(it, updateChannel = false) }
 
 			item.members
 				.map { ChannelMembersCrossRef(channelId = item.channel.id, memberId = it.id) }

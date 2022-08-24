@@ -19,10 +19,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.zero.android.common.R
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.Result
 import com.zero.android.models.Network
 import com.zero.android.models.fake.FakeModel
+import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.components.LoadingContainer
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
@@ -43,7 +43,8 @@ fun NetworkDrawerContent(
 	coroutineScope: CoroutineScope,
 	onNetworkSelected: (Network) -> Unit,
 	onSettingsClicked: () -> Unit,
-	onNavigateToTopLevelDestination: (NavDestination) -> Unit
+	onNetworkSettingsClick: (Network) -> Unit,
+	onNavigateToRootDestination: (NavDestination) -> Unit
 ) {
 	LoadingContainer(modifier = modifier.fillMaxSize(), loading = networks is Result.Loading) {
 		ConstraintLayout(
@@ -59,14 +60,8 @@ fun NetworkDrawerContent(
 					start.linkTo(parent.start)
 				},
 				network = currentNetwork!!,
-				onSettingsClick = {
-					onSettingsClicked()
-					/*onNavigateToTopLevelDestination(ProfileDestination)*/
-				},
-				onInviteClick = {
-					coroutineScope.launch { drawerState.close() }
-					/*onNavigateToTopLevelDestination(ProfileDestination)*/
-				}
+				onSettingsClick = { onSettingsClicked() },
+				onInviteClick = { coroutineScope.launch { drawerState.close() } }
 			)
 
 			Text(
@@ -92,7 +87,8 @@ fun NetworkDrawerContent(
 							onItemClick = {
 								onNetworkSelected(network)
 								coroutineScope.launch { drawerState.close() }
-							}
+							},
+							onSettingsClick = { onNetworkSettingsClick(network) }
 						)
 					}
 				}
@@ -104,10 +100,7 @@ fun NetworkDrawerContent(
 					bottom.linkTo(parent.bottom)
 					start.linkTo(parent.start)
 				},
-				onCreateWorldClick = {
-					coroutineScope.launch { drawerState.close() }
-					/*onNavigateToTopLevelDestination(ProfileDestination)*/
-				}
+				onCreateWorldClick = { coroutineScope.launch { drawerState.close() } }
 			)
 		}
 	}
@@ -123,7 +116,8 @@ fun NetworkDrawerContentPreview() = Preview {
 		drawerState = rememberDrawerState(initialValue = DrawerValue.Open),
 		coroutineScope = CoroutineScope(Dispatchers.Default),
 		onNetworkSelected = {},
-		onNavigateToTopLevelDestination = {},
-		onSettingsClicked = {}
+		onNavigateToRootDestination = {},
+		onSettingsClicked = {},
+		onNetworkSettingsClick = {}
 	)
 }

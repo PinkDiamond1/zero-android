@@ -18,16 +18,18 @@ constructor(
 
 	fun getLatestMessageByChannel(channelId: String) = messageDao.getLatestMessageByChannel(channelId)
 
-	suspend fun upsert(vararg data: MessageWithRefs) {
+	suspend fun upsert(vararg data: MessageWithRefs, updateChannel: Boolean = true) {
 		messageDao.upsert(memberDao, *data)
 
-		data
-			.map { it.message.channelId }
-			.forEach { channelId ->
-				getLatestMessageByChannel(channelId)?.let {
-					directChannelDao.updateLastMessage(channelId, it.id, it.createdAt)
+		if (updateChannel) {
+			data
+				.map { it.message.channelId }
+				.forEach { channelId ->
+					getLatestMessageByChannel(channelId)?.let {
+						directChannelDao.updateLastMessage(channelId, it.id, it.createdAt)
+					}
 				}
-			}
+		}
 	}
 
 	suspend fun update(id: String, text: String) = messageDao.update(id, text)

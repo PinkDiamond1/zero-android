@@ -18,6 +18,7 @@ import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
+import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiDirectChannel
 import com.zero.android.network.model.ApiGroupChannel
@@ -88,7 +89,7 @@ constructor(
 				.collect { trySend(it) }
 		}
 		launch {
-			channelService.getChannel(id, type = ChannelType.GROUP).map {
+			channelService.getChannel(id, type = ChannelType.GROUP).let {
 				it as ApiGroupChannel
 				channelDao.upsert(it.toEntity())
 			}
@@ -103,11 +104,19 @@ constructor(
 				.collectLatest { trySend(it) }
 		}
 		launch {
-			channelService.getChannel(id, type = ChannelType.GROUP).map {
+			channelService.getChannel(id, type = ChannelType.GROUP).let {
 				it as ApiDirectChannel
 				channelDao.upsert(it.toEntity(userId))
 			}
 		}
+	}
+
+	override suspend fun updateChannel(channel: Channel) {
+		channelService.updateChannel(channel)
+	}
+
+	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) {
+		channelService.updateNotificationSettings(channel, alertType)
 	}
 
 	override suspend fun joinChannel(channel: Channel) = channelService.joinChannel(channel)

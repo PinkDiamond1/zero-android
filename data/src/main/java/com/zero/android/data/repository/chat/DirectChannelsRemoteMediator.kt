@@ -11,7 +11,6 @@ import com.zero.android.data.conversion.toEntity
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.model.DirectChannelWithRefs
 import com.zero.android.network.service.ChannelService
-import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -59,16 +58,15 @@ internal class DirectChannelsRemoteMediator(
 			// thread.
 			try {
 				val response =
-					lastChannelId?.let { channelService.getDirectChannels(before = it).firstOrNull() }
-						?: channelService.getDirectChannels(loadSize = INITIAL_LOAD_SIZE).firstOrNull()
+					lastChannelId?.let { channelService.getDirectChannels(before = it) }
+						?: channelService.getDirectChannels(loadSize = INITIAL_LOAD_SIZE)
 
-				response?.map { it.toEntity(userId) }?.let { channelDao.upsert(*it.toTypedArray()) }
+				response.map { it.toEntity(userId) }.let { channelDao.upsert(*it.toTypedArray()) }
 
-				logger.d("Loading Direct Channels: $loadType - $lastChannelId: ${response?.size ?: 0}")
+				logger.d("Loading Direct Channels: $loadType - $lastChannelId: ${response.size}")
 
 				MediatorResult.Success(
-					endOfPaginationReached =
-					response.isNullOrEmpty() || response.size < CHANNELS_PAGE_LIMIT
+					endOfPaginationReached = response.isEmpty() || response.size < CHANNELS_PAGE_LIMIT
 				)
 			} catch (e: Exception) {
 				logger.e(e)

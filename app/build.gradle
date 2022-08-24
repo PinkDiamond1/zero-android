@@ -4,6 +4,8 @@ plugins {
 	id 'dagger.hilt.android.plugin'
 	id 'kotlin-kapt'
 	id 'com.google.firebase.crashlytics'
+	id 'com.google.gms.google-services'
+	id 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 }
 
 apply from: "../test_dependencies.gradle"
@@ -27,9 +29,16 @@ android {
 	}
 
 	buildTypes {
+		debug {
+			def properties = getEnv("development")
+			buildConfigField "String", "ONESIGNAL_ID", "\"${properties["one_signal_id"]}\""
+		}
 		release {
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+			def properties = getEnv("production")
+			buildConfigField "String", "ONESIGNAL_ID", "\"${properties["one_signal_id"]}\""
 		}
 	}
 	compileOptions {
@@ -43,7 +52,7 @@ android {
 		compose true
 	}
 	composeOptions {
-		kotlinCompilerExtensionVersion versions.compose
+		kotlinCompilerExtensionVersion versions.composeCompiler
 	}
 	packagingOptions {
 		resources {
@@ -54,6 +63,7 @@ android {
 
 dependencies {
 	implementation project(":ui")
+	implementation project(":navigation")
 	implementation project(":common")
 	implementation project(":models")
 	implementation project(":data")
@@ -73,7 +83,8 @@ dependencies {
 	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
 
 	implementation platform("com.google.firebase:firebase-bom:${versions.firebase}")
-	implementation 'com.google.firebase:firebase-crashlytics'
+	implementation "com.google.firebase:firebase-crashlytics-ktx"
+	implementation "com.onesignal:OneSignal:${versions.onesignal}"
 
 	// UI
 	implementation "androidx.compose.material:material:${versions.material2}"

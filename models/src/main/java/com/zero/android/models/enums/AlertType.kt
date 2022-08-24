@@ -10,6 +10,6 @@ enum class AlertType(val serializedName: String) {
 fun String?.toAlertType() =
 	when (this) {
 		null -> AlertType.DEFAULT
-		else -> AlertType.values().firstOrNull { type -> type.serializedName == this }
+		else -> AlertType.values().firstOrNull { type -> type.serializedName == this.lowercase() }
 			?: AlertType.DEFAULT
 	}

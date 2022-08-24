@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.zero.android.common.util.SymbolAnnotationType
 import com.zero.android.common.util.messageFormatter
-import com.zero.android.feature.messages.chatattachment.ChatAttachmentViewModel
+import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType

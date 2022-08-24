@@ -47,7 +47,7 @@ internal class SendBirdChatService(
 		}
 
 	override suspend fun send(channel: Channel, message: DraftMessage) =
-		suspendCancellableCoroutine<ApiMessage> { coroutine ->
+		suspendCancellableCoroutine { coroutine ->
 			val params = message.toParams()
 			val sbChannel = runBlocking { getChannel(channel) }
 			if (params is FileMessageParams) {
@@ -73,7 +73,7 @@ internal class SendBirdChatService(
 		send(channel, message.apply { parentMessageId = id })
 
 	override suspend fun deleteMessage(channel: Channel, message: Message) =
-		suspendCancellableCoroutine<Unit> { coroutine ->
+		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
 				getChannel(channel).deleteMessage(messages.getMessage(message)) {
 					if (it != null) {

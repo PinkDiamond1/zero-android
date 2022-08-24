@@ -33,6 +33,9 @@ dependencies {
 
 	implementation "com.google.dagger:hilt-android:${versions.hilt}"
 	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
+
+	implementation platform("com.google.firebase:firebase-bom:${versions.firebase}")
+	implementation "com.google.firebase:firebase-messaging-ktx"
 	implementation "com.sendbird.sdk:sendbird-android-sdk:${versions.sendbird}"
 
 	// Data

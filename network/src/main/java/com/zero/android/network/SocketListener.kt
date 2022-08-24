@@ -18,7 +18,7 @@ interface SocketListener {
 
 	fun onChannelChanged(channel: ApiChannel) {}
 
-	fun onChannelDeleted(url: String, channelType: ChannelType) {}
+	fun onChannelDeleted(id: String, channelType: ChannelType) {}
 
 	fun onReactionUpdated(channel: ApiChannel, event: ApiMessageReactionEvent) {}
 

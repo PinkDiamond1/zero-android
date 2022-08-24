@@ -6,10 +6,10 @@ import com.sendbird.android.GroupChannelParams
 import com.sendbird.android.Member
 import com.sendbird.android.OpenChannel
 import com.sendbird.android.OpenChannelParams
-import com.sendbird.android.SendBird
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.enums.AccessType
+import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.models.enums.toAlertType
 import com.zero.android.models.enums.toChannelType
@@ -164,4 +164,5 @@ internal fun BaseChannel.ChannelType.toType() = value().toChannelType()
 
 internal fun GroupChannel.PushTriggerOption.toType() = name.lowercase().toAlertType()
 
-internal fun SendBird.PushTriggerOption.toType() = value.toAlertType()
+internal fun AlertType.toOption() =
+	GroupChannel.PushTriggerOption.values().find { it.name.lowercase() == serializedName }

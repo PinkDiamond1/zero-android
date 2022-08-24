@@ -1,0 +1,20 @@
+plugins {
+	id 'com.android.library'
+	id 'org.jetbrains.kotlin.android'
+	id 'kotlin-kapt'
+}
+
+apply from: "../module.gradle"
+
+android {
+	buildFeatures {
+		compose true
+	}
+}
+
+dependencies {
+	implementation project(":common")
+
+	// UI
+	implementation "androidx.navigation:navigation-compose:${versions.navigation}"
+}

@@ -3,17 +3,13 @@ package com.zero.android.ui.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
@@ -25,53 +21,57 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.zero.android.common.R
-import com.zero.android.common.navigation.NavDestination
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.DirectChannelDestination
+import com.zero.android.feature.channels.ui.components.ChannelNotificationSettingsView
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
+import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
-import com.zero.android.ui.appbar.HOME_DESTINATIONS
 import com.zero.android.ui.components.Background
+import com.zero.android.ui.components.dialog.BottomSheetLayout
+import com.zero.android.ui.components.dialog.DialogListItem
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeRoute(viewModel: HomeViewModel = hiltViewModel(), onLogout: () -> Unit) {
+fun HomeRoute(
+	navController: NavController,
+	viewModel: HomeViewModel = hiltViewModel(),
+	onLogout: () -> Unit,
+	onNavigateToRootDestination: (NavDestination) -> Unit
+) {
 	val currentScreen by viewModel.currentScreen.collectAsState()
 	val currentNetwork: Network? by viewModel.selectedNetwork.collectAsState()
 	val networks: Result<List<Network>> by viewModel.networks.collectAsState()
 
 	HomeScreen(
 		viewModel = viewModel,
+		navController = navController,
 		currentScreen = currentScreen,
 		currentNetwork = currentNetwork,
 		networks = networks,
 		onNetworkSelected = viewModel::onNetworkSelected,
 		onTriggerSearch = { viewModel.triggerSearch(it) },
-		onLogout = onLogout
+		onLogout = onLogout,
+		onNavigateToRootDestination = onNavigateToRootDestination
 	)
 }
 
@@ -81,24 +81,23 @@ fun HomeRoute(viewModel: HomeViewModel = hiltViewModel(), onLogout: () -> Unit) 
 fun HomeScreen(
 	modifier: Modifier = Modifier,
 	viewModel: HomeViewModel,
+	navController: NavController,
 	currentScreen: NavDestination,
 	currentNetwork: Network?,
 	networks: Result<List<Network>>,
 	onNetworkSelected: (Network) -> Unit,
 	onTriggerSearch: (Boolean) -> Unit,
-	onLogout: () -> Unit
+	onLogout: () -> Unit,
+	onNavigateToRootDestination: (NavDestination) -> Unit
 ) {
-	val navController = rememberNavController()
+	val bottomNavController = rememberNavController()
+
 	val scaffoldState = rememberScaffoldState()
 	val coroutineScope = rememberCoroutineScope()
 
-	var isRootDestination by remember { mutableStateOf(true) }
-	var showMenu by remember { mutableStateOf(false) }
+	// 	var showMenu by remember { mutableStateOf(false) }
 
-	navController.addOnDestinationChangedListener { _, destination, _ ->
-		onTriggerSearch(false)
-		isRootDestination = HOME_DESTINATIONS.map { it.destination.route }.contains(destination.route)
-	}
+	bottomNavController.addOnDestinationChangedListener { _, _, _ -> onTriggerSearch(false) }
 
 	val actionItems: @Composable RowScope.() -> Unit = {
 		if (currentScreen == ChannelsDestination || currentScreen == DirectChannelDestination) {
@@ -187,9 +186,10 @@ fun HomeScreen(
 					viewModel.currentScreen.emit(it)
 					scaffoldState.drawerState.close()
 				}
-				navController.navigate(it.route) {
-					popUpTo(navController.graph.startDestinationId)
+				bottomNavController.navigate(it.route) {
+					popUpTo(navController.graph.startDestinationId) { saveState = true }
 					launchSingleTop = true
+					restoreState = true
 				}
 			}
 		)
@@ -200,39 +200,31 @@ fun HomeScreen(
 	}
 
 	val bottomState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+	val selectedNetworkSetting by viewModel.selectedNetworkSetting.collectAsState()
 	val context = LocalContext.current
 
-	ModalBottomSheetLayout(
-		sheetState = bottomState,
-		modifier = Modifier.shadow(shape = RoundedCornerShape(8.dp), elevation = 2.dp),
-		sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-		sheetContentColor = MaterialTheme.colorScheme.surfaceVariant,
-		sheetContent = {
-			Box(
-				modifier =
-				Modifier.padding(16.dp).fillMaxWidth().clickable {
+	BottomSheetLayout(
+		state = bottomState,
+		content = {
+			if (selectedNetworkSetting != null) {
+				ChannelNotificationSettingsView(
+					onItemSelected = { alertType ->
+						selectedNetworkSetting?.let {
+							viewModel.updateNetworkNotificationSetting(it, alertType)
+						}
+						coroutineScope.launch { bottomState.hide() }
+					}
+				)
+			} else {
+				DialogListItem(text = stringResource(R.string.logout)) {
 					viewModel.logout(context = context, onLogout = onLogout)
 				}
-			) {
-				Text(
-					text = stringResource(R.string.logout),
-					style = MaterialTheme.typography.bodyLarge,
-					color = AppTheme.colors.colorTextPrimary
-				)
 			}
 		}
 	) {
 		Scaffold(
-			topBar = {
-				if (isRootDestination) {
-					topBar()
-				}
-			},
-			bottomBar = {
-				if (isRootDestination) {
-					bottomBar()
-				}
-			},
+			topBar = { topBar() },
+			bottomBar = { bottomBar() },
 			scaffoldState = scaffoldState,
 			drawerContent = {
 				NetworkDrawerContent(
@@ -254,17 +246,28 @@ fun HomeScreen(
 						onNetworkSelected(it)
 						coroutineScope.launch { scaffoldState.drawerState.close() }
 					},
-					onNavigateToTopLevelDestination = {
-						navController.navigate(it.route) { popUpTo(navController.graph.startDestinationId) }
+					onNavigateToRootDestination = onNavigateToRootDestination,
+					onSettingsClicked = {
+						viewModel.onNetworkSettingSelected(null)
+						coroutineScope.launch { bottomState.show() }
 					},
-					onSettingsClicked = { coroutineScope.launch { bottomState.show() } }
+					onNetworkSettingsClick = {
+						coroutineScope.launch {
+							viewModel.onNetworkSettingSelected(it)
+							bottomState.show()
+						}
+					}
 				)
 			},
 			drawerGesturesEnabled = scaffoldState.drawerState.isOpen
 		) { innerPadding ->
 			Background {
 				Box(modifier = Modifier.padding(innerPadding)) {
-					HomeNavHost(navController = navController, network = currentNetwork)
+					HomeNavHost(
+						bottomNavController = bottomNavController,
+						navController = navController,
+						network = currentNetwork
+					)
 				}
 			}
 		}

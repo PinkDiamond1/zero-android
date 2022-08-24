@@ -15,7 +15,8 @@ import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toType
 import com.zero.android.network.model.events.ApiMessageReactionEvent
 
-class SendBirdSocketHandler(private val listener: SocketListener) : SendBird.ChannelHandler() {
+internal class SendBirdSocketHandler(private val listener: SocketListener) :
+	SendBird.ChannelHandler() {
 	override fun onMessageReceived(p0: BaseChannel, p1: BaseMessage) {
 		listener.onMessageReceived(p0.toApi(), p1.toApi())
 	}

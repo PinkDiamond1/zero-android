@@ -58,46 +58,46 @@ fun DirectChannelsScreen(
 	onChannelSearched: (String) -> Unit,
 	onSearchClosed: () -> Unit
 ) {
-    val directChannelsUiState = uiState.directChannelsUiState as? DirectChannelUiState.Success
+	val directChannelsUiState = uiState.directChannelsUiState as? DirectChannelUiState.Success
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        if (showSearchBar) {
-            SearchView(
-                placeHolder = stringResource(R.string.search_channels),
-                onValueChanged = { onChannelSearched(it) },
-                onSearchCancelled = { onSearchClosed() }
-            )
-        }
-        if (directChannelsUiState != null) {
-            DirectChannelsList(channels, loggedInUser, onChannelSelected)
-        }
+	Column(modifier = Modifier.fillMaxWidth()) {
+		if (showSearchBar) {
+			SearchView(
+				placeHolder = stringResource(R.string.search_channels),
+				onValueChanged = { onChannelSearched(it) },
+				onSearchCancelled = { onSearchClosed() }
+			)
+		}
+		if (directChannelsUiState != null) {
+			DirectChannelsList(channels, loggedInUser, onChannelSelected)
+		}
 
-        if (directChannelsUiState?.isSearchResult == true) {
-            Text(
-                text = "${channels.itemCount} results found",
-                modifier =
-                Modifier.fillMaxWidth()
-                    .padding(vertical = 10.dp)
-                    .background(MaterialTheme.colorScheme.primary),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    }
+		if (directChannelsUiState?.isSearchResult == true) {
+			Text(
+				text = "${channels.itemCount} results found",
+				modifier =
+				Modifier.fillMaxWidth()
+					.padding(vertical = 10.dp)
+					.background(MaterialTheme.colorScheme.primary),
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.labelMedium
+			)
+		}
+	}
 }
 
 @Composable
 fun ColumnScope.DirectChannelsList(
-    channels: LazyPagingItems<DirectChannel>,
-    loggedInUser: String,
-    onChannelSelected: (Channel) -> Unit
+	channels: LazyPagingItems<DirectChannel>,
+	loggedInUser: String,
+	onChannelSelected: (Channel) -> Unit
 ) {
-    LazyColumn(modifier = Modifier.weight(1f)) {
-        items(channels) { channel ->
-            channel ?: return@items
-            ChannelListItem(loggedInUser, channel) { onChannelSelected(it) }
-        }
-    }
+	LazyColumn(modifier = Modifier.weight(1f)) {
+		items(channels) { channel ->
+			channel ?: return@items
+			ChannelListItem(loggedInUser, channel) { onChannelSelected(it) }
+		}
+	}
 }
 
 @Preview @Composable

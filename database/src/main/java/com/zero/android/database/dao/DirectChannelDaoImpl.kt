@@ -38,7 +38,7 @@ abstract class DirectChannelDaoImpl : BaseChannelDao() {
 	) {
 		for (item in data) {
 			upsert(item.channel)
-			item.lastMessage?.let { messageDao.upsert(it) }
+			item.lastMessage?.let { messageDao.upsert(it, updateChannel = false) }
 
 			memberDao.upsert(item.members)
 			item.members

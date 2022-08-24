@@ -43,4 +43,6 @@ constructor(
 	}
 
 	suspend fun delete(entity: ChannelEntity) = groupChannelDao.delete(entity)
+
+	suspend fun delete(id: String) = groupChannelDao.delete(id)
 }
