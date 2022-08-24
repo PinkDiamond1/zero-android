@@ -3,11 +3,9 @@ package com.zero.android.ui.home
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -23,8 +21,6 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,6 +45,7 @@ import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.components.Background
 import com.zero.android.ui.components.dialog.BottomSheetLayout
+import com.zero.android.ui.components.dialog.DialogListItem
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -216,21 +213,11 @@ fun HomeScreen(
 							viewModel.updateNetworkNotificationSetting(it, alertType)
 						}
 						coroutineScope.launch { bottomState.hide() }
-					},
-					onCancelled = { coroutineScope.launch { bottomState.hide() } }
+					}
 				)
 			} else {
-				Box(
-					modifier =
-					Modifier.padding(16.dp).fillMaxWidth().clickable {
-						viewModel.logout(context = context, onLogout = onLogout)
-					}
-				) {
-					Text(
-						text = stringResource(R.string.logout),
-						style = MaterialTheme.typography.bodyLarge,
-						color = AppTheme.colors.colorTextPrimary
-					)
+				DialogListItem(text = stringResource(R.string.logout)) {
+					viewModel.logout(context = context, onLogout = onLogout)
 				}
 			}
 		}

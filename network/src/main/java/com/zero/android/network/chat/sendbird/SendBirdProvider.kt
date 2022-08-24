@@ -43,7 +43,7 @@ constructor(
 				}
 
 				override fun onInitSucceed() {
-					logger.i("Initialization is completed.")
+					logger.i("SendBird Connected")
 				}
 			}
 		)
@@ -87,7 +87,8 @@ constructor(
 			val deviceToken = SendBirdFCMService.getPushToken()
 
 			logger.i("SendBird Push Token: $deviceToken")
-			SendBird.registerPushTokenForCurrentUser(deviceToken) { _, e ->
+			SendBird.registerPushTokenForCurrentUser(deviceToken) { status, e ->
+				logger.d("SendBird Push Token: $status")
 				if (e != null) {
 					logger.e(e)
 					it.resumeWithException(e)

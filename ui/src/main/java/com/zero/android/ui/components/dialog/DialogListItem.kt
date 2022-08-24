@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,10 +28,7 @@ fun DialogListItem(
 	@DrawableRes icon: Int? = null,
 	onClick: () -> Unit
 ) {
-	ConstraintLayout(
-		modifier =
-		modifier.fillMaxWidth().wrapContentHeight().padding(16.dp).clickable(onClick = onClick)
-	) {
+	ConstraintLayout(modifier = modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp)) {
 		val (iconRef, textRef) = createRefs()
 
 		icon?.let {
