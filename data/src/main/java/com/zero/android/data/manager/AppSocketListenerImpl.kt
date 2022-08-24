@@ -27,11 +27,13 @@ constructor(
 	val userId
 		get() = runBlocking(Dispatchers.IO) { preferences.userId() }
 
+	private suspend fun updateChannel(channel: ApiChannel) {
+		if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity(userId))
+		else if (channel is ApiGroupChannel) channelDao.upsert(channel.toEntity())
+	}
+
 	override fun onChannelChanged(channel: ApiChannel) {
-		CoroutineScope(Dispatchers.IO).launch {
-			if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity(userId))
-			else if (channel is ApiGroupChannel) channelDao.upsert(channel.toEntity())
-		}
+		CoroutineScope(Dispatchers.IO).launch { updateChannel(channel) }
 	}
 
 	override fun onChannelDeleted(id: String, channelType: ChannelType) {
@@ -46,14 +48,14 @@ constructor(
 
 	override fun onMessageReceived(channel: ApiChannel, message: ApiMessage) {
 		CoroutineScope(Dispatchers.IO).launch {
-			onChannelChanged(channel)
+			updateChannel(channel)
 			messageDao.upsert(message.toEntity())
 		}
 	}
 
 	override fun onMessageUpdated(channel: ApiChannel, message: ApiMessage) {
 		CoroutineScope(Dispatchers.IO).launch {
-			onChannelChanged(channel)
+			updateChannel(channel)
 			messageDao.upsert(message.toEntity())
 		}
 	}
@@ -64,7 +66,7 @@ constructor(
 
 	override fun onMentionReceived(channel: ApiChannel, message: ApiMessage) {
 		CoroutineScope(Dispatchers.IO).launch {
-			onChannelChanged(channel)
+			updateChannel(channel)
 			messageDao.upsert(message.toEntity())
 		}
 	}
