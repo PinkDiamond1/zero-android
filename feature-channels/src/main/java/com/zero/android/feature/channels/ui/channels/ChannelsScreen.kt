@@ -71,23 +71,23 @@ fun ChannelsScreen(
 		val tabs = categories.map { ChannelTab(0, it, 0) }
 		if (tabs.isNotEmpty()) {
 			Column(modifier = Modifier.fillMaxWidth()) {
-                FadeExpandAnimation(visible = showSearchBar) {
-                    SearchView(
-                        placeHolder = stringResource(R.string.search_channels),
-                        onValueChanged = { onChannelSearched(it) },
-                        onSearchCancelled = { onSearchClosed() }
-                    )
-                }
-                FadeExpandAnimation(visible = isSearchState) {
-                    ChannelSearchResult(filteredChannels) {
-                        onSearchClosed()
-                        onChannelSelected(it)
-                    }
-                }
-                ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
-                ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
-                    onChannelSelected(it)
-                }
+				FadeExpandAnimation(visible = showSearchBar) {
+					SearchView(
+						placeHolder = stringResource(R.string.search_channels),
+						onValueChanged = { onChannelSearched(it) },
+						onSearchCancelled = { onSearchClosed() }
+					)
+				}
+				FadeExpandAnimation(visible = isSearchState) {
+					ChannelSearchResult(filteredChannels) {
+						onSearchClosed()
+						onChannelSelected(it)
+					}
+				}
+				ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
+				ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
+					onChannelSelected(it)
+				}
 			}
 		}
 	}

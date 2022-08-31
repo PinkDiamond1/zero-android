@@ -14,6 +14,7 @@ interface ChannelService {
 		type: ChannelType = ChannelType.GROUP,
 		before: String? = null,
 		loadSize: Int = 1,
+		limit: Int = 100,
 		searchName: String? = null
 	): List<ApiGroupChannel>
 
@@ -28,6 +29,8 @@ interface ChannelService {
 	suspend fun createChannel(networkId: String, channel: Channel): ApiChannel
 
 	suspend fun updateChannel(channel: Channel): ApiChannel
+
+	suspend fun getNetworkNotificationSettings(networkId: String): AlertType
 
 	suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType)
 

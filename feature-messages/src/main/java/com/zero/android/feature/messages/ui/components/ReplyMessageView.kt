@@ -1,11 +1,20 @@
 package com.zero.android.feature.messages.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,13 +34,10 @@ fun ReplyMessage(
 	modifier: Modifier = Modifier.fillMaxWidth(),
 	message: Message,
 	showCloseButton: Boolean = true,
-    color: Color = Color.Transparent,
+	color: Color = Color.Transparent,
 	onCloseView: () -> Unit = {}
 ) {
-	Surface(
-		modifier = if (showCloseButton) modifier.padding(6.dp) else modifier,
-		color = color
-	) {
+	Surface(modifier = if (showCloseButton) modifier.padding(6.dp) else modifier, color = color) {
 		Row(
 			modifier =
 			modifier
@@ -43,12 +49,12 @@ fun ReplyMessage(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			ExtraSmallCircularImage(
-				imageUrl = message.author.profileImage,
+				imageUrl = message.author?.profileImage,
 				placeHolder = R.drawable.ic_user_profile_placeholder
 			)
 			Spacer(modifier = Modifier.size(8.dp))
 			Column(modifier = Modifier.weight(1f)) {
-				message.author.name?.let {
+				message.author?.name?.let {
 					Text(
 						text = it,
 						color = Color.White,

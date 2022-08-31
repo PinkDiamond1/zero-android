@@ -3,7 +3,15 @@ package com.zero.android.feature.messages.ui.messages
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,11 +41,11 @@ import com.zero.android.ui.theme.AppTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChannelMessage(
-    msg: Message,
-    isUserMe: Boolean,
-    isFirstMessageByAuthor: Boolean,
-    chatAttachmentViewModel: ChatAttachmentViewModel,
-    onAuthorClick: (Member) -> Unit
+	msg: Message,
+	isUserMe: Boolean,
+	isFirstMessageByAuthor: Boolean,
+	chatAttachmentViewModel: ChatAttachmentViewModel,
+	onAuthorClick: (Member) -> Unit
 ) {
 	val currentSelectedMessage: Message? by MessageActionStateHandler.selectedMessage.collectAsState()
 	val modifier =
@@ -53,7 +61,7 @@ fun ChannelMessage(
 		} else modifier
 	) {
 		SmallCircularImage(
-			imageUrl = msg.author.profileImage,
+			imageUrl = msg.author?.profileImage,
 			placeHolder = R.drawable.ic_user_profile_placeholder
 		)
 		CMAuthorAndTextMessage(
@@ -108,13 +116,13 @@ fun CMAuthorAndTextMessage(
 						authorClicked = authorClicked,
 						chatAttachmentViewModel = chatAttachmentViewModel
 					)
-                    val messageDate = message.createdAt.toDate()
-                    Text(
-                        text = messageDate.format("hh:mm aa"),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.align(Alignment.End),
-                        color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
-                    )
+					val messageDate = message.createdAt.toDate()
+					Text(
+						text = messageDate.format("hh:mm aa"),
+						style = MaterialTheme.typography.bodySmall,
+						modifier = Modifier.align(Alignment.End),
+						color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
+					)
 				}
 			}
 		}
@@ -126,20 +134,20 @@ fun CMAuthorAndTextMessage(
 private fun AuthorNameTimestamp(isUserMe: Boolean, msg: Message) {
 	Row(modifier = Modifier.semantics(mergeDescendants = true) {}) {
 		Text(
-			text = if (isUserMe) "Me" else msg.author.name ?: "",
+			text = if (isUserMe) "Me" else msg.author?.name ?: "",
 			style = MaterialTheme.typography.titleMedium,
 			color = MaterialTheme.colorScheme.primary,
 			modifier =
 			Modifier.alignBy(LastBaseline)
 				.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
 		)
-		/*Spacer(modifier = Modifier.width(8.dp))
-		val messageDate = msg.createdAt.toDate()
-		Text(
-			text = "${messageDate.toMessageDateFormat()} at ${messageDate.format("hh:mm aa")}",
-			style = MaterialTheme.typography.bodySmall,
-			modifier = Modifier.alignBy(LastBaseline),
-			color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
-		)*/
+    /*Spacer(modifier = Modifier.width(8.dp))
+    val messageDate = msg.createdAt.toDate()
+    Text(
+    	text = "${messageDate.toMessageDateFormat()} at ${messageDate.format("hh:mm aa")}",
+    	style = MaterialTheme.typography.bodySmall,
+    	modifier = Modifier.alignBy(LastBaseline),
+    	color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
+    )*/
 	}
 }

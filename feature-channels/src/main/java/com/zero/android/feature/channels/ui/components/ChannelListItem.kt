@@ -88,7 +88,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 						contentDescription = "",
 						modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 						contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(AppTheme.colors.colorTextPrimary)
+						colorFilter = ColorFilter.tint(AppTheme.colors.colorTextPrimary)
 					)
 					Spacer(modifier = Modifier.padding(4.dp))
 				}
@@ -98,8 +98,8 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 						contentDescription = "",
 						modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 						contentScale = ContentScale.Fit,
-                        colorFilter = ColorFilter.tint(AppTheme.colors.colorTextPrimary)
-                    )
+						colorFilter = ColorFilter.tint(AppTheme.colors.colorTextPrimary)
+					)
 					Spacer(modifier = Modifier.padding(4.dp))
 				}
 			}
@@ -143,7 +143,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 						bottom.linkTo(image.bottom)
 						end.linkTo(parent.end)
 					},
-                    tint = AppTheme.colors.colorTextPrimary
+					tint = AppTheme.colors.colorTextPrimary
 				)
 			} else {
 				if (channel.unreadMessageCount > 0) {

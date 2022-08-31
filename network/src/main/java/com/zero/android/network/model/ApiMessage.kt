@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 data class ApiMessage(
 	val id: String,
 	@SerialName("channel_url") val channelId: String,
-	val author: ApiMember,
+	val author: ApiMember?,
 	val mentions: List<ApiMember> = emptyList(),
 	@Serializable(MessageTypeSerializer::class) val type: MessageType,
 	@Serializable(MessageMentionTypeSerializer::class) val mentionType: MessageMentionType,
@@ -42,10 +42,10 @@ data class ApiFileThumbnail(
 
 @Serializable
 data class ApiFileData(
-	@SerialName("height") val height: Int,
+	@SerialName("height") val height: Int? = null,
 	@SerialName("type") val type: String,
 	@SerialName("url") val url: String,
-	@SerialName("width") val width: Int
+	@SerialName("width") val width: Int? = null
 )
 
 @Serializable

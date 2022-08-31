@@ -1,5 +1,6 @@
 package com.zero.android.models
 
+import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.InviteMode
 
 data class Network(
@@ -14,7 +15,8 @@ data class Network(
 	val disabledApps: List<String>? = null,
 	val inviteMode: InviteMode = InviteMode.NONE,
 	val permissions: NetworkPermissions? = null,
-	val unreadCount: Int = 0
+	val unreadCount: Int = 0,
+	val alerts: AlertType = AlertType.DEFAULT
 )
 
 data class NetworkPermissions(val invite: Boolean)

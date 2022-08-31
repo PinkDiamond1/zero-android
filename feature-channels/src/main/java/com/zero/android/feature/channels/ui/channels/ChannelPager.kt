@@ -27,12 +27,12 @@ fun ChannelPager(
 	onClick: (Channel) -> Unit
 ) {
 	InstantAnimation {
-        HorizontalPager(state = pagerState, count = categories.size) { index ->
-            Column(modifier = Modifier.fillMaxSize()) {
-                pagers[categories[index]]?.let { PagedChannels(pagedData = it, onClick = onClick) }
-            }
-        }
-    }
+		HorizontalPager(state = pagerState, count = categories.size) { index ->
+			Column(modifier = Modifier.fillMaxSize()) {
+				pagers[categories[index]]?.let { PagedChannels(pagedData = it, onClick = onClick) }
+			}
+		}
+	}
 }
 
 @Composable

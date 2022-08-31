@@ -25,12 +25,12 @@ fun ChannelNotificationSettingsView(
 		DialogListItem(
 			text = stringResource(R.string.alert_type_mentions_only),
 			icon = R.drawable.ic_notificatons_mentions
-		) { onItemSelected(AlertType.ALL) }
+		) { onItemSelected(AlertType.MENTION_ONLY) }
 		DialogListItem(
 			text = stringResource(R.string.alert_type_off),
 			icon = R.drawable.ic_notifications_off
 		) {
-			onItemSelected(AlertType.ALL)
+			onItemSelected(AlertType.OFF)
 		}
 	}
 }

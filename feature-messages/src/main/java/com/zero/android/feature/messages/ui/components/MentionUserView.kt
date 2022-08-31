@@ -20,11 +20,12 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun MentionUsersList(membersList: List<Member>, onMemberSelected: (Member) -> Unit) {
-	LazyColumn(modifier = Modifier
-        .fillMaxWidth()
-        .heightIn(max = 150.dp)
-        .background(color = AppTheme.colors.surfaceInverse)
-    ) {
+	LazyColumn(
+		modifier =
+		Modifier.fillMaxWidth()
+			.heightIn(max = 150.dp)
+			.background(color = AppTheme.colors.surfaceInverse)
+	) {
 		items(membersList) { member ->
 			Column(modifier = Modifier.clickable { onMemberSelected(member) }) {
 				Row(

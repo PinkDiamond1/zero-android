@@ -9,7 +9,7 @@ interface NetworkRepository {
 
 	suspend fun getNetworks(): Flow<List<Network>>
 
-	suspend fun getCategories(networkId: String): Flow<List<ChannelCategory>>
+	suspend fun getCategories(id: String): Flow<List<ChannelCategory>>
 
-	suspend fun updateNotificationSettings(networkId: String, alertType: AlertType)
+	suspend fun updateNotificationSettings(id: String, alertType: AlertType)
 }

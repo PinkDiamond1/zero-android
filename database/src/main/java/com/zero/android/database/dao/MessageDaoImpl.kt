@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import com.zero.android.database.model.MemberEntity
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageMentionCrossRef
 import com.zero.android.database.model.MessageMeta
@@ -32,7 +33,8 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	@Transaction
 	internal open suspend fun upsert(memberDao: MemberDao, vararg data: MessageWithRefs) {
 		for (item in data) {
-			val members = mutableListOf(item.author)
+			val members = mutableListOf<MemberEntity>()
+			item.author?.let { members.add(it) }
 			item.mentions?.let { members.addAll(it) }
 			item.parentMessageAuthor?.let { members.add(it) }
 			memberDao.upsert(members)

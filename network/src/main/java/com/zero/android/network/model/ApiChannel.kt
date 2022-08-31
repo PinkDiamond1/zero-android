@@ -35,7 +35,7 @@ data class ApiDirectChannel(
 	override val isTemporary: Boolean = false,
 	override val unreadMentionCount: Int = 0,
 	override val unreadMessageCount: Int = 0,
-	@Serializable(AlertTypeSerializer::class) override val alerts: AlertType = AlertType.ALL,
+	@Serializable(AlertTypeSerializer::class) override val alerts: AlertType = AlertType.DEFAULT,
 	override val accessCode: String? = null
 ) : ApiChannel {
 
@@ -62,7 +62,7 @@ data class ApiGroupChannel(
 	val isDiscoverable: Boolean = false,
 	val isVideoEnabled: Boolean = false,
 	val createdBy: ApiMember? = null,
-	@Serializable(AlertTypeSerializer::class) override val alerts: AlertType = AlertType.ALL,
+	@Serializable(AlertTypeSerializer::class) override val alerts: AlertType = AlertType.DEFAULT,
 	val messageLifeSeconds: Int = 0,
 	override val accessCode: String? = null,
 	@Serializable(ChannelTypeSerializer::class) val type: ChannelType = ChannelType.GROUP,

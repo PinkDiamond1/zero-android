@@ -23,6 +23,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.zero.android.common.R
 import com.zero.android.models.Network
+import com.zero.android.models.enums.AlertType
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.CountBadge
 import com.zero.android.ui.components.MediumCircularImage
@@ -30,7 +31,7 @@ import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
-fun DrawerItem(
+fun NetworkDrawerItem(
 	modifier: Modifier = Modifier,
 	item: Network,
 	onItemClick: () -> Unit,
@@ -103,7 +104,15 @@ fun DrawerItem(
 		}
 
 		Image(
-			painter = painterResource(R.drawable.ic_settings),
+			painter =
+			painterResource(
+				when (item.alerts) {
+					AlertType.DEFAULT,
+					AlertType.ALL -> R.drawable.ic_notifications
+					AlertType.MENTION_ONLY -> R.drawable.ic_notificatons_mentions
+					AlertType.OFF -> R.drawable.ic_notifications_off
+				}
+			),
 			contentDescription = stringResource(R.string.cd_ic_settings),
 			contentScale = ContentScale.Fit,
 			colorFilter = ColorFilter.tint(AppTheme.colors.surface),
@@ -114,6 +123,6 @@ fun DrawerItem(
 
 @Preview(showBackground = false)
 @Composable
-fun DrawerItemPreview() = Preview {
-	DrawerItem(item = FakeModel.Network(), onItemClick = {}, onSettingsClick = {})
+fun NetworkDrawerItemPreview() = Preview {
+	NetworkDrawerItem(item = FakeModel.Network(), onItemClick = {}, onSettingsClick = {})
 }

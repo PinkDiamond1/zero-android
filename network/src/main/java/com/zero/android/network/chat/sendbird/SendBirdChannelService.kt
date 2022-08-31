@@ -59,13 +59,14 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		type: ChannelType,
 		before: String?,
 		loadSize: Int,
+		limit: Int,
 		searchName: String?
 	) = suspendCancellableCoroutine { coroutine ->
 		if (type == ChannelType.OPEN) {
 			if (openNetworkId != networkId || openQuery != null) {
 				openQuery =
 					OpenChannel.createOpenChannelListQuery().apply {
-						setLimit(100)
+						setLimit(limit)
 						setCustomTypeFilter(networkId.encodeToNetworkId())
 
 						searchName?.let { setNameKeyword(searchName) }
@@ -84,7 +85,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			if (groupNetworkId != networkId || groupQuery != null) {
 				groupQuery =
 					GroupChannel.createMyGroupChannelListQuery().apply {
-						limit = 100
+						this.limit = limit
 						isIncludeEmpty = false
 						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 						customTypeStartsWithFilter = networkId.encodeToNetworkId()
@@ -201,6 +202,15 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			}
 		}
 	}
+
+	override suspend fun getNetworkNotificationSettings(networkId: String): AlertType =
+		suspendCancellableCoroutine { coroutine ->
+			withSameScope {
+				val channels = getGroupChannels(networkId, limit = 1, loadSize = 1)
+				if (channels.isNotEmpty()) coroutine.resume(channels[0].alerts)
+				else coroutine.resume(AlertType.DEFAULT)
+			}
+		}
 
 	override suspend fun updateNotificationSettings(networkId: String, alertType: AlertType) =
 		suspendCancellableCoroutine { coroutine ->

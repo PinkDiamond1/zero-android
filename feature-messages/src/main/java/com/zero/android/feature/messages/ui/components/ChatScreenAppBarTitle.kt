@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.SmallCircularImage
-import com.zero.android.ui.theme.customTextStyle
 
 @Composable
 fun ChatScreenAppBarTitle(channel: Channel, isGroupChannel: Boolean) {

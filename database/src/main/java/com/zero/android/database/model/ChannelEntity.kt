@@ -45,7 +45,7 @@ data class ChannelEntity(
 	val unreadMentionCount: Int = 0,
 	val unreadMessageCount: Int = 0,
 	val messageLifeSeconds: Int = 0,
-	val alerts: AlertType = AlertType.ALL,
+	val alerts: AlertType = AlertType.DEFAULT,
 	val accessCode: String? = null,
 	val networkId: String? = null,
 	val category: ChannelCategory? = null,

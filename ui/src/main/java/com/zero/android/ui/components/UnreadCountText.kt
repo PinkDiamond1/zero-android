@@ -18,7 +18,10 @@ fun UnreadCountText(modifier: Modifier = Modifier, text: String) {
 		text = text,
 		modifier =
 		modifier
-			.background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(24.dp))
+			.background(
+				color = MaterialTheme.colorScheme.primary,
+				shape = RoundedCornerShape(24.dp)
+			)
 			.wrapContentHeight()
 			.padding(6.dp, 2.dp, 6.dp, 2.dp),
 		style = MaterialTheme.typography.labelLarge

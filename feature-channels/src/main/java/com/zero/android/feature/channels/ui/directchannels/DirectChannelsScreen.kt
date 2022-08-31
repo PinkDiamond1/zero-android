@@ -65,36 +65,35 @@ fun DirectChannelsScreen(
 
 	Column(modifier = Modifier.fillMaxWidth()) {
 		FadeExpandAnimation(visible = showSearchBar) {
-            SearchView(
-                placeHolder = stringResource(R.string.search_channels),
-                onValueChanged = { onChannelSearched(it) },
-                onSearchCancelled = { onSearchClosed() }
-            )
-        }
-        if (directChannelsUiState != null) {
-            DirectChannelsList(channels, loggedInUser, onChannelSelected)
-        }
-        SearchResultCount(
-            show = directChannelsUiState?.isSearchResult == true,
-            itemCount = channels.itemCount
-        )
-    }
+			SearchView(
+				placeHolder = stringResource(R.string.search_channels),
+				onValueChanged = { onChannelSearched(it) },
+				onSearchCancelled = { onSearchClosed() }
+			)
+		}
+		if (directChannelsUiState != null) {
+			DirectChannelsList(channels, loggedInUser, onChannelSelected)
+		}
+		SearchResultCount(
+			show = directChannelsUiState?.isSearchResult == true,
+			itemCount = channels.itemCount
+		)
+	}
 }
 
 @Composable
-fun ColumnScope.SearchResultCount(show: Boolean, itemCount: Int){
-    FadeAnimation(visible = show) {
-        Text(
-            text = "$itemCount results found",
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp)
-                .background(MaterialTheme.colorScheme.primary),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelMedium
-        )
-    }
+fun ColumnScope.SearchResultCount(show: Boolean, itemCount: Int) {
+	FadeAnimation(visible = show) {
+		Text(
+			text = "$itemCount results found",
+			modifier =
+			Modifier.fillMaxWidth()
+				.padding(vertical = 10.dp)
+				.background(MaterialTheme.colorScheme.primary),
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.labelMedium
+		)
+	}
 }
 
 @Composable
@@ -104,14 +103,14 @@ fun ColumnScope.DirectChannelsList(
 	onChannelSelected: (Channel) -> Unit
 ) {
 	val modifier = Modifier.weight(1f)
-    InstantAnimation(modifier = modifier) {
-        LazyColumn(modifier = modifier) {
-            items(channels) { channel ->
-                channel ?: return@items
-                ChannelListItem(loggedInUser, channel) { onChannelSelected(it) }
-            }
-        }
-    }
+	InstantAnimation(modifier = modifier) {
+		LazyColumn(modifier = modifier) {
+			items(channels) { channel ->
+				channel ?: return@items
+				ChannelListItem(loggedInUser, channel) { onChannelSelected(it) }
+			}
+		}
+	}
 }
 
 @Preview @Composable

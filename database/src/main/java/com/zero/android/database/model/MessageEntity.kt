@@ -45,7 +45,7 @@ import com.zero.android.models.enums.MessageType
 )
 data class MessageEntity(
 	@PrimaryKey override val id: String,
-	val authorId: String,
+	val authorId: String? = null,
 	val parentMessageId: String? = null,
 	val parentMessageAuthorId: String? = null,
 	val channelId: String,
@@ -66,7 +66,7 @@ data class MessageEntity(
 
 data class MessageMeta(@PrimaryKey val id: String, val createdAt: Long)
 
-fun MessageEntity.toModel(author: Member) =
+fun MessageEntity.toModel(author: Member?) =
 	Message(
 		id = id,
 		channelId = channelId,

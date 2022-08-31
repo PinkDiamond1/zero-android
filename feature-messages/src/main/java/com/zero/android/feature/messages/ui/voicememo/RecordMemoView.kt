@@ -18,11 +18,12 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun RecordMemoView(onCancel: () -> Unit, onSendMemo: () -> Unit) {
-	Row(modifier = Modifier
-        .fillMaxWidth()
-        .background(color = AppTheme.colors.surfaceInverse)
-        .padding(horizontal = 12.dp, vertical = 20.dp)
-    ) {
+	Row(
+		modifier =
+		Modifier.fillMaxWidth()
+			.background(color = AppTheme.colors.surfaceInverse)
+			.padding(horizontal = 12.dp, vertical = 20.dp)
+	) {
 		Timer(Modifier.align(Alignment.CenterVertically))
 		Spacer(modifier = Modifier.size(6.dp))
 		DotsBounceAnimation(modifier = Modifier.weight(1f).align(Alignment.CenterVertically))

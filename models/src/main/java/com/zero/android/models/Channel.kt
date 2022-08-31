@@ -34,7 +34,7 @@ data class DirectChannel(
 	override val unreadMentionCount: Int = 0,
 	override val unreadMessageCount: Int = 0,
 	override val messageLifeSeconds: Int = 0,
-	override val alerts: AlertType = AlertType.ALL,
+	override val alerts: AlertType = AlertType.DEFAULT,
 	override val accessCode: String? = null
 ) : Channel
 
@@ -55,7 +55,7 @@ data class GroupChannel(
 	val isDiscoverable: Boolean = false,
 	val isVideoEnabled: Boolean = false,
 	val createdBy: Member? = null,
-	override val alerts: AlertType = AlertType.ALL,
+	override val alerts: AlertType = AlertType.DEFAULT,
 	override val messageLifeSeconds: Int = 0,
 	override val accessCode: String? = null,
 	val type: ChannelType = ChannelType.GROUP,

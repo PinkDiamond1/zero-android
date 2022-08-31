@@ -1,6 +1,10 @@
 package com.zero.android.feature.messages.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -65,7 +69,8 @@ private fun ClickableMessage(message: Message, authorClicked: (Member) -> Unit) 
 			styledMessage.getStringAnnotations(start = it, end = it).firstOrNull()?.let { annotation ->
 				when (annotation.tag) {
 					SymbolAnnotationType.LINK.name -> uriHandler.openUri(annotation.item)
-					SymbolAnnotationType.PERSON.name -> authorClicked(message.author)
+					SymbolAnnotationType.PERSON.name ->
+						message.author?.let { author -> authorClicked(author) }
 					else -> Unit
 				}
 			}

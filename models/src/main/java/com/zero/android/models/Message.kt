@@ -8,7 +8,7 @@ import java.io.File
 
 internal interface BaseMessage {
 	val channelId: String
-	val author: Member
+	val author: Member?
 	val type: MessageType
 	val mentionType: MessageMentionType
 	val message: String?
@@ -25,7 +25,7 @@ internal interface BaseMessage {
 data class Message(
 	val id: String,
 	override val channelId: String,
-	override val author: Member,
+	override val author: Member? = null,
 	val mentions: List<Member> = emptyList(),
 	override val type: MessageType,
 	override val mentionType: MessageMentionType = MessageMentionType.UNKNOWN,

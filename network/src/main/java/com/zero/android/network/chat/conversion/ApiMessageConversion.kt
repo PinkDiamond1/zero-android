@@ -11,7 +11,7 @@ internal fun Message.toApi(): ApiMessage =
 	ApiMessage(
 		id = id,
 		channelId = channelId,
-		author = author.toApi(),
+		author = author?.toApi(),
 		mentions = mentions.map { it.toApi() },
 		type = type,
 		mentionType = mentionType,

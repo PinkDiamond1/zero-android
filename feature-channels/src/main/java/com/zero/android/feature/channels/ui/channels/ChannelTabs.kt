@@ -34,41 +34,37 @@ fun ChannelTabLayout(
 ) {
 	val tabIndex = pagerState.currentPage
 
-	InstantAnimation(
-        enterAnimation = slideInHorizontally() + fadeIn()
-    ) {
-        ScrollableTabRow(
-            selectedTabIndex = tabIndex,
-            edgePadding = 0.dp,
-            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-            indicator = { tabPositions ->
-                val indicatorPosition = if (tabIndex > tabPositions.size - 1) 0 else tabIndex
-                Box(
-                    modifier =
-                    Modifier.tabIndicatorOffset(tabPositions[indicatorPosition])
-                        .height(2.dp)
-                        .background(color = AppTheme.colors.glow)
-                )
-            },
-            containerColor = AppTheme.colors.surfaceInverse
-        ) {
-            tabs.forEachIndexed { index, item ->
-                val isSelectedTab = tabIndex == index
-                Tab(
-                    selected = isSelectedTab,
-                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
-                    text = { TabItemWithBadge(item, isSelectedTab) }
-                )
-            }
-        }
-    }
+	InstantAnimation(enterAnimation = slideInHorizontally() + fadeIn()) {
+		ScrollableTabRow(
+			selectedTabIndex = tabIndex,
+			edgePadding = 0.dp,
+			modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+			indicator = { tabPositions ->
+				val indicatorPosition = if (tabIndex > tabPositions.size - 1) 0 else tabIndex
+				Box(
+					modifier =
+					Modifier.tabIndicatorOffset(tabPositions[indicatorPosition])
+						.height(2.dp)
+						.background(color = AppTheme.colors.glow)
+				)
+			},
+			containerColor = AppTheme.colors.surfaceInverse
+		) {
+			tabs.forEachIndexed { index, item ->
+				val isSelectedTab = tabIndex == index
+				Tab(
+					selected = isSelectedTab,
+					onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+					text = { TabItemWithBadge(item, isSelectedTab) }
+				)
+			}
+		}
+	}
 }
 
 @Composable
 fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
-	Row(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()) {
+	Row(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
 		if (isSelectedTab) {
 			Text(
 				text = channelTab.name,
@@ -100,10 +96,9 @@ fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
 				color = AppTheme.colors.surfaceInverse,
 				text = channelTab.unreadCount.toString(),
 				modifier =
-                Modifier
-                    .background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))
-                    .wrapContentHeight()
-                    .padding(6.dp, 2.dp, 6.dp, 2.dp),
+				Modifier.background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))
+					.wrapContentHeight()
+					.padding(6.dp, 2.dp, 6.dp, 2.dp),
 				style = MaterialTheme.typography.labelLarge
 			)
 		}

@@ -13,7 +13,7 @@ internal fun ApiMessage.toModel(): Message =
 	Message(
 		id = id,
 		channelId = channelId,
-		author = author.toModel(),
+		author = author?.toModel(),
 		mentions = mentions.map { it.toModel() },
 		type = type,
 		mentionType = mentionType,
@@ -37,7 +37,7 @@ internal fun ApiMessage.toEntity(): MessageWithRefs =
 		MessageEntity(
 			id = id,
 			channelId = channelId,
-			authorId = author.id,
+			authorId = author?.id,
 			parentMessageId = parentMessage?.id,
 			parentMessageAuthorId = parentMessage?.author?.id,
 			type = type,
@@ -54,7 +54,7 @@ internal fun ApiMessage.toEntity(): MessageWithRefs =
 			fileMimeType = fileMimeType,
 			reactions = reactions?.map { it.toModel() } ?: emptyList()
 		),
-		author = author.toEntity(),
+		author = author?.toEntity(),
 		mentions = mentions.map { it.toEntity() },
 		parentMessage = parentMessage?.toEntity()?.message,
 		parentMessageAuthor = parentMessage?.author?.toEntity()

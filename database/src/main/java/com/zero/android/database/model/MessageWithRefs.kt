@@ -9,7 +9,7 @@ import com.zero.android.models.Message
 @DatabaseView("SELECT * FROM messages")
 data class MessageWithRefs(
 	@Embedded val message: MessageEntity,
-	@Relation(parentColumn = "authorId", entityColumn = "id") val author: MemberEntity,
+	@Relation(parentColumn = "authorId", entityColumn = "id") val author: MemberEntity? = null,
 	@Relation(parentColumn = "parentMessageId", entityColumn = "id")
 	val parentMessage: MessageEntity? = null,
 	@Relation(parentColumn = "parentMessageAuthorId", entityColumn = "id")
@@ -30,7 +30,7 @@ data class MessageWithRefs(
 fun MessageWithRefs.toModel() =
 	Message(
 		id = message.id,
-		author = author.toModel(),
+		author = author?.toModel(),
 		mentions = mentions?.map { it.toModel() } ?: emptyList(),
 		parentMessage =
 		parentMessageAuthor?.let { author -> parentMessage?.toModel(author.toModel()) },

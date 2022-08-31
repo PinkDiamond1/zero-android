@@ -87,18 +87,19 @@ fun UserInputPanel(
 	var textFieldFocusState by remember { mutableStateOf(false) }
 
 	Row(
-        modifier = modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
-        verticalAlignment = CenterVertically
-    ) {
-        Spacer(modifier = Modifier.size(8.dp))
-        Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = "cd_add_attachment",
-            modifier = Modifier.clickable {
-                currentInputSelector = InputSelector.ATTACHMENT
-                addAttachment()
-            }
-        )
+		modifier = modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
+		verticalAlignment = CenterVertically
+	) {
+		Spacer(modifier = Modifier.size(8.dp))
+		Icon(
+			imageVector = Icons.Filled.Add,
+			contentDescription = "cd_add_attachment",
+			modifier =
+			Modifier.clickable {
+				currentInputSelector = InputSelector.ATTACHMENT
+				addAttachment()
+			}
+		)
 		UserInputText(
 			modifier = Modifier.weight(1f),
 			textFieldValue = textState,
@@ -124,24 +125,26 @@ fun UserInputPanel(
 				}
 			}
 		)
-        Icon(
-            painter = painterResource(R.drawable.ic_camera),
-            contentDescription = "cd_add_attachment",
-            modifier = Modifier.clickable {
-                currentInputSelector = InputSelector.IMAGE
-                addImage()
-            }
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        Icon(
-            painter = painterResource(R.drawable.ic_mic),
-            contentDescription = "cd_record_audio",
-            modifier = Modifier.clickable {
-                currentInputSelector = InputSelector.VOICE_MEMO
-                recordMemo()
-            }
-        )
-        Spacer(modifier = Modifier.size(8.dp))
+		Icon(
+			painter = painterResource(R.drawable.ic_camera),
+			contentDescription = "cd_add_attachment",
+			modifier =
+			Modifier.clickable {
+				currentInputSelector = InputSelector.IMAGE
+				addImage()
+			}
+		)
+		Spacer(modifier = Modifier.size(8.dp))
+		Icon(
+			painter = painterResource(R.drawable.ic_mic),
+			contentDescription = "cd_record_audio",
+			modifier =
+			Modifier.clickable {
+				currentInputSelector = InputSelector.VOICE_MEMO
+				recordMemo()
+			}
+		)
+		Spacer(modifier = Modifier.size(8.dp))
 	}
 }
 
@@ -183,16 +186,13 @@ private fun UserInputText(
 			placeHolderTextStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-                .align(Alignment.CenterStart)
-                .onFocusChanged { state ->
-                    if (lastFocusState != state.isFocused) {
-                        onTextFieldFocused(state.isFocused)
-                    }
-                    lastFocusState = state.isFocused
-                },
+			Modifier.fillMaxWidth().padding(10.dp).align(Alignment.CenterStart).onFocusChanged {
+					state ->
+				if (lastFocusState != state.isFocused) {
+					onTextFieldFocused(state.isFocused)
+				}
+				lastFocusState = state.isFocused
+			},
 			shape = RoundedCornerShape(24.dp),
 			keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Send),
 			keyboardActions = KeyboardActions(onSend = { onMessageSent(textFieldValue.text) })

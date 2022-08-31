@@ -79,7 +79,7 @@ constructor(
 
 	fun updateNetworkNotificationSetting(network: Network, alertType: AlertType) {
 		ioScope.launch {
-			networkRepository.updateNotificationSettings(networkId = network.id, alertType = alertType)
+			networkRepository.updateNotificationSettings(network.id, alertType = alertType)
 			selectedNetworkSetting.emit(null)
 		}
 	}

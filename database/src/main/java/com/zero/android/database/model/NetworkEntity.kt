@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.zero.android.models.Network
 import com.zero.android.models.NetworkPermissions
+import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.InviteMode
 
 @Entity(tableName = "networks")
@@ -21,7 +22,8 @@ data class NetworkEntity(
 	val inviteMode: InviteMode,
 	@Embedded(prefix = "permissions_") val permissions: NetworkPermissions? = null,
 	val unreadCount: Int = 0,
-	val isSelected: Boolean = false
+	val isSelected: Boolean = false,
+	val alerts: AlertType = AlertType.DEFAULT
 ) : BaseEntity
 
 fun NetworkEntity.toModel() =
@@ -37,5 +39,6 @@ fun NetworkEntity.toModel() =
 		disabledApps = disabledApps,
 		inviteMode = inviteMode,
 		permissions = permissions,
-		unreadCount = unreadCount
+		unreadCount = unreadCount,
+		alerts = alerts
 	)

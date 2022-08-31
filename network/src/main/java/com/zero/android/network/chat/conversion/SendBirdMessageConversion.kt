@@ -40,7 +40,7 @@ internal fun BaseMessage.toApi(
 		type = if (this is FileMessage) data?.type.toMessageType() else customType.toMessageType(),
 		mentionType = mentionType.toType(),
 		channelId = channelId,
-		author = sender.toApi(),
+		author = sender?.toApi(),
 		status = sendingStatus.toType(),
 		createdAt = createdAt,
 		updatedAt = updatedAt,
@@ -55,7 +55,7 @@ internal fun UserMessage.toApi(channelId: String = channelUrl) =
 	ApiMessage(
 		id = messageId.toString(),
 		channelId = channelId,
-		author = sender.toApi(),
+		author = sender?.toApi(),
 		mentions = mentionedUsers.map { it.toApi() },
 		type = customType.toMessageType(),
 		mentionType = mentionType.toType(),
@@ -72,7 +72,7 @@ internal fun FileMessage.toApi(channelId: String = channelUrl) =
 	ApiMessage(
 		id = messageId.toString(),
 		channelId = channelId,
-		author = sender.toApi(),
+		author = sender?.toApi(),
 		mentions = mentionedUsers.map { it.toApi() },
 		type = type.toMessageType(),
 		mentionType = mentionType.toType(),

@@ -82,7 +82,7 @@ fun NetworkDrawerContent(
 			) {
 				if (networks is Result.Success) {
 					items(items = networks.data, key = { item -> item.id }) { network ->
-						DrawerItem(
+						NetworkDrawerItem(
 							item = network,
 							onItemClick = {
 								onNetworkSelected(network)
