@@ -35,127 +35,122 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessagesContent(
-    modifier: Modifier = Modifier,
-    userChannelInfo: Pair<String, Boolean>,
-    uiState: MessagesUIState,
-    messages: LazyPagingItems<Message>
+	modifier: Modifier = Modifier,
+	userChannelInfo: Pair<String, Boolean>,
+	uiState: MessagesUIState,
+	messages: LazyPagingItems<Message>
 ) {
-    val scrollState = rememberLazyListState()
-    val appbarState = rememberTopAppBarState()
-    val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(appbarState) }
-    val scope = rememberCoroutineScope()
+	val scrollState = rememberLazyListState()
+	val appbarState = rememberTopAppBarState()
+	val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(appbarState) }
+	val scope = rememberCoroutineScope()
 
-    Surface(modifier = modifier) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(AppTheme.colors.surfaceInverse)
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-            ) {
-                Messages(
-                    modifier = Modifier.weight(1f),
-                    userChannelInfo = userChannelInfo,
-                    uiState = uiState,
-                    messages = messages,
-                    scrollState = scrollState,
-                    coroutineScope = scope
-                )
-            }
-        }
-    }
+	Surface(modifier = modifier) {
+		Box(modifier = Modifier.fillMaxSize()) {
+			Column(
+				Modifier.fillMaxSize()
+					.background(AppTheme.colors.surfaceInverse)
+					.nestedScroll(scrollBehavior.nestedScrollConnection)
+			) {
+				Messages(
+					modifier = Modifier.weight(1f),
+					userChannelInfo = userChannelInfo,
+					uiState = uiState,
+					messages = messages,
+					scrollState = scrollState,
+					coroutineScope = scope
+				)
+			}
+		}
+	}
 }
 
 @Composable
 fun Messages(
-    modifier: Modifier = Modifier,
-    userChannelInfo: Pair<String, Boolean>,
-    uiState: MessagesUIState,
-    messages: LazyPagingItems<Message>,
-    scrollState: LazyListState,
-    coroutineScope: CoroutineScope,
-    chatAttachmentViewModel: ChatAttachmentViewModel = hiltViewModel()
+	modifier: Modifier = Modifier,
+	userChannelInfo: Pair<String, Boolean>,
+	uiState: MessagesUIState,
+	messages: LazyPagingItems<Message>,
+	scrollState: LazyListState,
+	coroutineScope: CoroutineScope,
+	chatAttachmentViewModel: ChatAttachmentViewModel = hiltViewModel()
 ) {
-    DisposableEffect(Unit) { onDispose { chatAttachmentViewModel.dispose() } }
-    Box(modifier = modifier.padding(14.dp)) {
-        chatAttachmentViewModel.configure(messages)
-        FadeExpandAnimation(
-            visible = uiState is Result.Success
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                reverseLayout = true,
-                state = scrollState,
-                contentPadding =
-                WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues()
-            ) {
-                item {
-                    Spacer(modifier = Modifier.size(100.dp))
-                }
-                items(messages) { content ->
-                    content ?: return@items
-                    val index = messages.itemSnapshotList.items.indexOf(content)
+	DisposableEffect(Unit) { onDispose { chatAttachmentViewModel.dispose() } }
+	Box(modifier = modifier.padding(14.dp)) {
+		chatAttachmentViewModel.configure(messages)
+		FadeExpandAnimation(visible = uiState is Result.Success) {
+			LazyColumn(
+				modifier = Modifier.fillMaxSize(),
+				reverseLayout = true,
+				state = scrollState,
+				contentPadding =
+				WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues()
+			) {
+				item { Spacer(modifier = Modifier.size(100.dp)) }
+				items(messages) { content ->
+					content ?: return@items
+					val index = messages.itemSnapshotList.items.indexOf(content)
 
-                    val prevAuthor = if (index != 0) messages[index - 1]?.author else null
-                    val nextAuthor = if (messages.itemCount > index + 1) messages[index + 1]?.author else null
-                    val messageDate = content.createdAt.toDate()
-                    val nextMessageDate =
-                        if (messages.itemCount > index + 1) (messages[index + 1]?.createdAt ?: 0).toDate()
-                        else 0L.toDate()
-                    val isSameDay = nextMessageDate.isSameDay(messageDate)
-                    val isFirstMessageByAuthor = prevAuthor?.id != content.author?.id
-                    val isLastMessageByAuthor = nextAuthor?.id != content.author?.id
+					val prevAuthor = if (index != 0) messages[index - 1]?.author else null
+					val nextAuthor = if (messages.itemCount > index + 1) messages[index + 1]?.author else null
+					val messageDate = content.createdAt.toDate()
+					val nextMessageDate =
+						if (messages.itemCount > index + 1) (messages[index + 1]?.createdAt ?: 0).toDate()
+						else 0L.toDate()
+					val isSameDay = nextMessageDate.isSameDay(messageDate)
+					val isFirstMessageByAuthor = prevAuthor?.id != content.author?.id
+					val isLastMessageByAuthor = nextAuthor?.id != content.author?.id
 
-                    /*if (!userChannelInfo.second) {
-                        DirectMessage(
-                            msg = content,
-                            isUserMe = content.author.id == userChannelInfo.first,
-                            isSameDay = isSameDay,
-                            isFirstMessageByAuthor = isFirstMessageByAuthor,
-                            isLastMessageByAuthor = isLastMessageByAuthor,
-                            chatAttachmentViewModel = chatAttachmentViewModel,
-                            onAuthorClick = {}
-                        )
-                    } else {
-                        ChannelMessage(
-                            msg = content,
-                            isUserMe = content.author.id == userChannelInfo.first,
-                            isFirstMessageByAuthor = isFirstMessageByAuthor,
-                            chatAttachmentViewModel = chatAttachmentViewModel,
-                            onAuthorClick = {}
-                        )
-                    }*/
-                    DirectMessage(
-                        msg = content,
-                        isUserMe = content.author?.id == userChannelInfo.first,
-                        isSameDay = isSameDay,
-                        isFirstMessageByAuthor = isFirstMessageByAuthor,
-                        isLastMessageByAuthor = isLastMessageByAuthor,
-                        chatAttachmentViewModel = chatAttachmentViewModel,
-                        onAuthorClick = {}
-                    )
+          /*if (!userChannelInfo.second) {
+              DirectMessage(
+                  msg = content,
+                  isUserMe = content.author.id == userChannelInfo.first,
+                  isSameDay = isSameDay,
+                  isFirstMessageByAuthor = isFirstMessageByAuthor,
+                  isLastMessageByAuthor = isLastMessageByAuthor,
+                  chatAttachmentViewModel = chatAttachmentViewModel,
+                  onAuthorClick = {}
+              )
+          } else {
+              ChannelMessage(
+                  msg = content,
+                  isUserMe = content.author.id == userChannelInfo.first,
+                  isFirstMessageByAuthor = isFirstMessageByAuthor,
+                  chatAttachmentViewModel = chatAttachmentViewModel,
+                  onAuthorClick = {}
+              )
+          }*/
+					DirectMessage(
+						msg = content,
+						isUserMe = content.author?.id == userChannelInfo.first,
+						isSameDay = isSameDay,
+						isFirstMessageByAuthor = isFirstMessageByAuthor,
+						isLastMessageByAuthor = isLastMessageByAuthor,
+						chatAttachmentViewModel = chatAttachmentViewModel,
+						onAuthorClick = {}
+					)
 
-                    if (!isSameDay) {
-                        StrikeLabel(messageDate.format("MMMM dd, yyyy"))
-                    }
-                }
-            }
-        }
+					if (!isSameDay) {
+						StrikeLabel(messageDate.format("MMMM dd, yyyy"))
+					}
+				}
+			}
+		}
 
-        val jumpThreshold = with(LocalDensity.current) { JumpToBottomThreshold.toPx() }
-        val jumpToBottomButtonEnabled by remember {
-            derivedStateOf {
-                scrollState.firstVisibleItemIndex != 0 ||
-                    scrollState.firstVisibleItemScrollOffset > jumpThreshold
-            }
-        }
-        JumpToBottom(
-            // Only show if the scroller is not at the bottom
-            enabled = jumpToBottomButtonEnabled,
-            onClicked = { coroutineScope.launch { scrollState.animateScrollToItem(0) } },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
-    }
+		val jumpThreshold = with(LocalDensity.current) { JumpToBottomThreshold.toPx() }
+		val jumpToBottomButtonEnabled by remember {
+			derivedStateOf {
+				scrollState.firstVisibleItemIndex != 0 ||
+					scrollState.firstVisibleItemScrollOffset > jumpThreshold
+			}
+		}
+		JumpToBottom(
+			// Only show if the scroller is not at the bottom
+			enabled = jumpToBottomButtonEnabled,
+			onClicked = { coroutineScope.launch { scrollState.animateScrollToItem(0) } },
+			modifier = Modifier.align(Alignment.BottomCenter)
+		)
+	}
 }
 
 @Preview @Composable

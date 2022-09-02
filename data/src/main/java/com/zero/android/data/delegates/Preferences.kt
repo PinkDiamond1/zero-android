@@ -6,5 +6,5 @@ interface Preferences {
 
 	suspend fun userId(): String
 
-    suspend fun userCredentials(): AuthCredentials?
+	suspend fun userCredentials(): AuthCredentials?
 }

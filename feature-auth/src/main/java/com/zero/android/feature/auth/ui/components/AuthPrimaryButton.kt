@@ -17,30 +17,26 @@ import com.zero.android.common.R
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
-fun AuthButton(
-    text: String,
-    onClick: () -> Unit = {},
-) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center,
-    ){
-        Image(
-            modifier = Modifier.fillMaxWidth().clickable { onClick() },
-            painter = painterResource(R.drawable.primary_cta),
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.displayLarge.copy(
-                shadow = Shadow(
-                    color = MaterialTheme.colorScheme.outline,
-                    offset = Offset(2f, 2f),
-                    blurRadius = 50f
-                )
-            ),
-            color = AppTheme.colors.colorTextPrimary
-        )
-    }
+fun AuthButton(text: String, onClick: () -> Unit = {}) {
+	Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+		Image(
+			modifier = Modifier.fillMaxWidth().clickable { onClick() },
+			painter = painterResource(R.drawable.primary_cta),
+			contentDescription = null,
+			contentScale = ContentScale.FillWidth
+		)
+		Text(
+			text = text,
+			style =
+			MaterialTheme.typography.displayLarge.copy(
+				shadow =
+				Shadow(
+					color = MaterialTheme.colorScheme.outline,
+					offset = Offset(2f, 2f),
+					blurRadius = 50f
+				)
+			),
+			color = AppTheme.colors.colorTextPrimary
+		)
+	}
 }

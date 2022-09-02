@@ -7,12 +7,12 @@ import kotlinx.datetime.Instant
 import java.lang.Exception
 
 fun Credentials.toAuthCredentials() =
-    AuthCredentials(
-        idToken = idToken,
-        accessToken = accessToken,
-        type = type,
-        refreshToken = refreshToken,
-        expiresAt = Instant.fromEpochMilliseconds(expiresAt.time)
-    )
+	AuthCredentials(
+		idToken = idToken,
+		accessToken = accessToken,
+		type = type,
+		refreshToken = refreshToken,
+		expiresAt = Instant.fromEpochMilliseconds(expiresAt.time)
+	)
 
 fun AuthenticationException.toException(): Exception = IllegalStateException(this.getDescription())

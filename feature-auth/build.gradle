@@ -7,17 +7,6 @@ plugins {
 
 apply from: '../feature_module.gradle'
 
-android {
-	buildTypes {
-		debug {
-			def properties = getEnv("development")
-		}
-		release {
-			def properties = getEnv("production")
-		}
-	}
-}
-
 dependencies {
 	implementation project(":ui")
 	implementation project(":data")

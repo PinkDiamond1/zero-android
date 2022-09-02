@@ -17,33 +17,34 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun PasswordTextField(
-    modifier: Modifier = Modifier,
-    placeHolder: @Composable () -> Unit,
-    singleLine: Boolean = true,
-    error: Int? = null,
-    onTextChanged: (String) -> Unit = {},
-    onFocusChanged: (Boolean) -> Unit = {},
-    iconTint: Color = AppTheme.colors.glow,
-    imeAction: ImeAction = ImeAction.Done,
-){
-    var passwordVisible by remember { mutableStateOf(false) }
-    AuthInputField(
-        modifier = modifier,
-        placeHolder = placeHolder,
-        singleLine = singleLine,
-        error = error,
-        onTextChanged = onTextChanged,
-        onFocusChanged = onFocusChanged,
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
-        trailingIcon = {
-            val image = if (passwordVisible) Icons.Filled.Visibility
-            else Icons.Filled.VisibilityOff
-            val description = if (passwordVisible) "Hide password" else "Show password"
+	modifier: Modifier = Modifier,
+	placeHolder: @Composable () -> Unit,
+	singleLine: Boolean = true,
+	error: Int? = null,
+	onTextChanged: (String) -> Unit = {},
+	onFocusChanged: (Boolean) -> Unit = {},
+	iconTint: Color = AppTheme.colors.glow,
+	imeAction: ImeAction = ImeAction.Done
+) {
+	var passwordVisible by remember { mutableStateOf(false) }
+	AuthInputField(
+		modifier = modifier,
+		placeHolder = placeHolder,
+		singleLine = singleLine,
+		error = error,
+		onTextChanged = onTextChanged,
+		onFocusChanged = onFocusChanged,
+		visualTransformation =
+		if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+		keyboardOptions =
+		KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
+		trailingIcon = {
+			val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+			val description = if (passwordVisible) "Hide password" else "Show password"
 
-            IconButton(onClick = {passwordVisible = !passwordVisible}){
-                Icon(imageVector  = image, description, tint = iconTint)
-            }
-        }
-    )
+			IconButton(onClick = { passwordVisible = !passwordVisible }) {
+				Icon(imageVector = image, description, tint = iconTint)
+			}
+		}
+	)
 }

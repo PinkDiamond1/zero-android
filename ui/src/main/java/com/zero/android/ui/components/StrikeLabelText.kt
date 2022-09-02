@@ -17,52 +17,49 @@ import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun StrikeLabel(
-    text: String,
-    textStyle: TextStyle = MaterialTheme.typography.labelSmall,
-    textColor: Color = AppTheme.colors.colorTextSecondaryVariant,
-    strikeColors: List<Color> = listOf(
-        AppTheme.colors.surfaceInverse, AppTheme.colors.surface
-    ),
-    paddingVertical: Dp = 8.dp,
-    paddingHorizontal: Dp = 16.dp,
-    strikeSize: Dp = 0.5.dp
+	text: String,
+	textStyle: TextStyle = MaterialTheme.typography.labelSmall,
+	textColor: Color = AppTheme.colors.colorTextSecondaryVariant,
+	strikeColors: List<Color> = listOf(AppTheme.colors.surfaceInverse, AppTheme.colors.surface),
+	paddingVertical: Dp = 8.dp,
+	paddingHorizontal: Dp = 16.dp,
+	strikeSize: Dp = 0.5.dp
 ) {
-    Row(modifier = Modifier
-        .padding(vertical = paddingVertical, horizontal = paddingHorizontal)
-        .wrapContentHeight(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PreStrikeLine(strikeColors, strikeSize)
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            style = textStyle,
-            color = textColor
-        )
-        PostStrikeLine(strikeColors, strikeSize)
-    }
+	Row(
+		modifier =
+		Modifier.padding(vertical = paddingVertical, horizontal = paddingHorizontal)
+			.wrapContentHeight(),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		PreStrikeLine(strikeColors, strikeSize)
+		Text(
+			text = text,
+			modifier = Modifier.padding(horizontal = 16.dp),
+			style = textStyle,
+			color = textColor
+		)
+		PostStrikeLine(strikeColors, strikeSize)
+	}
 }
 
 @Composable
 private fun RowScope.PreStrikeLine(strikeColors: List<Color>, strikeSize: Dp) {
-    Box(
-        modifier = Modifier.weight(1f)
-            .height(strikeSize)
-            .background(
-                brush = Brush.horizontalGradient(colors = strikeColors)
-            )
-    )
+	Box(
+		modifier =
+		Modifier.weight(1f)
+			.height(strikeSize)
+			.background(brush = Brush.horizontalGradient(colors = strikeColors))
+	)
 }
 
 @Composable
 private fun RowScope.PostStrikeLine(strikeColors: List<Color>, strikeSize: Dp) {
-    Box(
-        modifier = Modifier.weight(1f)
-            .height(strikeSize)
-            .background(
-                brush = Brush.horizontalGradient(colors = strikeColors.reversed())
-            )
-    )
+	Box(
+		modifier =
+		Modifier.weight(1f)
+			.height(strikeSize)
+			.background(brush = Brush.horizontalGradient(colors = strikeColors.reversed()))
+	)
 }
 
 @Preview @Composable

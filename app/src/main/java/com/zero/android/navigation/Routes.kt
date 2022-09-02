@@ -26,11 +26,11 @@ import com.zero.android.navigation.extensions.composable
 internal fun NavGraphBuilder.appGraph(controller: NavController) {
 	navigation(startDestination = AuthDestination.route, route = AppGraph.AUTH) {
 		authGraph(
-            onLogin = { controller.navigate(HomeDestination.route) { asRoot() } },
-            onForgotPassword = { controller.navigate(ForgotPasswordDestination.route) },
-            onRegister = { controller.navigate(RegisterDestination.route) },
-            onBackPress = { controller.navigateUp() }
-        )
+			onLogin = { controller.navigate(HomeDestination.route) { asRoot() } },
+			onForgotPassword = { controller.navigate(ForgotPasswordDestination.route) },
+			onRegister = { controller.navigate(RegisterDestination.route) },
+			onBackPress = { controller.navigateUp() }
+		)
 	}
 	navigation(startDestination = HomeDestination.route, route = AppGraph.MAIN) {
 		chatGraph(onBackClick = { controller.navigateUp() })

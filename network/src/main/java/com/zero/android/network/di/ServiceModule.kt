@@ -59,7 +59,6 @@ object ServiceModule {
 	fun provideChatMediaService(retrofit: Retrofit): ChatMediaService =
 		retrofit.base.create(ChatMediaService::class.java)
 
-    @Singleton
-    @Provides
-    fun provideAuthService(logger: Logger): AuthService = AuthServiceImpl(logger)
+	@Singleton @Provides
+	fun provideAuthService(logger: Logger): AuthService = AuthServiceImpl(logger)
 }

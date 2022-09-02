@@ -41,115 +41,121 @@ import com.zero.android.ui.util.BackHandler
 
 @Composable
 fun ResetPasswordRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () -> Unit) {
-    val forgotPasswordValidator by viewModel.forgotPasswordValidator.collectAsState()
-    val forgotPasswordRequestState by viewModel.forgotPasswordRequestState.collectAsState()
-    val isLoading: Boolean by viewModel.loading.collectAsState()
-    val requestError: String? by viewModel.error.collectAsState()
+	val forgotPasswordValidator by viewModel.forgotPasswordValidator.collectAsState()
+	val forgotPasswordRequestState by viewModel.forgotPasswordRequestState.collectAsState()
+	val isLoading: Boolean by viewModel.loading.collectAsState()
+	val requestError: String? by viewModel.error.collectAsState()
 
-    BackHandler { onBack() }
-    ResetPasswordScreen(isLoading, forgotPasswordValidator, forgotPasswordRequestState, requestError, onBack) { email ->
-        viewModel.resetPassword(email)
-    }
+	BackHandler { onBack() }
+	ResetPasswordScreen(
+		isLoading,
+		forgotPasswordValidator,
+		forgotPasswordRequestState,
+		requestError,
+		onBack
+	) { email
+		->
+		viewModel.resetPassword(email)
+	}
 }
 
 @Composable
 fun ResetPasswordScreen(
-    isLoading: Boolean,
-    forgotPasswordValidator: AuthUtil.ResetPasswordValidator,
-    isForgotPasswordSuccess: Boolean,
-    requestError: String?,
-    onBack: () -> Unit,
-    onForgotPassword: (String?) -> Unit,
+	isLoading: Boolean,
+	forgotPasswordValidator: AuthUtil.ResetPasswordValidator,
+	isForgotPasswordSuccess: Boolean,
+	requestError: String?,
+	onBack: () -> Unit,
+	onForgotPassword: (String?) -> Unit
 ) {
-    var email: String? by remember { mutableStateOf(null) }
-    val emailError = remember(forgotPasswordValidator) { mutableStateOf(forgotPasswordValidator.emailError) }
+	var email: String? by remember { mutableStateOf(null) }
+	val emailError =
+		remember(forgotPasswordValidator) { mutableStateOf(forgotPasswordValidator.emailError) }
 
-    AuthBackground(isLoading) {
-        InstantAnimation(
-            enterAnimation = expandVertically() + fadeIn(),
-            exitAnimation = shrinkVertically() + fadeOut()
-        ) {
-            Box {
-                if (!requestError.isNullOrEmpty()) {
-                    AppAlertDialog(requestError)
-                }
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    ) {
-                        IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "cd_ic_back",
-                                tint = AppTheme.colors.glow
-                            )
-                        }
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = stringResource(R.string.reset_password),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = AppTheme.colors.colorTextPrimary,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    Spacer(modifier = Modifier.size(30.dp))
-                    Image(painter = painterResource(R.drawable.key), contentDescription = "cd_key")
-                    Spacer(modifier = Modifier.size(60.dp))
-                    if (isForgotPasswordSuccess) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 32.dp),
-                            text = stringResource(R.string.reset_password_success),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = AppTheme.colors.colorTextPrimary,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.size(32.dp))
-                        Text(
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                            text = email ?: "",
-                            style = MaterialTheme.typography.customTextStyle(fontSize = 24.sp)
-                                .copy(shadow = Shadow(
-                                    color = AppTheme.colors.glow,
-                                    offset = Offset(2f, 2f),
-                                    blurRadius = 50f
-                                )
-                                ),
-                            color = AppTheme.colors.colorTextPrimary,
-                            textAlign = TextAlign.Center
-                        )
-                    } else {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 32.dp),
-                            text = stringResource(R.string.reset_password_description),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = AppTheme.colors.colorTextSecondary,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.size(24.dp))
-                        AuthInputField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            placeHolder = { Text(stringResource(R.string.email_id)) },
-                            error = emailError.value,
-                            onTextChanged = {
-                                email = it
-                                emailError.value = null
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done)
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-                        AuthButton(text = stringResource(R.string.send_reset_link)) {
-                            onForgotPassword(email)
-                        }
-                    }
-                }
-            }
-        }
-    }
+	AuthBackground(isLoading) {
+		InstantAnimation(
+			enterAnimation = expandVertically() + fadeIn(),
+			exitAnimation = shrinkVertically() + fadeOut()
+		) {
+			Box {
+				if (!requestError.isNullOrEmpty()) {
+					AppAlertDialog(requestError)
+				}
+				Column(
+					modifier = Modifier.fillMaxSize(),
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+					Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp)) {
+						IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
+							Icon(
+								imageVector = Icons.Filled.ArrowBack,
+								contentDescription = "cd_ic_back",
+								tint = AppTheme.colors.glow
+							)
+						}
+						Text(
+							modifier = Modifier.align(Alignment.Center),
+							text = stringResource(R.string.reset_password),
+							style = MaterialTheme.typography.bodyLarge,
+							fontWeight = FontWeight.SemiBold,
+							color = AppTheme.colors.colorTextPrimary,
+							textAlign = TextAlign.Center
+						)
+					}
+					Spacer(modifier = Modifier.size(30.dp))
+					Image(painter = painterResource(R.drawable.key), contentDescription = "cd_key")
+					Spacer(modifier = Modifier.size(60.dp))
+					if (isForgotPasswordSuccess) {
+						Text(
+							modifier = Modifier.padding(horizontal = 32.dp),
+							text = stringResource(R.string.reset_password_success),
+							style = MaterialTheme.typography.bodyLarge,
+							color = AppTheme.colors.colorTextPrimary,
+							textAlign = TextAlign.Center
+						)
+						Spacer(modifier = Modifier.size(32.dp))
+						Text(
+							modifier = Modifier.padding(horizontal = 20.dp),
+							text = email ?: "",
+							style =
+							MaterialTheme.typography
+								.customTextStyle(fontSize = 24.sp)
+								.copy(
+									shadow =
+									Shadow(
+										color = AppTheme.colors.glow,
+										offset = Offset(2f, 2f),
+										blurRadius = 50f
+									)
+								),
+							color = AppTheme.colors.colorTextPrimary,
+							textAlign = TextAlign.Center
+						)
+					} else {
+						Text(
+							modifier = Modifier.padding(horizontal = 32.dp),
+							text = stringResource(R.string.reset_password_description),
+							style = MaterialTheme.typography.bodyMedium,
+							color = AppTheme.colors.colorTextSecondary,
+							textAlign = TextAlign.Center
+						)
+						Spacer(modifier = Modifier.size(24.dp))
+						AuthInputField(
+							modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+							placeHolder = { Text(stringResource(R.string.email_id)) },
+							error = emailError.value,
+							onTextChanged = {
+								email = it
+								emailError.value = null
+							},
+							keyboardOptions =
+							KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done)
+						)
+						Spacer(modifier = Modifier.size(16.dp))
+						AuthButton(text = stringResource(R.string.send_reset_link)) { onForgotPassword(email) }
+					}
+				}
+			}
+		}
+	}
 }

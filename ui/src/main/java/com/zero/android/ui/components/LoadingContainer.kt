@@ -19,9 +19,7 @@ fun LoadingContainer(
 ) {
 	if (loading) {
 		Column(
-			modifier = modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 100.dp),
+			modifier = modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp),
 			verticalArrangement = Arrangement.Center,
 			horizontalAlignment = Alignment.CenterHorizontally
 		) { CircularProgress(size = size) }
@@ -32,23 +30,21 @@ fun LoadingContainer(
 
 @Composable
 fun OverlappingLoadingContainer(
-    modifier: Modifier = Modifier,
-    loading: Boolean,
-    size: Dp = 42.dp,
-    content: @Composable () -> Unit
+	modifier: Modifier = Modifier,
+	loading: Boolean,
+	size: Dp = 42.dp,
+	content: @Composable () -> Unit
 ) {
-    Box(modifier, contentAlignment = Alignment.Center) {
-        content()
-        if (loading) {
-            Column(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 100.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) { CircularProgress(size = size) }
-        }
-    }
+	Box(modifier, contentAlignment = Alignment.Center) {
+		content()
+		if (loading) {
+			Column(
+				modifier = modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp),
+				verticalArrangement = Arrangement.Center,
+				horizontalAlignment = Alignment.CenterHorizontally
+			) { CircularProgress(size = size) }
+		}
+	}
 }
 
 @Preview

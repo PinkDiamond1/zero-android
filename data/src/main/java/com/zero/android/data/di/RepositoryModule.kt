@@ -1,8 +1,8 @@
 package com.zero.android.data.di
 
+import com.zero.android.data.repository.*
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.AuthRepositoryImpl
-import com.zero.android.data.repository.*
 import com.zero.android.data.repository.mediaplayer.MediaPlayerRepository
 import com.zero.android.data.repository.mediaplayer.MediaPlayerRepositoryImpl
 import dagger.Binds

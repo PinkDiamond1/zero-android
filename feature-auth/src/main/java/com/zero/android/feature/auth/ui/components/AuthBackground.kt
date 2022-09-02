@@ -14,23 +14,19 @@ import com.zero.android.common.R
 import com.zero.android.ui.components.OverlappingLoadingContainer
 
 @Composable
-fun AuthBackground(
-    isLoading: Boolean = false,
-    content: @Composable () -> Unit
-){
-    Box {
-        Image(
-            modifier = Modifier.fillMaxWidth(),
-            painter = painterResource(R.drawable.bg_auth),
-            contentDescription = "auth_bg",
-            contentScale = ContentScale.Crop
-        )
-        OverlappingLoadingContainer(
-            loading = isLoading,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)) {
-            content()
-        }
-    }
+fun AuthBackground(isLoading: Boolean = false, content: @Composable () -> Unit) {
+	Box {
+		Image(
+			modifier = Modifier.fillMaxWidth(),
+			painter = painterResource(R.drawable.bg_auth),
+			contentDescription = "auth_bg",
+			contentScale = ContentScale.Crop
+		)
+		OverlappingLoadingContainer(
+			loading = isLoading,
+			modifier = Modifier.fillMaxSize().background(Color.Transparent)
+		) {
+			content()
+		}
+	}
 }

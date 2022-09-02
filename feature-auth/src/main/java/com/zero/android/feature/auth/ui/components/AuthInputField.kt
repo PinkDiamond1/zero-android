@@ -23,53 +23,52 @@ import com.zero.android.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthInputField(
-    modifier: Modifier = Modifier,
-    placeHolder: @Composable () -> Unit,
-    trailingIcon: @Composable () -> Unit = {},
-    singleLine: Boolean = true,
-    error: Int? = null,
-    onTextChanged: (String) -> Unit = {},
-    onFocusChanged: (Boolean) -> Unit = {},
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+	modifier: Modifier = Modifier,
+	placeHolder: @Composable () -> Unit,
+	trailingIcon: @Composable () -> Unit = {},
+	singleLine: Boolean = true,
+	error: Int? = null,
+	onTextChanged: (String) -> Unit = {},
+	onFocusChanged: (Boolean) -> Unit = {},
+	visualTransformation: VisualTransformation = VisualTransformation.None,
+	keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
-    val text = remember { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
-    val isError = error != null
-    val errorIcon: @Composable () -> Unit = {
-        Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colorScheme.error)
-    }
+	val text = remember { mutableStateOf("") }
+	val focusManager = LocalFocusManager.current
+	val isError = error != null
+	val errorIcon: @Composable () -> Unit = {
+		Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colorScheme.error)
+	}
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            modifier = modifier.onFocusChanged { state -> onFocusChanged(state.isFocused) },
-            value = text.value,
-            onValueChange = {
-                text.value = it
-                onTextChanged(it)
-            },
-            label = placeHolder,
-            trailingIcon = if (isError) errorIcon else trailingIcon,
-            singleLine = singleLine,
-            shape = RoundedCornerShape(35.dp),
-            visualTransformation = visualTransformation,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
-            ),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = AppTheme.colors.glow,
-                unfocusedBorderColor = AppTheme.colors.glow.copy(0.25f)
-            ),
-            isError = isError
-        )
-        if (isError) {
-            Text(
-                text = error?.let { stringResource(it) } ?: "",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = 40.dp, vertical = 4.dp)
-            )
-        }
-    }
+	Column(modifier = Modifier.fillMaxWidth()) {
+		OutlinedTextField(
+			modifier = modifier.onFocusChanged { state -> onFocusChanged(state.isFocused) },
+			value = text.value,
+			onValueChange = {
+				text.value = it
+				onTextChanged(it)
+			},
+			label = placeHolder,
+			trailingIcon = if (isError) errorIcon else trailingIcon,
+			singleLine = singleLine,
+			shape = RoundedCornerShape(35.dp),
+			visualTransformation = visualTransformation,
+			keyboardOptions = keyboardOptions,
+			keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+			colors =
+			TextFieldDefaults.outlinedTextFieldColors(
+				focusedBorderColor = AppTheme.colors.glow,
+				unfocusedBorderColor = AppTheme.colors.glow.copy(0.25f)
+			),
+			isError = isError
+		)
+		if (isError) {
+			Text(
+				text = error?.let { stringResource(it) } ?: "",
+				color = MaterialTheme.colorScheme.error,
+				style = MaterialTheme.typography.bodySmall,
+				modifier = Modifier.padding(horizontal = 40.dp, vertical = 4.dp)
+			)
+		}
+	}
 }

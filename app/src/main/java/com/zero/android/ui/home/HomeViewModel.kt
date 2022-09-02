@@ -25,7 +25,7 @@ class HomeViewModel
 constructor(
 	private val networkRepository: NetworkRepository,
 	private val authManager: AuthManager,
-    private val authRepository: AuthRepository,
+	private val authRepository: AuthRepository,
 	private val searchTriggerUseCase: SearchTriggerUseCase
 ) : BaseViewModel() {
 
@@ -91,10 +91,7 @@ constructor(
 	fun logout(context: Context, onLogout: () -> Unit) {
 		viewModelScope.launch {
 			withContext(Dispatchers.IO) {
-                awaitAll(
-                    async { authRepository.revokeToken() },
-                    async { authManager.logout(context) }
-                )
+				awaitAll(async { authRepository.revokeToken() }, async { authManager.logout(context) })
 				withContext(Dispatchers.Main) { onLogout() }
 			}
 		}

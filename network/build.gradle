@@ -47,12 +47,11 @@ dependencies {
 	implementation "com.sendbird.sdk:sendbird-android-sdk:${versions.sendbird}"
 
 	// Data
+	implementation "com.auth0.android:auth0:${versions.auth0}"
 	implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
 	implementation "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}"
 	implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:${versions.jsonConvertor}"
 
 	// Misc
 	implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:${versions.json}"
-
-	implementation 'com.auth0.android:auth0:2.8.0'
 }

@@ -8,5 +8,5 @@ class PreferencesImpl @Inject constructor(private val appPreferences: AppPrefere
 
 	override suspend fun userId() = appPreferences.userId()
 
-    override suspend fun userCredentials() = appPreferences.authCredentials()
+	override suspend fun userCredentials() = appPreferences.authCredentials()
 }

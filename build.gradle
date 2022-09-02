@@ -42,7 +42,7 @@ buildscript {
 		// Data
 		"retrofit"        : "2.9.0",
 		"okhttp"          : "4.9.3",
-		"lock"            : "3.2.0",
+		"auth0"            : "3.2.0",
 		"room"            : "2.4.3",
 		"pagingCompose"   : "1.0.0-alpha15",
 		"datastore"       : "1.0.0",
