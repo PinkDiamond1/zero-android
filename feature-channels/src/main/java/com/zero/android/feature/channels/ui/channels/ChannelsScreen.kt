@@ -19,6 +19,7 @@ import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Network
+import com.zero.android.ui.components.FadeAnimation
 import com.zero.android.ui.components.FadeExpandAnimation
 import com.zero.android.ui.components.SearchView
 import com.zero.android.ui.extensions.Preview
@@ -78,15 +79,18 @@ fun ChannelsScreen(
 						onSearchCancelled = { onSearchClosed() }
 					)
 				}
-				FadeExpandAnimation(visible = isSearchState) {
-					ChannelSearchResult(filteredChannels) {
-						onSearchClosed()
+				if (isSearchState) {
+					FadeAnimation(visible = isSearchState) {
+						ChannelSearchResult(filteredChannels) {
+							onSearchClosed()
+							onChannelSelected(it)
+						}
+					}
+				} else {
+					ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
+					ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
 						onChannelSelected(it)
 					}
-				}
-				ChannelTabLayout(pagerState = pagerState, coroutineScope = coroutineScope, tabs = tabs)
-				ChannelPager(pagerState = pagerState, pagers = pagers, categories = categories) {
-					onChannelSelected(it)
 				}
 			}
 		}

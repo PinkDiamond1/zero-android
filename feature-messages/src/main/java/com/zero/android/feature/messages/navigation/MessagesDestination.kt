@@ -1,13 +1,15 @@
 package com.zero.android.feature.messages.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.accompanist.navigation.animation.composable
 import com.zero.android.feature.messages.ui.messages.MessagesRoute
 import com.zero.android.navigation.DeepLinks
 import com.zero.android.navigation.NavDestination
-import com.zero.android.navigation.extensions.composable
+import com.zero.android.ui.util.NavAnimationUtil
 
 object MessagesDestination : NavDestination() {
 	const val ARG_CHANNEL_ID = "channelId"
@@ -35,6 +37,12 @@ object MessagesDestination : NavDestination() {
 	fun route(id: String, isGroupChannel: Boolean) = "$BASE_ROUTE/$id/$isGroupChannel"
 }
 
+@ExperimentalAnimationApi
 fun NavGraphBuilder.chatGraph(onBackClick: () -> Unit) {
-	composable(MessagesDestination) { MessagesRoute(onBackClick) }
+	composable(
+		route = MessagesDestination.route,
+		arguments = MessagesDestination.arguments,
+		enterTransition = { NavAnimationUtil.DEFAULT_ENTER_ANIM },
+		exitTransition = { NavAnimationUtil.DEFAULT_EXIT_ANIM }
+	) { MessagesRoute(onBackClick) }
 }

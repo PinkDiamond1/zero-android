@@ -71,7 +71,8 @@ fun UserInputPanel(
 		BackHandler(onBack = dismissKeyboard)
 	}
 	val updatedMessage = prepareInitialMessage(initialText)
-	var textState by remember {
+	var textState by
+	remember(initialText) {
 		mutableStateOf(TextFieldValue(updatedMessage, TextRange(updatedMessage.length)))
 	}
 	LaunchedEffect(Unit) {

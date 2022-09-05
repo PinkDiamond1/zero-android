@@ -150,4 +150,15 @@ constructor(
 			loading.emit(false)
 		}
 	}
+
+	fun resetErrorState(resetValidations: Boolean = false) {
+		ioScope.launch {
+			error.emit(null)
+			if (resetValidations) {
+				loginValidator.emit(AuthUtil.LoginValidator())
+				forgotPasswordValidator.emit(AuthUtil.ResetPasswordValidator())
+				registerValidator.emit(AuthUtil.RegistrationValidator())
+			}
+		}
+	}
 }

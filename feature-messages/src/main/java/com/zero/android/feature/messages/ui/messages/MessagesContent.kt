@@ -22,10 +22,8 @@ import androidx.paging.compose.items
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.isSameDay
 import com.zero.android.common.extensions.toDate
-import com.zero.android.common.ui.Result
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
 import com.zero.android.models.Message
-import com.zero.android.ui.components.FadeExpandAnimation
 import com.zero.android.ui.components.JumpToBottom
 import com.zero.android.ui.components.StrikeLabel
 import com.zero.android.ui.theme.AppTheme
@@ -37,7 +35,6 @@ import kotlinx.coroutines.launch
 fun MessagesContent(
 	modifier: Modifier = Modifier,
 	userChannelInfo: Pair<String, Boolean>,
-	uiState: MessagesUIState,
 	messages: LazyPagingItems<Message>
 ) {
 	val scrollState = rememberLazyListState()
@@ -55,7 +52,6 @@ fun MessagesContent(
 				Messages(
 					modifier = Modifier.weight(1f),
 					userChannelInfo = userChannelInfo,
-					uiState = uiState,
 					messages = messages,
 					scrollState = scrollState,
 					coroutineScope = scope
@@ -69,7 +65,6 @@ fun MessagesContent(
 fun Messages(
 	modifier: Modifier = Modifier,
 	userChannelInfo: Pair<String, Boolean>,
-	uiState: MessagesUIState,
 	messages: LazyPagingItems<Message>,
 	scrollState: LazyListState,
 	coroutineScope: CoroutineScope,
@@ -78,61 +73,58 @@ fun Messages(
 	DisposableEffect(Unit) { onDispose { chatAttachmentViewModel.dispose() } }
 	Box(modifier = modifier.padding(14.dp)) {
 		chatAttachmentViewModel.configure(messages)
-		FadeExpandAnimation(visible = uiState is Result.Success) {
-			LazyColumn(
-				modifier = Modifier.fillMaxSize(),
-				reverseLayout = true,
-				state = scrollState,
-				contentPadding =
-				WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues()
-			) {
-				item { Spacer(modifier = Modifier.size(100.dp)) }
-				items(messages) { content ->
-					content ?: return@items
-					val index = messages.itemSnapshotList.items.indexOf(content)
+		LazyColumn(
+			modifier = Modifier.fillMaxSize(),
+			reverseLayout = true,
+			state = scrollState,
+			contentPadding = WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues()
+		) {
+			item { Spacer(modifier = Modifier.size(100.dp)) }
+			items(messages) { content ->
+				content ?: return@items
+				val index = messages.itemSnapshotList.items.indexOf(content)
 
-					val prevAuthor = if (index != 0) messages[index - 1]?.author else null
-					val nextAuthor = if (messages.itemCount > index + 1) messages[index + 1]?.author else null
-					val messageDate = content.createdAt.toDate()
-					val nextMessageDate =
-						if (messages.itemCount > index + 1) (messages[index + 1]?.createdAt ?: 0).toDate()
-						else 0L.toDate()
-					val isSameDay = nextMessageDate.isSameDay(messageDate)
-					val isFirstMessageByAuthor = prevAuthor?.id != content.author?.id
-					val isLastMessageByAuthor = nextAuthor?.id != content.author?.id
+				val prevAuthor = if (index != 0) messages[index - 1]?.author else null
+				val nextAuthor = if (messages.itemCount > index + 1) messages[index + 1]?.author else null
+				val messageDate = content.createdAt.toDate()
+				val nextMessageDate =
+					if (messages.itemCount > index + 1) (messages[index + 1]?.createdAt ?: 0).toDate()
+					else 0L.toDate()
+				val isSameDay = nextMessageDate.isSameDay(messageDate)
+				val isFirstMessageByAuthor = prevAuthor?.id != content.author?.id
+				val isLastMessageByAuthor = nextAuthor?.id != content.author?.id
 
-          /*if (!userChannelInfo.second) {
-              DirectMessage(
-                  msg = content,
-                  isUserMe = content.author.id == userChannelInfo.first,
-                  isSameDay = isSameDay,
-                  isFirstMessageByAuthor = isFirstMessageByAuthor,
-                  isLastMessageByAuthor = isLastMessageByAuthor,
-                  chatAttachmentViewModel = chatAttachmentViewModel,
-                  onAuthorClick = {}
-              )
-          } else {
-              ChannelMessage(
-                  msg = content,
-                  isUserMe = content.author.id == userChannelInfo.first,
-                  isFirstMessageByAuthor = isFirstMessageByAuthor,
-                  chatAttachmentViewModel = chatAttachmentViewModel,
-                  onAuthorClick = {}
-              )
-          }*/
-					DirectMessage(
-						msg = content,
-						isUserMe = content.author?.id == userChannelInfo.first,
-						isSameDay = isSameDay,
-						isFirstMessageByAuthor = isFirstMessageByAuthor,
-						isLastMessageByAuthor = isLastMessageByAuthor,
-						chatAttachmentViewModel = chatAttachmentViewModel,
-						onAuthorClick = {}
-					)
+        /*if (!userChannelInfo.second) {
+            DirectMessage(
+                msg = content,
+                isUserMe = content.author.id == userChannelInfo.first,
+                isSameDay = isSameDay,
+                isFirstMessageByAuthor = isFirstMessageByAuthor,
+                isLastMessageByAuthor = isLastMessageByAuthor,
+                chatAttachmentViewModel = chatAttachmentViewModel,
+                onAuthorClick = {}
+            )
+        } else {
+            ChannelMessage(
+                msg = content,
+                isUserMe = content.author.id == userChannelInfo.first,
+                isFirstMessageByAuthor = isFirstMessageByAuthor,
+                chatAttachmentViewModel = chatAttachmentViewModel,
+                onAuthorClick = {}
+            )
+        }*/
+				DirectMessage(
+					msg = content,
+					isUserMe = content.author?.id == userChannelInfo.first,
+					isSameDay = isSameDay,
+					isFirstMessageByAuthor = isFirstMessageByAuthor,
+					isLastMessageByAuthor = isLastMessageByAuthor,
+					chatAttachmentViewModel = chatAttachmentViewModel,
+					onAuthorClick = {}
+				)
 
-					if (!isSameDay) {
-						StrikeLabel(messageDate.format("MMMM dd, yyyy"))
-					}
+				if (!isSameDay) {
+					StrikeLabel(messageDate.format("MMMM dd, yyyy"))
 				}
 			}
 		}

@@ -1,9 +1,5 @@
 package com.zero.android.feature.auth.ui.login
 
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -40,7 +36,6 @@ import com.zero.android.feature.auth.ui.components.PasswordTextField
 import com.zero.android.feature.auth.util.AuthUtil
 import com.zero.android.ui.components.AppAlertDialog
 import com.zero.android.ui.components.CircularImage
-import com.zero.android.ui.components.InstantAnimation
 import com.zero.android.ui.components.StrikeLabel
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
@@ -58,6 +53,8 @@ fun LoginRoute(
 	val requestError: String? by viewModel.error.collectAsState()
 	val context = LocalContext.current
 
+	DisposableEffect(Unit) { onDispose { viewModel.resetErrorState(resetValidations = true) } }
+
 	if (uiState == AuthScreenUIState.LOGIN) {
 		LaunchedEffect(Unit) { onLogin() }
 	} else {
@@ -69,7 +66,8 @@ fun LoginRoute(
 			onRegister,
 			onLogin = { email, password -> viewModel.login(email?.trim(), password?.trim()) },
 			onLoginWithGoogle = { viewModel.loginWithGoogle(context) },
-			onLoginWithApple = { viewModel.loginWithApple(context) }
+			onLoginWithApple = { viewModel.loginWithApple(context) },
+			onErrorShown = { viewModel.resetErrorState() }
 		)
 	}
 }
@@ -83,7 +81,8 @@ fun LoginScreen(
 	onRegister: () -> Unit,
 	onLogin: (String?, String?) -> Unit,
 	onLoginWithGoogle: () -> Unit,
-	onLoginWithApple: () -> Unit
+	onLoginWithApple: () -> Unit,
+	onErrorShown: () -> Unit
 ) {
 	val isInviteLink: Boolean = false
 
@@ -93,150 +92,141 @@ fun LoginScreen(
 	val passwordError = remember(loginValidator) { mutableStateOf(loginValidator.passwordError) }
 
 	AuthBackground(isLoading) {
-		InstantAnimation(
-			enterAnimation = expandVertically() + fadeIn(),
-			exitAnimation = shrinkVertically() + fadeOut()
-		) {
-			Box {
-				if (!requestError.isNullOrEmpty()) {
-					AppAlertDialog(requestError)
+		Box {
+			if (!requestError.isNullOrEmpty()) {
+				AppAlertDialog(requestError) { onErrorShown() }
+			}
+			Column(
+				modifier = Modifier.fillMaxSize(),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.SpaceBetween
+			) {
+				if (isInviteLink) {
+					Column(horizontalAlignment = Alignment.CenterHorizontally) {
+						Image(
+							modifier = Modifier.size(100.dp, height = 50.dp),
+							painter = painterResource(R.drawable.zero_logo),
+							contentDescription = "cd_zero_logo",
+							contentScale = ContentScale.Fit
+						)
+						CircularImage(
+							modifier = Modifier.size(100.dp),
+							placeHolder = R.drawable.ic_circular_image_placeholder
+						)
+						Spacer(modifier = Modifier.size(8.dp))
+						Text(
+							text =
+							buildAnnotatedString {
+								withStyle(SpanStyle(color = AppTheme.colors.colorTextPrimary)) {
+									append("Eth Fish has invited you to ")
+								}
+								withStyle(SpanStyle(color = AppTheme.colors.glow)) { append("Wilder World") }
+								withStyle(SpanStyle(color = AppTheme.colors.colorTextPrimary)) { append("!") }
+							},
+							style = MaterialTheme.typography.displayLarge
+						)
+					}
+				} else {
+					Image(
+						modifier = Modifier.padding(top = 50.dp),
+						painter = painterResource(R.drawable.zero_logo),
+						contentDescription = "cd_zero_logo"
+					)
 				}
 				Column(
-					modifier = Modifier.fillMaxSize(),
-					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.SpaceBetween
+					modifier = Modifier.fillMaxWidth(),
+					horizontalAlignment = Alignment.CenterHorizontally
 				) {
-					if (isInviteLink) {
-						Column(horizontalAlignment = Alignment.CenterHorizontally) {
-							Image(
-								modifier = Modifier.size(100.dp, height = 50.dp),
-								painter = painterResource(R.drawable.zero_logo),
-								contentDescription = "cd_zero_logo",
-								contentScale = ContentScale.Fit
-							)
-							CircularImage(
-								modifier = Modifier.size(100.dp),
-								placeHolder = R.drawable.ic_circular_image_placeholder
-							)
-							Spacer(modifier = Modifier.size(8.dp))
-							Text(
-								text =
-								buildAnnotatedString {
-									withStyle(SpanStyle(color = AppTheme.colors.colorTextPrimary)) {
-										append("Eth Fish has invited you to ")
-									}
-									withStyle(SpanStyle(color = AppTheme.colors.glow)) {
-										append("Wilder World")
-									}
-									withStyle(SpanStyle(color = AppTheme.colors.colorTextPrimary)) {
-										append("!")
-									}
-								},
-								style = MaterialTheme.typography.displayLarge
-							)
+					AuthInputField(
+						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+						placeHolder = { Text(stringResource(R.string.email_id)) },
+						error = emailError.value,
+						onTextChanged = {
+							email = it
+							emailError.value = null
+						},
+						keyboardOptions =
+						KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+					)
+					Spacer(modifier = Modifier.size(16.dp))
+					PasswordTextField(
+						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+						placeHolder = { Text(stringResource(R.string.password)) },
+						error = passwordError.value,
+						onTextChanged = {
+							password = it
+							passwordError.value = null
 						}
-					} else {
-						Image(
-							modifier = Modifier.padding(top = 50.dp),
-							painter = painterResource(R.drawable.zero_logo),
-							contentDescription = "cd_zero_logo"
-						)
-					}
-					Column(
+					)
+					Spacer(modifier = Modifier.size(16.dp))
+					AuthButton(text = stringResource(R.string.login)) { onLogin(email, password) }
+					Spacer(modifier = Modifier.size(8.dp))
+					StrikeLabel(
+						text = stringResource(R.string.or_continue_with),
+						textStyle = MaterialTheme.typography.displayMedium,
+						strikeColors = listOf(AppTheme.colors.surfaceInverse, AppTheme.colors.glow),
+						paddingHorizontal = 20.dp,
+						strikeSize = 1.dp
+					)
+					Spacer(modifier = Modifier.size(24.dp))
+					Row(
 						modifier = Modifier.fillMaxWidth(),
-						horizontalAlignment = Alignment.CenterHorizontally
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.SpaceEvenly
 					) {
-						AuthInputField(
-							modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-							placeHolder = { Text(stringResource(R.string.email_id)) },
-							error = emailError.value,
-							onTextChanged = {
-								email = it
-								emailError.value = null
-							},
-							keyboardOptions =
-							KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
-						)
-						Spacer(modifier = Modifier.size(16.dp))
-						PasswordTextField(
-							modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-							placeHolder = { Text(stringResource(R.string.password)) },
-							error = passwordError.value,
-							onTextChanged = {
-								password = it
-								passwordError.value = null
-							}
-						)
-						Spacer(modifier = Modifier.size(16.dp))
-						AuthButton(text = stringResource(R.string.login)) { onLogin(email, password) }
-						Spacer(modifier = Modifier.size(8.dp))
-						StrikeLabel(
-							text = stringResource(R.string.or_continue_with),
-							textStyle = MaterialTheme.typography.displayMedium,
-							strikeColors = listOf(AppTheme.colors.surfaceInverse, AppTheme.colors.glow),
-							paddingHorizontal = 20.dp,
-							strikeSize = 1.dp
-						)
-						Spacer(modifier = Modifier.size(24.dp))
-						Row(
-							modifier = Modifier.fillMaxWidth(),
-							verticalAlignment = Alignment.CenterVertically,
-							horizontalArrangement = Arrangement.SpaceEvenly
+						OutlinedButton(
+							onClick = onLoginWithApple,
+							modifier = Modifier.height(56.dp).weight(1f).padding(start = 20.dp, end = 6.dp),
+							shape = RoundedCornerShape(35.dp),
+							border = BorderStroke(1.dp, AppTheme.colors.glow.copy(0.25f))
 						) {
-							OutlinedButton(
-								onClick = onLoginWithApple,
-								modifier = Modifier.height(56.dp).weight(1f).padding(start = 20.dp, end = 6.dp),
-								shape = RoundedCornerShape(35.dp),
-								border = BorderStroke(1.dp, AppTheme.colors.glow.copy(0.25f))
-							) {
-								Icon(
-									painter = painterResource(R.drawable.ic_apple),
-									contentDescription = null,
-									tint = AppTheme.colors.colorTextSecondary
-								)
-							}
-							OutlinedButton(
-								onClick = onLoginWithGoogle,
-								modifier = Modifier.height(56.dp).weight(1f).padding(start = 6.dp, end = 20.dp),
-								shape = RoundedCornerShape(35.dp),
-								border = BorderStroke(1.dp, AppTheme.colors.glow.copy(0.25f))
-							) {
-								Icon(
-									painter = painterResource(R.drawable.ic_google),
-									contentDescription = null,
-									tint = AppTheme.colors.colorTextSecondary
-								)
-							}
+							Icon(
+								painter = painterResource(R.drawable.ic_apple),
+								contentDescription = null,
+								tint = AppTheme.colors.colorTextSecondary
+							)
+						}
+						OutlinedButton(
+							onClick = onLoginWithGoogle,
+							modifier = Modifier.height(56.dp).weight(1f).padding(start = 6.dp, end = 20.dp),
+							shape = RoundedCornerShape(35.dp),
+							border = BorderStroke(1.dp, AppTheme.colors.glow.copy(0.25f))
+						) {
+							Icon(
+								painter = painterResource(R.drawable.ic_google),
+								contentDescription = null,
+								tint = AppTheme.colors.colorTextSecondary
+							)
 						}
 					}
-					Column(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalAlignment = Alignment.CenterHorizontally
-					) {
-            /*Text(
-                modifier = Modifier.clickable { onRegister() },
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = AppTheme.colors.colorTextPrimary)) {
-                        append(stringResource(R.string.not_a_member))
-                    }
-                    append(" ")
-                    withStyle(style = SpanStyle(
-                        color = AppTheme.colors.glow,
-                        textDecoration = TextDecoration.Underline,
-                    )) { append(stringResource(R.string.create_an_account)) }
-                },
-                style = MaterialTheme.typography.displayMedium
-            )
-            Spacer(modifier = Modifier.size(10.dp))*/
-						Text(
-							modifier = Modifier.clickable { onForgotPassword() },
-							text = stringResource(R.string.forgot_password),
-							color = AppTheme.colors.colorTextSecondary,
-							textDecoration = TextDecoration.Underline,
-							style = MaterialTheme.typography.displayMedium
-						)
-						Spacer(modifier = Modifier.size(20.dp))
-					}
+				}
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+          /*Text(
+              modifier = Modifier.clickable { onRegister() },
+              text = buildAnnotatedString {
+                  withStyle(SpanStyle(color = AppTheme.colors.colorTextPrimary)) {
+                      append(stringResource(R.string.not_a_member))
+                  }
+                  append(" ")
+                  withStyle(style = SpanStyle(
+                      color = AppTheme.colors.glow,
+                      textDecoration = TextDecoration.Underline,
+                  )) { append(stringResource(R.string.create_an_account)) }
+              },
+              style = MaterialTheme.typography.displayMedium
+          )
+          Spacer(modifier = Modifier.size(10.dp))*/
+					Text(
+						modifier = Modifier.clickable { onForgotPassword() },
+						text = stringResource(R.string.forgot_password),
+						color = AppTheme.colors.colorTextSecondary,
+						textDecoration = TextDecoration.Underline,
+						style = MaterialTheme.typography.displayMedium
+					)
+					Spacer(modifier = Modifier.size(20.dp))
 				}
 			}
 		}

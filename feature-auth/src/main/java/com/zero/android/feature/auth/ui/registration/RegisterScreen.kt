@@ -4,10 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -36,7 +32,6 @@ import com.zero.android.feature.auth.AuthViewModel
 import com.zero.android.feature.auth.ui.components.*
 import com.zero.android.feature.auth.util.AuthUtil
 import com.zero.android.ui.components.AppAlertDialog
-import com.zero.android.ui.components.InstantAnimation
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
 import java.io.File
@@ -47,6 +42,8 @@ fun RegisterRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () -> Unit
 	val isLoading: Boolean by viewModel.loading.collectAsState()
 	val requestError: String? by viewModel.error.collectAsState()
 	var profilePic: File? by remember { mutableStateOf(null) }
+
+	DisposableEffect(Unit) { onDispose { viewModel.resetErrorState(resetValidations = true) } }
 
 	BackHandler { onBack() }
 	val context = LocalContext.current
@@ -74,11 +71,12 @@ fun RegisterRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () -> Unit
 		registerValidator,
 		requestError,
 		onBack = onBack,
-		onPickImage = { imageSelectorLauncher.launch(it) }
-	) { name, email, password, confirmPassword
-		->
-		viewModel.register(name, email, password, confirmPassword, profilePic)
-	}
+		onPickImage = { imageSelectorLauncher.launch(it) },
+		onRegister = { name, email, password, confirmPassword ->
+			viewModel.register(name, email, password, confirmPassword, profilePic)
+		},
+		onErrorShown = { viewModel.resetErrorState() }
+	)
 }
 
 @Composable
@@ -88,7 +86,8 @@ fun RegisterScreen(
 	requestError: String?,
 	onBack: () -> Unit,
 	onPickImage: (Intent) -> Unit,
-	onRegister: (String?, String?, String?, String?) -> Unit
+	onRegister: (String?, String?, String?, String?) -> Unit,
+	onErrorShown: () -> Unit
 ) {
 	val context = LocalContext.current
 
@@ -106,105 +105,100 @@ fun RegisterScreen(
 	var showPasswordMeter by remember { mutableStateOf(false) }
 
 	AuthBackground(isLoading) {
-		InstantAnimation(
-			enterAnimation = expandVertically() + fadeIn(),
-			exitAnimation = shrinkVertically() + fadeOut()
-		) {
-			Box {
-				if (!requestError.isNullOrEmpty()) {
-					AppAlertDialog(requestError)
-				}
-				Column(
-					modifier = Modifier.fillMaxSize(),
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp)) {
-						IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
-							Icon(
-								imageVector = Icons.Filled.ArrowBack,
-								contentDescription = "cd_ic_back",
-								tint = AppTheme.colors.glow
-							)
-						}
-						Text(
-							modifier = Modifier.align(Alignment.Center),
-							text = stringResource(R.string.create_account),
-							style = MaterialTheme.typography.bodyLarge,
-							fontWeight = FontWeight.SemiBold,
-							color = AppTheme.colors.colorTextPrimary,
-							textAlign = TextAlign.Center
-						)
-					}
-					Spacer(modifier = Modifier.size(24.dp))
-					OutlinedButton(
-						modifier = Modifier.size(100.dp),
-						onClick = { context.getActivity()?.let { showImagePicker(it, onPickImage) } },
-						shape = CircleShape,
-						border = BorderStroke(1.dp, AppTheme.colors.glow)
-					) {
+		Box {
+			if (!requestError.isNullOrEmpty()) {
+				AppAlertDialog(requestError) { onErrorShown() }
+			}
+			Column(
+				modifier = Modifier.fillMaxSize(),
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp)) {
+					IconButton(onClick = onBack, modifier = Modifier.align(Alignment.CenterStart)) {
 						Icon(
-							imageVector = Icons.Outlined.PhotoCamera,
-							contentDescription = "cd_add_image",
+							imageVector = Icons.Filled.ArrowBack,
+							contentDescription = "cd_ic_back",
 							tint = AppTheme.colors.glow
 						)
 					}
-					Spacer(modifier = Modifier.size(24.dp))
-					AuthInputField(
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-						placeHolder = { Text(stringResource(R.string.member_name)) },
-						onTextChanged = {
-							name = it
-							nameError.value = null
-						},
-						error = nameError.value,
-						keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+					Text(
+						modifier = Modifier.align(Alignment.Center),
+						text = stringResource(R.string.create_account),
+						style = MaterialTheme.typography.bodyLarge,
+						fontWeight = FontWeight.SemiBold,
+						color = AppTheme.colors.colorTextPrimary,
+						textAlign = TextAlign.Center
 					)
-					Spacer(modifier = Modifier.size(16.dp))
-					AuthInputField(
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-						placeHolder = { Text(stringResource(R.string.email_id)) },
-						error = emailError.value,
-						onTextChanged = {
-							email = it
-							emailError.value = null
-						},
-						keyboardOptions =
-						KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+				}
+				Spacer(modifier = Modifier.size(24.dp))
+				OutlinedButton(
+					modifier = Modifier.size(100.dp),
+					onClick = { context.getActivity()?.let { showImagePicker(it, onPickImage) } },
+					shape = CircleShape,
+					border = BorderStroke(1.dp, AppTheme.colors.glow)
+				) {
+					Icon(
+						imageVector = Icons.Outlined.PhotoCamera,
+						contentDescription = "cd_add_image",
+						tint = AppTheme.colors.glow
 					)
-					Spacer(modifier = Modifier.size(16.dp))
-					PasswordTextField(
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-						placeHolder = { Text(stringResource(R.string.password)) },
-						error = passwordError.value,
-						onTextChanged = {
-							password = it
-							passwordError.value = null
-						},
-						onFocusChanged = { showPasswordMeter = it },
-						imeAction = ImeAction.Next
+				}
+				Spacer(modifier = Modifier.size(24.dp))
+				AuthInputField(
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+					placeHolder = { Text(stringResource(R.string.member_name)) },
+					onTextChanged = {
+						name = it
+						nameError.value = null
+					},
+					error = nameError.value,
+					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+				)
+				Spacer(modifier = Modifier.size(16.dp))
+				AuthInputField(
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+					placeHolder = { Text(stringResource(R.string.email_id)) },
+					error = emailError.value,
+					onTextChanged = {
+						email = it
+						emailError.value = null
+					},
+					keyboardOptions =
+					KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
+				)
+				Spacer(modifier = Modifier.size(16.dp))
+				PasswordTextField(
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+					placeHolder = { Text(stringResource(R.string.password)) },
+					error = passwordError.value,
+					onTextChanged = {
+						password = it
+						passwordError.value = null
+					},
+					onFocusChanged = { showPasswordMeter = it },
+					imeAction = ImeAction.Next
+				)
+				if (showPasswordMeter && !password.isNullOrEmpty()) {
+					Spacer(modifier = Modifier.size(8.dp))
+					PasswordStrengthMeter(
+						modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
+						password = password!!
 					)
-					if (showPasswordMeter && !password.isNullOrEmpty()) {
-						Spacer(modifier = Modifier.size(8.dp))
-						PasswordStrengthMeter(
-							modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
-							password = password!!
-						)
-					}
-					Spacer(modifier = Modifier.size(16.dp))
-					PasswordTextField(
-						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-						placeHolder = { Text(stringResource(R.string.confirm_password)) },
-						onTextChanged = {
-							confirmPassword = it
-							confirmPasswordError.value = null
-						},
-						error = confirmPasswordError.value,
-						imeAction = ImeAction.Done
-					)
-					Spacer(modifier = Modifier.size(24.dp))
-					AuthButton(text = stringResource(R.string.create_account)) {
-						onRegister(name, email, password, confirmPassword)
-					}
+				}
+				Spacer(modifier = Modifier.size(16.dp))
+				PasswordTextField(
+					modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+					placeHolder = { Text(stringResource(R.string.confirm_password)) },
+					onTextChanged = {
+						confirmPassword = it
+						confirmPasswordError.value = null
+					},
+					error = confirmPasswordError.value,
+					imeAction = ImeAction.Done
+				)
+				Spacer(modifier = Modifier.size(24.dp))
+				AuthButton(text = stringResource(R.string.create_account)) {
+					onRegister(name, email, password, confirmPassword)
 				}
 			}
 		}

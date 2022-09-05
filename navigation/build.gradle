@@ -17,4 +17,5 @@ dependencies {
 
 	// UI
 	implementation "androidx.navigation:navigation-compose:${versions.navigation}"
+	implementation "com.google.accompanist:accompanist-navigation-animation:${versions.navigationAnim}"
 }

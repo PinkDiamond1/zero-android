@@ -31,6 +31,7 @@ buildscript {
 		"material2"       : "1.3.0-alpha03",
 		"material3"       : "1.0.0-alpha16",
 		"navigation"      : "2.5.1",
+		"navigationAnim"  : "0.26.2-beta",
 		"hiltNavigation"  : "1.0.0",
 		"lifecycle"       : "2.6.0-alpha01",
 		"splashscreen"    : "1.0.0",
@@ -42,7 +43,7 @@ buildscript {
 		// Data
 		"retrofit"        : "2.9.0",
 		"okhttp"          : "4.9.3",
-		"auth0"            : "3.2.0",
+		"auth0"           : "2.8.0",
 		"room"            : "2.4.3",
 		"pagingCompose"   : "1.0.0-alpha15",
 		"datastore"       : "1.0.0",

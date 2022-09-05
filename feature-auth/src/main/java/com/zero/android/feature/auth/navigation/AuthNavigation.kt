@@ -1,7 +1,8 @@
 package com.zero.android.feature.auth.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import com.google.accompanist.navigation.animation.composable
 import com.zero.android.feature.auth.ui.login.LoginRoute
 import com.zero.android.feature.auth.ui.registration.RegisterRoute
 import com.zero.android.feature.auth.ui.resetpassword.ResetPasswordRoute
@@ -22,6 +23,7 @@ object RegisterDestination : NavDestination() {
 	override val destination = "register_destination"
 }
 
+@ExperimentalAnimationApi
 fun NavGraphBuilder.authGraph(
 	onLogin: () -> Unit,
 	onForgotPassword: () -> Unit,

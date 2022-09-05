@@ -1,18 +1,24 @@
 package com.zero.android.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
+@ExperimentalAnimationApi
 @Composable
 fun AppNavHost(
 	modifier: Modifier = Modifier,
-	navController: NavHostController = rememberNavController(),
+	navController: NavHostController = rememberAnimatedNavController(),
 	startDestination: String = AppGraph.AUTH
 ) {
-	NavHost(navController = navController, startDestination = startDestination, modifier = modifier) {
+	AnimatedNavHost(
+		navController = navController,
+		startDestination = startDestination,
+		modifier = modifier
+	) {
 		appGraph(navController)
 	}
 }

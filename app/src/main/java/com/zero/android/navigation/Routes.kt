@@ -1,8 +1,10 @@
 package com.zero.android.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.navigation
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.navigation
 import com.zero.android.feature.account.navigation.NotificationsDestination
 import com.zero.android.feature.account.ui.notifications.NotificationsRoute
 import com.zero.android.feature.auth.navigation.AuthDestination
@@ -22,9 +24,18 @@ import com.zero.android.feature.people.navigation.MembersDestination
 import com.zero.android.models.Network
 import com.zero.android.navigation.extensions.asRoot
 import com.zero.android.navigation.extensions.composable
+import com.zero.android.ui.util.NavAnimationUtil
 
+@ExperimentalAnimationApi
 internal fun NavGraphBuilder.appGraph(controller: NavController) {
-	navigation(startDestination = AuthDestination.route, route = AppGraph.AUTH) {
+	navigation(
+		startDestination = AuthDestination.route,
+		route = AppGraph.AUTH,
+		enterTransition = { NavAnimationUtil.DEFAULT_ENTER_ANIM },
+		exitTransition = { NavAnimationUtil.DEFAULT_EXIT_ANIM },
+		popEnterTransition = { NavAnimationUtil.DEFAULT_POP_ENTER_ANIM },
+		popExitTransition = { NavAnimationUtil.DEFAULT_POP_EXIT_ANIM }
+	) {
 		authGraph(
 			onLogin = { controller.navigate(HomeDestination.route) { asRoot() } },
 			onForgotPassword = { controller.navigate(ForgotPasswordDestination.route) },
@@ -34,9 +45,9 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 	}
 	navigation(startDestination = HomeDestination.route, route = AppGraph.MAIN) {
 		chatGraph(onBackClick = { controller.navigateUp() })
-		composable(MembersDestination) { MembersRoute() }
-		composable(FeedDestination) { FeedRoute() }
-		composable(NotificationsDestination) { NotificationsRoute() }
+		composable(MembersDestination.route) { MembersRoute() }
+		composable(FeedDestination.route) { FeedRoute() }
+		composable(NotificationsDestination.route) { NotificationsRoute() }
 
 		homeGraph(
 			navController = controller,
