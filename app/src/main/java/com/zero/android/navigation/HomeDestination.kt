@@ -3,9 +3,9 @@ package com.zero.android.navigation
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import com.google.accompanist.navigation.animation.composable
+import com.zero.android.navigation.extensions.composable
+import com.zero.android.navigation.util.FadeNavAnimation
 import com.zero.android.ui.home.HomeRoute
-import com.zero.android.ui.util.NavAnimationUtil
 
 object HomeDestination : NavDestination() {
 	override val route = "home_route"
@@ -18,13 +18,7 @@ internal fun NavGraphBuilder.homeGraph(
 	onNavigateToRootDestination: (NavDestination) -> Unit,
 	onLogout: () -> Unit
 ) {
-	composable(
-		route = HomeDestination.route,
-		enterTransition = { NavAnimationUtil.DEFAULT_ENTER_ANIM },
-		exitTransition = { NavAnimationUtil.DEFAULT_EXIT_ANIM },
-		popEnterTransition = { NavAnimationUtil.DEFAULT_POP_ENTER_ANIM },
-		popExitTransition = { NavAnimationUtil.DEFAULT_POP_EXIT_ANIM }
-	) {
+	composable(HomeDestination, animation = FadeNavAnimation) {
 		HomeRoute(
 			navController = navController,
 			onNavigateToRootDestination = onNavigateToRootDestination,

@@ -87,7 +87,6 @@ dependencies {
 	implementation "com.onesignal:OneSignal:${versions.onesignal}"
 
 	// UI
-	implementation "androidx.compose.material:material:${versions.material2}"
 	implementation "androidx.core:core-splashscreen:${versions.splashscreen}"
 	implementation "io.coil-kt:coil-compose:${versions.coil}"
 

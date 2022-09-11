@@ -2,11 +2,11 @@ package com.zero.android.feature.auth.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import com.google.accompanist.navigation.animation.composable
 import com.zero.android.feature.auth.ui.login.LoginRoute
 import com.zero.android.feature.auth.ui.registration.RegisterRoute
 import com.zero.android.feature.auth.ui.resetpassword.ResetPasswordRoute
 import com.zero.android.navigation.NavDestination
+import com.zero.android.navigation.extensions.composable
 
 object AuthDestination : NavDestination() {
 	override val route = "login_route"
@@ -30,9 +30,9 @@ fun NavGraphBuilder.authGraph(
 	onRegister: () -> Unit,
 	onBackPress: () -> Unit
 ) {
-	composable(route = AuthDestination.route) {
+	composable(AuthDestination) {
 		LoginRoute(onLogin = onLogin, onForgotPassword = onForgotPassword, onRegister = onRegister)
 	}
-	composable(route = ForgotPasswordDestination.route) { ResetPasswordRoute(onBack = onBackPress) }
-	composable(route = RegisterDestination.route) { RegisterRoute(onBack = onBackPress) }
+	composable(ForgotPasswordDestination) { ResetPasswordRoute(onBack = onBackPress) }
+	composable(RegisterDestination) { RegisterRoute(onBack = onBackPress) }
 }
