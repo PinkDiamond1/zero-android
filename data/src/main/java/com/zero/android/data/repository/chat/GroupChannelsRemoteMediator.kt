@@ -63,13 +63,15 @@ internal class GroupChannelsRemoteMediator(
 						channelService.getGroupChannels(
 							networkId = networkId,
 							before = it,
-							searchName = search
+							searchName = search,
+							refresh = loadType == LoadType.REFRESH
 						)
 					}
 						?: channelService.getGroupChannels(
 							networkId = networkId,
 							loadSize = INITIAL_LOAD_SIZE,
-							searchName = search
+							searchName = search,
+							refresh = loadType == LoadType.REFRESH
 						)
 
 				response.map { it.toEntity() }.let { channelDao.upsert(*it.toTypedArray()) }

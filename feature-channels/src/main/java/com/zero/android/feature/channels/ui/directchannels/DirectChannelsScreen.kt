@@ -11,12 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
@@ -28,6 +31,7 @@ import com.zero.android.ui.components.FadeAnimation
 import com.zero.android.ui.components.FadeExpandAnimation
 import com.zero.android.ui.components.InstantAnimation
 import com.zero.android.ui.components.SearchView
+import com.zero.android.ui.extensions.OnLifecycleEvent
 import com.zero.android.ui.extensions.Preview
 
 @Composable
@@ -35,10 +39,18 @@ fun DirectChannelsRoute(
 	viewModel: DirectChannelsViewModel = hiltViewModel(),
 	onChannelSelected: (Channel) -> Unit
 ) {
+	val initialLoad = remember { mutableStateOf(false) }
 	val uiState: DirectChannelScreenUiState by viewModel.uiState.collectAsState()
 	val showSearch: Boolean by viewModel.showSearchBar.collectAsState()
 
 	val pagedChannels = viewModel.channels.collectAsLazyPagingItems()
+
+	OnLifecycleEvent { _, event ->
+		if (event == Lifecycle.Event.ON_START) {
+			pagedChannels.refresh()
+		}
+		initialLoad.value = true
+	}
 
 	DirectChannelsScreen(
 		loggedInUser = viewModel.loggedInUserId,
@@ -82,7 +94,7 @@ fun DirectChannelsScreen(
 }
 
 @Composable
-fun ColumnScope.SearchResultCount(show: Boolean, itemCount: Int) {
+fun SearchResultCount(show: Boolean, itemCount: Int) {
 	FadeAnimation(visible = show) {
 		Text(
 			text = "$itemCount results found",

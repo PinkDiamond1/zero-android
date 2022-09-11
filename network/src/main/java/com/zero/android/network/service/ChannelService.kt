@@ -15,13 +15,15 @@ interface ChannelService {
 		before: String? = null,
 		loadSize: Int = 1,
 		limit: Int = 100,
-		searchName: String? = null
+		searchName: String? = null,
+		refresh: Boolean = false
 	): List<ApiGroupChannel>
 
 	suspend fun getDirectChannels(
 		before: String? = null,
 		loadSize: Int = 1,
-		searchName: String? = null
+		searchName: String? = null,
+		refresh: Boolean = false
 	): List<ApiDirectChannel>
 
 	suspend fun getChannel(url: String, type: ChannelType = ChannelType.GROUP): ApiChannel

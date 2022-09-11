@@ -2,7 +2,11 @@ package com.zero.android.feature.channels.ui.channels
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +44,7 @@ fun ChannelsRoute(
 	val pagers by viewModel.pagers.collectAsState()
 
 	LaunchedEffect(network?.id) { network?.let { viewModel.onNetworkUpdated(it) } }
+
 	ChannelsScreen(
 		categoriesUiState,
 		pagers,

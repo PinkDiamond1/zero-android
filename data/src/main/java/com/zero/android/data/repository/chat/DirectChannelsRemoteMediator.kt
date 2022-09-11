@@ -58,8 +58,13 @@ internal class DirectChannelsRemoteMediator(
 			// thread.
 			try {
 				val response =
-					lastChannelId?.let { channelService.getDirectChannels(before = it) }
-						?: channelService.getDirectChannels(loadSize = INITIAL_LOAD_SIZE)
+					lastChannelId?.let {
+						channelService.getDirectChannels(before = it, refresh = loadType == LoadType.REFRESH)
+					}
+						?: channelService.getDirectChannels(
+							loadSize = INITIAL_LOAD_SIZE,
+							refresh = loadType == LoadType.REFRESH
+						)
 
 				response.map { it.toEntity(userId) }.let { channelDao.upsert(*it.toTypedArray()) }
 

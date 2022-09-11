@@ -60,9 +60,11 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		before: String?,
 		loadSize: Int,
 		limit: Int,
-		searchName: String?
+		searchName: String?,
+		refresh: Boolean
 	) = suspendCancellableCoroutine { coroutine ->
 		if (type == ChannelType.OPEN) {
+			if (refresh) openQuery = null
 			if (openNetworkId != networkId || openQuery != null) {
 				openQuery =
 					OpenChannel.createOpenChannelListQuery().apply {
@@ -82,6 +84,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 				}
 			}
 		} else if (type == ChannelType.GROUP) {
+			if (refresh) groupQuery = null
 			if (groupNetworkId != networkId || groupQuery != null) {
 				groupQuery =
 					GroupChannel.createMyGroupChannelListQuery().apply {
@@ -106,30 +109,33 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		}
 	}
 
-	override suspend fun getDirectChannels(before: String?, loadSize: Int, searchName: String?) =
-		suspendCancellableCoroutine { coroutine ->
-			if (directQuery == null) {
-				directQuery =
-					GroupChannel.createMyGroupChannelListQuery().apply {
-						isIncludeEmpty = false
-						limit = 100
-						memberStateFilter = GroupChannelListQuery.MemberStateFilter.ALL
-						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
+	override suspend fun getDirectChannels(
+		before: String?,
+		loadSize: Int,
+		searchName: String?,
+		refresh: Boolean
+	) = suspendCancellableCoroutine { coroutine ->
+		if (refresh) directQuery = null
+		if (directQuery == null) {
+			directQuery =
+				GroupChannel.createMyGroupChannelListQuery().apply {
+					isIncludeEmpty = false
+					limit = 100
+					memberStateFilter = GroupChannelListQuery.MemberStateFilter.ALL
+					order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 
-						searchName?.let { channelNameContainsFilter = searchName }
-					}
-			}
-			directQuery!!.next { channels, e ->
-				if (e != null) {
-					logger.e("Failed to get direct channels", e)
-					coroutine.resumeWithException(e)
-				} else {
-					coroutine.resume(
-						channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() }
-					)
+					searchName?.let { channelNameContainsFilter = searchName }
 				}
+		}
+		directQuery!!.next { channels, e ->
+			if (e != null) {
+				logger.e("Failed to get direct channels", e)
+				coroutine.resumeWithException(e)
+			} else {
+				coroutine.resume(channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() })
 			}
 		}
+	}
 
 	override suspend fun createChannel(networkId: String, channel: Channel): ApiChannel =
 		suspendCancellableCoroutine {
