@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -35,6 +36,7 @@ object MessagesDestination : NavDestination() {
 	fun route(id: String, isGroupChannel: Boolean) = "$BASE_ROUTE/$id/$isGroupChannel"
 }
 
+@ExperimentalAnimationApi
 fun NavGraphBuilder.chatGraph(onBackClick: () -> Unit) {
 	composable(MessagesDestination) { MessagesRoute(onBackClick) }
 }

@@ -2,6 +2,7 @@ package com.zero.android.ui
 
 import com.zero.android.common.extensions.emitInScope
 import com.zero.android.common.ui.base.BaseViewModel
+import com.zero.android.common.usecases.ThemePaletteUseCase
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.datastore.AppPreferences
@@ -11,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -21,11 +23,14 @@ class AppViewModel
 constructor(
 	private val preferences: AppPreferences,
 	private val authManager: AuthManager,
-	private val connectionManager: ConnectionManager
+	private val connectionManager: ConnectionManager,
+	private val themePaletteUseCase: ThemePaletteUseCase
 ) : BaseViewModel() {
 
 	val loading = MutableStateFlow(true)
 	lateinit var startDestination: String
+
+	val dynamicThemePalette: StateFlow<Int> = themePaletteUseCase.dynamicThemePalette
 
 	init {
 		checkAuthOnLaunch()

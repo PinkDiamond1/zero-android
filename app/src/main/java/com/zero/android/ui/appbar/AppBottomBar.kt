@@ -66,7 +66,7 @@ fun AppBottomBar(
 				)
 				.fillMaxWidth(),
 			backgroundColor = AppTheme.colors.surfaceInverse,
-			contentColor = AppTheme.colors.surface,
+			contentColor = AppTheme.colors.glow,
 			elevation = 0.dp
 		) {
 			HOME_DESTINATIONS.forEach { item ->

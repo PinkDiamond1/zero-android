@@ -104,7 +104,7 @@ fun AppDrawerHeader(
 					MaterialTheme.typography.displayLarge.copy(
 						shadow =
 						Shadow(
-							color = MaterialTheme.colorScheme.outline,
+							color = AppTheme.colors.glow,
 							offset = Offset(2f, 2f),
 							blurRadius = 50f
 						)

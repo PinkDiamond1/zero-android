@@ -7,6 +7,16 @@ val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
+val Indigo = Color(0xFF470080)
+val Crayola = Color(0xFF5CE8E4)
+val DeepGreen = Color(0xFF0F6B69)
+val RoseViolet = Color(0xFF42003E)
+val Fuchsia = Color(0xFFFF10F0)
+val BloodRed = Color(0xFF660000)
+val DeepCarminePink = Color(0xFFFF3131)
+val RichBlack = Color(0xFF003038)
+val VividSkyBlue = Color(0xFF04D9FF)
+
 /** Colors from Zero Color palette from figma */
 // DARK Mode Colors
 val PersianIndigo = Color(0xFF31156F)

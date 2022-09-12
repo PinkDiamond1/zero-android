@@ -3,16 +3,7 @@ package com.zero.android.feature.messages.ui.messages
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -107,7 +98,7 @@ fun DMAuthorAndTextMessage(
 ) {
 	val backgroundColorsList =
 		if (isUserMe) {
-			listOf(Color(0xFF470080), Color(0xFFB14EFF))
+			listOf(AppTheme.colors.glowVariant, AppTheme.colors.glow)
 		} else {
 			listOf(Color(0xFF191919), Color(0xFF0A0A0A))
 		}
@@ -136,7 +127,7 @@ fun DMAuthorAndTextMessage(
 						Text(
 							text = message.author?.name ?: "",
 							style = MaterialTheme.typography.titleMedium,
-							color = MaterialTheme.colorScheme.primary,
+							color = AppTheme.colors.glow,
 							modifier = Modifier.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
 						)
 						Spacer(modifier = Modifier.width(8.dp))

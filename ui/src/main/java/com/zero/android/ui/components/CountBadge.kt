@@ -23,10 +23,10 @@ fun CountBadge(
 ) {
 	Badge(
 		modifier = modifier.padding(horizontal = 4.dp),
-		containerColor = MaterialTheme.colorScheme.primary,
-		contentColor = AppTheme.colors.colorTextPrimary
+		containerColor = AppTheme.colors.glow,
+		contentColor = Color.Black
 	) {
-		Text(text = count.toString(), style = style, color = Color.White)
+		Text(text = count.toString(), style = style, color = Color.Black)
 	}
 }
 

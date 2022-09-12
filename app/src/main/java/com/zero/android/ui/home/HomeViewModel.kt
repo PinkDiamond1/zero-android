@@ -6,6 +6,7 @@ import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
+import com.zero.android.common.usecases.ThemePaletteUseCase
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.NetworkRepository
@@ -26,7 +27,8 @@ constructor(
 	private val networkRepository: NetworkRepository,
 	private val authManager: AuthManager,
 	private val authRepository: AuthRepository,
-	private val searchTriggerUseCase: SearchTriggerUseCase
+	private val searchTriggerUseCase: SearchTriggerUseCase,
+	private val themePaletteUseCase: ThemePaletteUseCase
 ) : BaseViewModel() {
 
 	val currentScreen = MutableStateFlow<NavDestination>(ChannelsDestination)
@@ -64,6 +66,10 @@ constructor(
 		}
 	}
 
+	fun switchTheme() {
+		viewModelScope.launch { themePaletteUseCase.changeThemePalette() }
+	}
+
 	fun onNetworkSelected(network: Network) {
 		viewModelScope.launch {
 			selectedNetwork.emit(network)
@@ -93,6 +99,7 @@ constructor(
 			withContext(Dispatchers.IO) {
 				awaitAll(async { authRepository.revokeToken() }, async { authManager.logout(context) })
 				withContext(Dispatchers.Main) { onLogout() }
+				themePaletteUseCase.changeThemePalette(default = true)
 			}
 		}
 	}

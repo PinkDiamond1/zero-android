@@ -29,50 +29,14 @@ private val LightColorScheme =
 		inversePrimary = Blue300
 	)
 
-private val DarkExtendedColorPalette =
-	ExtendedColor(
-		chatBubblePrimary = PersianIndigo,
-		chatBubblePrimaryVariant = RussianViolet,
-		chatBubbleSecondary = CetaceanBlue,
-		header = Platinum,
-		headerVariant = RaisinBlack,
-		buttonPrimary = RaisinBlack75,
-		buttonSecondary = Gray,
-		colorTextPrimary = White,
-		colorTextSecondary = TaupeGray,
-		colorTextSecondaryVariant = Gray,
-		success = EmeraldGreen,
-		glow = LavenderIndigo,
-		divider = Gray,
-		surface = White,
-		surfaceVariant = Gray,
-		surfaceInverse = Black
-	)
-
-private val LightExtendedColorPalette =
-	ExtendedColor(
-		chatBubblePrimary = CadetBlue,
-		chatBubblePrimaryVariant = Rhythm,
-		chatBubbleSecondary = CetaceanBlue,
-		header = ChineseBlack,
-		headerVariant = RaisinBlack,
-		buttonPrimary = RaisinBlack75,
-		buttonSecondary = Gray,
-		colorTextPrimary = RaisinBlack75,
-		colorTextSecondary = PhilippineSilver,
-		colorTextSecondaryVariant = Gray,
-		success = EmeraldGreen,
-		glow = LavenderIndigo,
-		divider = Gray,
-		surface = Black,
-		surfaceVariant = Gray,
-		surfaceInverse = White
-	)
-
 @Composable
-fun ZeroTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun ZeroTheme(
+	darkTheme: Boolean = isSystemInDarkTheme(),
+	randomThemePalette: Int = 0,
+	content: @Composable () -> Unit
+) {
 	val colorsScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-	val extendedColors = if (darkTheme) DarkExtendedColorPalette else LightExtendedColorPalette
+	val extendedColors = getThemePalette(darkTheme, randomThemePalette)
 
 	CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
 		MaterialTheme(

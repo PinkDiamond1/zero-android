@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -93,7 +94,7 @@ fun TabItemWithBadge(channelTab: ChannelTab, isSelectedTab: Boolean) {
 		if (channelTab.unreadCount > 0) {
 			Spacer(modifier = Modifier.padding(2.dp))
 			Text(
-				color = AppTheme.colors.surfaceInverse,
+				color = Color.Black,
 				text = channelTab.unreadCount.toString(),
 				modifier =
 				Modifier.background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))

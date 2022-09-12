@@ -8,20 +8,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun UnreadCountText(modifier: Modifier = Modifier, text: String) {
 	Text(
-		color = AppTheme.colors.colorTextPrimary,
+		color = Color.Black,
 		text = text,
 		modifier =
 		modifier
-			.background(
-				color = MaterialTheme.colorScheme.primary,
-				shape = RoundedCornerShape(24.dp)
-			)
+			.background(color = AppTheme.colors.glow, shape = RoundedCornerShape(24.dp))
 			.wrapContentHeight()
 			.padding(6.dp, 2.dp, 6.dp, 2.dp),
 		style = MaterialTheme.typography.labelLarge
