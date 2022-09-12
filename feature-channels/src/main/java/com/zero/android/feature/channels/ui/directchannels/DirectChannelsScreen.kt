@@ -46,7 +46,7 @@ fun DirectChannelsRoute(
 	val pagedChannels = viewModel.channels.collectAsLazyPagingItems()
 
 	OnLifecycleEvent { _, event ->
-		if (event == Lifecycle.Event.ON_START) {
+		if (event == Lifecycle.Event.ON_START && initialLoad.value) {
 			pagedChannels.refresh()
 		}
 		initialLoad.value = true

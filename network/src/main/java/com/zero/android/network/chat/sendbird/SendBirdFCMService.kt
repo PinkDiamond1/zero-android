@@ -6,6 +6,8 @@ import com.sendbird.android.SendBirdException
 import com.sendbird.android.SendBirdPushHandler
 import com.sendbird.android.SendBirdPushHelper
 import com.zero.android.common.system.Logger
+import com.zero.android.common.system.NotificationManager
+import com.zero.android.network.chat.conversion.getNetworkId
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONException
 import org.json.JSONObject
@@ -14,7 +16,9 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-internal class SendBirdFCMService @Inject constructor(private val logger: Logger) :
+class SendBirdFCMService
+@Inject
+constructor(private val logger: Logger, private val notificationManager: NotificationManager) :
 	SendBirdPushHandler() {
 
 	override fun onNewToken(newToken: String?) {
@@ -29,25 +33,30 @@ internal class SendBirdFCMService @Inject constructor(private val logger: Logger
 			if (remoteMessage?.data?.containsKey("sendbird") == true) {
 				val sendbird = remoteMessage.data["sendbird"]?.let { JSONObject(it) }
 				val channel = sendbird?.get("channel") as JSONObject?
+				val networkId = channel?.getString("custom_type")?.let { getNetworkId(it) }
 
-				sendNotification(
-					context,
-					remoteMessage.data["push_title"],
-					remoteMessage.data["message"],
-					channel?.getString("channel_url")
-				)
+				channel?.getString("channel_url")?.let { url ->
+					sendNotification(
+						id = url,
+						isGroupChannel = networkId != null,
+						title = remoteMessage.data["push_title"],
+						body = remoteMessage.data["message"]
+					)
+				}
 			}
 		} catch (e: JSONException) {
 			e.printStackTrace()
 		}
 	}
 
-	private fun sendNotification(
-		context: Context?,
-		messageTitle: String?,
-		messageBody: String?,
-		channelUrl: String?
-	) = Unit
+	private fun sendNotification(id: String, isGroupChannel: Boolean, title: String?, body: String?) {
+		notificationManager.createMessageNotification(
+			id = id,
+			isGroupChannel = isGroupChannel,
+			title = title ?: "",
+			text = body ?: ""
+		)
+	}
 
 	override fun isUniquePushToken() = false
 

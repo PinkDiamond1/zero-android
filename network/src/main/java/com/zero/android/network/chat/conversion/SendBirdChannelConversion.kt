@@ -26,7 +26,7 @@ internal fun BaseChannel.toApi(): ApiChannel {
 	throw IllegalStateException("not handled")
 }
 
-private fun getNetworkId(customType: String): String? {
+internal fun getNetworkId(customType: String): String? {
 	return Regex(pattern = "network:([-a-zA-Z0-9]+)").matchEntire(customType)?.groups?.get(1)?.value
 }
 

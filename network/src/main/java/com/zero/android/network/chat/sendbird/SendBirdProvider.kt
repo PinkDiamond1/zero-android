@@ -5,13 +5,12 @@ import com.sendbird.android.SendBird
 import com.sendbird.android.SendBirdException
 import com.sendbird.android.SendBirdPushHelper
 import com.sendbird.android.handlers.InitResultHandler
+import com.zero.android.common.extensions.withScope
 import com.zero.android.common.system.Logger
 import com.zero.android.network.BuildConfig
 import com.zero.android.network.chat.ChatProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -22,7 +21,7 @@ internal class SendBirdProvider
 constructor(
 	@ApplicationContext private val context: Context,
 	private val logger: Logger,
-	private val fcmService: SendBirdFCMService = SendBirdFCMService(logger)
+	private val fcmService: SendBirdFCMService
 ) : ChatProvider {
 
 	override fun initialize() {
@@ -52,12 +51,12 @@ constructor(
 	override suspend fun connect(userId: String, accessToken: String?) = suspendCoroutine {
 		logger.i("Connecting to SendBird")
 		SendBird.connect(userId, accessToken) { user, e ->
+			withScope(Dispatchers.IO) { registerDevice() }
 			if (user != null) {
 				if (e != null) {
 					// Proceed in offline mode with the data stored in the local database.
 					// Later, connection will be made automatically
 					// and can be notified through the ConnectionHandler.onReconnectSucceeded().
-					registerNotificationHandler()
 					it.resume(Unit)
 				} else {
 					// Proceed in online mode.
@@ -73,7 +72,7 @@ constructor(
 
 	override suspend fun disconnect(context: Context) = suspendCoroutine { coroutine ->
 		logger.d("Disconnecting from SendBird")
-		CoroutineScope(Dispatchers.IO).launch {
+		withScope(Dispatchers.IO) {
 			unregisterNotificationHandler()
 			SendBird.unregisterPushTokenAllForCurrentUser {
 				SendBird.clearCachedData(context) {}
@@ -83,7 +82,7 @@ constructor(
 	}
 
 	override suspend fun registerDevice() = suspendCoroutine {
-		CoroutineScope(Dispatchers.IO).launch {
+		withScope(Dispatchers.IO) {
 			val deviceToken = SendBirdFCMService.getPushToken()
 
 			logger.i("SendBird Push Token: $deviceToken")

@@ -9,8 +9,6 @@ import com.zero.android.data.repository.AuthRepository
 import com.zero.android.feature.auth.util.AuthUtil
 import com.zero.android.models.AuthCredentials
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -144,7 +142,7 @@ constructor(
 	}
 
 	private fun onAuth(authCredentials: AuthCredentials) {
-		CoroutineScope(Dispatchers.IO).launch {
+		ioScope.launch {
 			authManager.login(authCredentials)
 			uiState.emit(AuthScreenUIState.LOGIN)
 			loading.emit(false)

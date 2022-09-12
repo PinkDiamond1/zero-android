@@ -15,9 +15,13 @@ import com.zero.android.models.Network
 import com.zero.android.models.enums.AlertType
 import com.zero.android.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -73,9 +77,7 @@ constructor(
 	fun onNetworkSelected(network: Network) {
 		viewModelScope.launch {
 			selectedNetwork.emit(network)
-			allNetworks?.let { allNetworks ->
-				networks.emit(Result.Success(allNetworks.filter { it.id != network.id }))
-			}
+			allNetworks?.let { allNetworks -> networks.emit(Result.Success(allNetworks)) }
 		}
 	}
 
