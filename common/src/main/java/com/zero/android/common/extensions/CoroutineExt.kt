@@ -1,5 +1,6 @@
 package com.zero.android.common.extensions
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
@@ -11,6 +12,9 @@ import kotlin.experimental.ExperimentalTypeInference
 
 inline fun <T> withSameScope(crossinline block: suspend () -> T) =
 	CoroutineScope(Dispatchers.Unconfined).launch { block() }
+
+inline fun <T> withScope(dispatcher: CoroutineDispatcher, crossinline block: suspend () -> T) =
+	CoroutineScope(dispatcher).launch { block() }
 
 inline fun <T> FlowCollector<T>.emitInScope(
 	value: T,

@@ -29,6 +29,5 @@ constructor(
 
 	override suspend fun subscribe() {
 		OneSignal.sendTags(JSONObject(mapOf("user_id" to preferences.userId())))
-		chatProvider.registerDevice()
 	}
 }

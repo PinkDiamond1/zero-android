@@ -23,8 +23,6 @@ internal class SendBirdFCMService @Inject constructor(private val logger: Logger
 	}
 
 	override fun onMessageReceived(context: Context?, remoteMessage: RemoteMessage?) {
-		logger.d("onMessageReceived")
-
 		try {
 			if (remoteMessage?.data?.containsKey("sendbird") == true) {
 				val sendbird = remoteMessage.data["sendbird"]?.let { JSONObject(it) }
