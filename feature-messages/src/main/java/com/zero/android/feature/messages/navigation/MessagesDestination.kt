@@ -33,6 +33,9 @@ object MessagesDestination : NavDestination() {
 		)
 
 	fun route(id: String, isGroupChannel: Boolean) = "$BASE_ROUTE/$id/$isGroupChannel"
+
+	fun deeplink(id: String, isGroupChannel: Boolean) =
+		"${DeepLinks.URI}/channel?channel_id=$id&is_group=$isGroupChannel"
 }
 
 fun NavGraphBuilder.chatGraph(onBackClick: () -> Unit) {

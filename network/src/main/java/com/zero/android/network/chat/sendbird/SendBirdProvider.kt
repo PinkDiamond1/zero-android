@@ -21,7 +21,7 @@ internal class SendBirdProvider
 constructor(
 	@ApplicationContext private val context: Context,
 	private val logger: Logger,
-	private val fcmService: SendBirdFCMService = SendBirdFCMService(logger)
+	private val fcmService: SendBirdFCMService
 ) : ChatProvider {
 
 	override fun initialize() {
