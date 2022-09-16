@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,8 +21,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zero.android.common.R
 import com.zero.android.feature.people.ui.components.MemberCircleItem
@@ -39,7 +44,7 @@ import com.zero.android.ui.theme.AppTheme
 fun CreateDirectChannelRoute(
 	viewModel: CreateDirectChannelViewModel = hiltViewModel(),
 	onChannelCreated: (DirectChannel) -> Unit,
-	onBack: () -> Unit
+	onBackClick: () -> Unit
 ) {
 	val users by viewModel.users.collectAsState()
 	val selectedUsers by viewModel.selectedUsers.collectAsState()
@@ -57,7 +62,7 @@ fun CreateDirectChannelRoute(
 		members = users,
 		selectedUsers = selectedUsers,
 		loading = loading,
-		onBackClick = onBack,
+		onBackClick = onBackClick,
 		onDone = { viewModel.onDone() },
 		onMemberSelected = { viewModel.selectMember(it) },
 		onMemberRemoved = { viewModel.removeMember(it) },
@@ -80,7 +85,7 @@ fun CreateDirectChannelScreen(
 	val topBar: @Composable () -> Unit = {
 		AppBar(
 			navIcon = {
-				IconButton(onClick = onBackClick) {
+				IconButton(onClick = { if (!loading) onBackClick() }) {
 					Icon(
 						imageVector = Icons.Filled.ArrowBack,
 						contentDescription = "cd_back",
@@ -90,8 +95,12 @@ fun CreateDirectChannelScreen(
 			},
 			title = { stringResource(id = R.string.new_chat) },
 			actions = {
-				OutlinedButton(onClick = onDone) {
-					Text(text = stringResource(R.string.create), color = AppTheme.colors.colorTextPrimary)
+				OutlinedButton(enabled = selectedUsers.isNotEmpty() || loading, onClick = onDone) {
+					Text(
+						text = stringResource(R.string.create),
+						color = AppTheme.colors.colorTextPrimary,
+						fontSize = 12.sp
+					)
 				}
 			}
 		)
@@ -102,12 +111,19 @@ fun CreateDirectChannelScreen(
 			Column(modifier = Modifier.fillMaxWidth()) {
 				SearchView(
 					placeHolder = stringResource(R.string.search_users),
+					showSearchCancel = false,
 					onValueChanged = { onSearchTextChange(it) }
 				)
-				if (selectedUsers.isNotEmpty()) {
-					SelectedMembers(members = selectedUsers, onMemberRemoved = onMemberRemoved)
+				Column(modifier = Modifier.verticalScroll(rememberScrollState()).weight(1f)) {
+					if (selectedUsers.isNotEmpty()) {
+						SelectedMembers(
+							modifier = Modifier.padding(horizontal = 12.dp, vertical = 0.dp),
+							members = selectedUsers,
+							onMemberRemoved = onMemberRemoved
+						)
+					}
+					MemberSectionList(members, nested = true, onMemberSelected)
 				}
-				MemberSectionList(members, onMemberSelected)
 			}
 		}
 	}
@@ -120,7 +136,22 @@ private fun SelectedMembers(
 	onMemberRemoved: (Member) -> Unit
 ) {
 	InstantAnimation(modifier = modifier) {
-		LazyRow(modifier = modifier) { items(members) { member -> MemberCircleItem(member = member) } }
+		LazyRow(modifier = modifier) {
+			items(members) { member ->
+				MemberCircleItem(
+					member = member,
+					topIcon = {
+						IconButton(modifier = it, onClick = { onMemberRemoved(member) }) {
+							Icon(
+								painter = painterResource(R.drawable.ic_cancel_24),
+								contentDescription = "",
+								tint = AppTheme.colors.surfaceVariant
+							)
+						}
+					}
+				)
+			}
+		}
 	}
 }
 

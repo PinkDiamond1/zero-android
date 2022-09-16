@@ -31,7 +31,6 @@ constructor(
 	private val _users = MutableStateFlow<List<Member>>(emptyList())
 	val users = _users.asStateFlow()
 
-	private val selectedUserList = mutableListOf<Member>()
 	private val _selectedUsers = MutableStateFlow<List<Member>>(emptyList())
 	val selectedUsers = _selectedUsers.asStateFlow()
 
@@ -42,24 +41,19 @@ constructor(
 
 	init {
 		viewModelScope.launch {
-			_textSearch.asStateFlow().debounce(200).collectLatest { query ->
-				val selectedIds = selectedUserList.map { it.id }
-				val members =
-					memberRepository.getMembers(query).first().filter { member ->
-						!selectedIds.contains(member.id)
-					}
-				_users.emit(members.distinct())
+			_textSearch.asStateFlow().debounce(100).collectLatest { query ->
+				filterMembers(memberRepository.getMembers(query).first())
 			}
 		}
 	}
 
 	fun onDone() {
-		if (selectedUserList.size == 0) return
+		if (_selectedUsers.value.isEmpty()) return
 
 		ioScope.launch {
 			loading.emit(true)
 			try {
-				val channel = channelRepository.createDirectChannel(selectedUserList)
+				val channel = channelRepository.createDirectChannel(_selectedUsers.value)
 				_navState.emit(NavigationState.Navigate(channel))
 			} catch (e: Exception) {
 				loading.emit(false)
@@ -72,22 +66,30 @@ constructor(
 	}
 
 	fun selectMember(member: Member) {
-		selectedUserList
+		_selectedUsers.value
 			.find { it.id == member.id }
 			.let {
 				if (it == null) {
-					selectedUserList.add(member)
-					viewModelScope.launch { _selectedUsers.emit(selectedUserList) }
+					viewModelScope.launch {
+						_selectedUsers.value = _selectedUsers.value.toMutableList().apply { add(member) }
+					}
 				}
 			}
 	}
 
 	fun removeMember(member: Member) {
-		selectedUserList
+		_selectedUsers.value
 			.find { it.id == member.id }
 			?.let {
-				selectedUserList.remove(it)
-				viewModelScope.launch { _selectedUsers.emit(selectedUserList) }
+				viewModelScope.launch {
+					_selectedUsers.value = _selectedUsers.value.toMutableList().apply { remove(it) }
+				}
 			}
+	}
+
+	private fun filterMembers(members: List<Member>) {
+		val selectedIds = _selectedUsers.value.map { it.id }
+		val mMembers = members.filter { member -> !selectedIds.contains(member.id) }
+		viewModelScope.launch { _users.emit(mMembers.distinct()) }
 	}
 }

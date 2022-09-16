@@ -122,7 +122,10 @@ fun HomeScreen(
 				)
 			}
 			if (currentScreen == DirectChannelDestination) {
-				IconButton(onClick = { navigateToRootDestination(CreateDirectChannelDestination) }) {
+				IconButton(
+					modifier = Modifier.size(28.dp),
+					onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
+				) {
 					Image(
 						painter = painterResource(R.drawable.ic_add_circle),
 						contentDescription = stringResource(R.string.create_direct_message)

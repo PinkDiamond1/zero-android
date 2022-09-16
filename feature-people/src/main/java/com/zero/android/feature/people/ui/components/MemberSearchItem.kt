@@ -11,10 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.models.Member
+import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.SmallCircularImage
+import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
@@ -38,3 +41,7 @@ fun MemberSearchItem(member: Member, onClick: (Member) -> Unit) {
 		)
 	}
 }
+
+@Preview
+@Composable
+fun MemberSearchItemPreview() = Preview { MemberSearchItem(member = FakeModel.Member()) {} }

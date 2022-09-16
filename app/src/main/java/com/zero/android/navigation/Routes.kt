@@ -47,19 +47,15 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 			CreateDirectChannelRoute(
 				onChannelCreated = {
 					controller.navigateUp()
-					controller.navigate(MessagesDestination.route(it.id, false)) {
-						popUpTo(controller.graph.startDestinationId)
-					}
+					controller.navigate(MessagesDestination.route(it.id, false))
 				},
-				onBack = { controller.navigateUp() }
+				onBackClick = { controller.navigateUp() }
 			)
 		}
 
 		homeGraph(
 			navController = controller,
-			onNavigateToRootDestination = {
-				controller.navigate(it) { popUpTo(controller.graph.startDestinationId) }
-			},
+			onNavigateToRootDestination = { controller.navigate(it) },
 			onLogout = { controller.navigate(AppGraph.AUTH) { asRoot() } }
 		)
 	}

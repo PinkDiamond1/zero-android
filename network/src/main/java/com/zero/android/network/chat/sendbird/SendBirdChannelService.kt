@@ -166,22 +166,12 @@ internal class SendBirdChannelService(private val logger: Logger) :
 	}
 
 	override suspend fun createDirectChannel(members: List<Member>) = suspendCancellableCoroutine {
-		val params =
-			DirectChannel(
-				id = "",
-				name = "",
-				members = members,
-				memberCount = members.size,
-				createdAt = System.currentTimeMillis()
-			)
-				.toParams()
-
-		GroupChannel.createChannel(params) { groupChannel, e ->
+		GroupChannel.createChannelWithUserIds(members.map { it.id }, true) { directChannel, e ->
 			if (e != null) {
 				logger.e("Failed to create channel", e)
 				it.resumeWithException(e)
 			} else {
-				it.resume(groupChannel.toDirectApi())
+				it.resume(directChannel.toDirectApi())
 			}
 		}
 	}

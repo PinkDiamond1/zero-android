@@ -40,7 +40,7 @@ constructor(
 	private val channelDao: ChannelDao,
 	private val channelService: ChannelService,
 	private val logger: Logger,
-	private val preferences: Preferences
+	preferences: Preferences
 ) : ChannelRepository {
 
 	private val userId = runBlocking { preferences.userId() }
