@@ -9,6 +9,7 @@ import com.zero.android.common.system.Logger
 import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.DirectChannel
+import com.zero.android.models.Member
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.chat.conversion.encodeToNetworkId
@@ -137,37 +138,43 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		}
 	}
 
-	override suspend fun createChannel(networkId: String, channel: Channel): ApiChannel =
-		suspendCancellableCoroutine {
-			if (channel.isGroupChannel()) {
-				val params =
-					when (channel) {
-						is DirectChannel -> channel.toParams()
-						is com.zero.android.models.GroupChannel -> channel.toParams()
-						else -> throw IllegalStateException()
-					}
+	override suspend fun createGroupChannel(
+		networkId: String,
+		channel: com.zero.android.models.GroupChannel
+	) = suspendCancellableCoroutine {
+		if (channel.isGroupChannel()) {
+			val params = channel.toParams()
 
-				GroupChannel.createChannel(params) { groupChannel, e ->
-					if (e != null) {
-						logger.e("Failed to create channel", e)
-						it.resumeWithException(e)
-					} else {
-						it.resume(groupChannel.toApi())
-					}
+			GroupChannel.createChannel(params) { groupChannel, e ->
+				if (e != null) {
+					logger.e("Failed to create channel", e)
+					it.resumeWithException(e)
+				} else {
+					it.resume(groupChannel.toGroupApi())
 				}
-			} else if (channel.isOpenChannel()) {
-				OpenChannel.createChannel(
-					(channel as com.zero.android.models.GroupChannel).toOpenParams()
-				) { openChannel, e ->
-					if (e != null) {
-						logger.e("Failed to create channel", e)
-						it.resumeWithException(e)
-					} else {
-						it.resume(openChannel.toApi())
-					}
+			}
+		} else if (channel.isOpenChannel()) {
+			OpenChannel.createChannel(channel.toOpenParams()) { openChannel, e ->
+				if (e != null) {
+					logger.e("Failed to create channel", e)
+					it.resumeWithException(e)
+				} else {
+					it.resume(openChannel.toApi())
 				}
 			}
 		}
+	}
+
+	override suspend fun createDirectChannel(members: List<Member>) = suspendCancellableCoroutine {
+		GroupChannel.createChannelWithUserIds(members.map { it.id }, true) { directChannel, e ->
+			if (e != null) {
+				logger.e("Failed to create channel", e)
+				it.resumeWithException(e)
+			} else {
+				it.resume(directChannel.toDirectApi())
+			}
+		}
+	}
 
 	override suspend fun getChannel(url: String, type: ChannelType): ApiChannel =
 		suspendCancellableCoroutine {

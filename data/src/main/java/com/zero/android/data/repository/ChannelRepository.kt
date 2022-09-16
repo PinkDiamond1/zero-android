@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
+import com.zero.android.models.Member
 import com.zero.android.models.enums.AlertType
 import kotlinx.coroutines.flow.Flow
 
@@ -20,6 +21,10 @@ interface ChannelRepository {
 	suspend fun getGroupChannel(id: String): Flow<GroupChannel>
 
 	suspend fun getDirectChannel(id: String): Flow<DirectChannel>
+
+	suspend fun createGroupChannel(networkId: String, channel: GroupChannel): GroupChannel
+
+	suspend fun createDirectChannel(members: List<Member>): DirectChannel
 
 	suspend fun updateChannel(channel: Channel)
 

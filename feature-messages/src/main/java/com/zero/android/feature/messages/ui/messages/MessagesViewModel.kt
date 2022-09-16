@@ -8,6 +8,7 @@ import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.ChatRepository
+import com.zero.android.data.repository.MemberRepository
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.navigation.MessagesDestination
 import com.zero.android.feature.messages.util.MessageUtil
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ constructor(
 	savedStateHandle: SavedStateHandle,
 	private val preferences: Preferences,
 	private val chatRepository: ChatRepository,
+	private val memberRepository: MemberRepository,
 	private val channelRepository: ChannelRepository
 ) : BaseViewModel() {
 
@@ -74,7 +77,7 @@ constructor(
 	init {
 		viewModelScope.launch {
 			_textSearch.asStateFlow().debounce(1500).collectLatest { query ->
-				val members = chatRepository.getChatMembers(query)
+				val members = memberRepository.getMembers(query).first()
 				_chatMentionUsers.emit(members.distinct())
 			}
 		}

@@ -100,7 +100,7 @@ fun ChannelSearchItem(
 						if (channel.hasTelegramChannel) {
 							Spacer(modifier = Modifier.padding(8.dp))
 							Image(
-								painter = painterResource(R.drawable.ic_vector),
+								painter = painterResource(R.drawable.ic_chat_icon),
 								contentDescription = "",
 								modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 								contentScale = ContentScale.Fit

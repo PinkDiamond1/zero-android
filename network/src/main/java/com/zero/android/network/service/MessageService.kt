@@ -1,6 +1,5 @@
 package com.zero.android.network.service
 
-import com.zero.android.network.model.ApiChatMentionMember
 import com.zero.android.network.model.request.DeleteMessageRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -8,10 +7,8 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface MessageService {
 
@@ -29,9 +26,4 @@ interface MessageService {
 		@Path("id") id: String,
 		@Body body: DeleteMessageRequest
 	): Response<ResponseBody>
-
-	@GET("users/searchInNetworks")
-	suspend fun getMembers(
-		@Query("filter") memberFilter: String
-	): Response<List<ApiChatMentionMember>>
 }

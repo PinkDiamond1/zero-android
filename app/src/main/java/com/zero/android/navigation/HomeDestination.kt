@@ -21,7 +21,7 @@ internal fun NavGraphBuilder.homeGraph(
 	composable(HomeDestination, animation = FadeNavAnimation) {
 		HomeRoute(
 			navController = navController,
-			onNavigateToRootDestination = onNavigateToRootDestination,
+			navigateToRootDestination = onNavigateToRootDestination,
 			onLogout = onLogout
 		)
 	}

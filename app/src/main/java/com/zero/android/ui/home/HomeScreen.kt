@@ -1,7 +1,6 @@
 package com.zero.android.ui.home
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -10,9 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.zero.android.common.R
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
+import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
 import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.feature.channels.ui.components.ChannelNotificationSettingsView
 import com.zero.android.models.Network
@@ -53,7 +58,7 @@ fun HomeRoute(
 	navController: NavController,
 	viewModel: HomeViewModel = hiltViewModel(),
 	onLogout: () -> Unit,
-	onNavigateToRootDestination: (NavDestination) -> Unit
+	navigateToRootDestination: (NavDestination) -> Unit
 ) {
 	val currentScreen by viewModel.currentScreen.collectAsState()
 	val currentNetwork: Network? by viewModel.selectedNetwork.collectAsState()
@@ -71,16 +76,12 @@ fun HomeRoute(
 		},
 		onTriggerSearch = { viewModel.triggerSearch(it) },
 		onLogout = onLogout,
-		onNavigateToRootDestination = onNavigateToRootDestination
+		navigateToRootDestination = navigateToRootDestination
 	)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(
-	ExperimentalMaterial3Api::class,
-	ExperimentalMaterialApi::class,
-	ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
 	modifier: Modifier = Modifier,
@@ -92,7 +93,7 @@ fun HomeScreen(
 	onNetworkSelected: (Network) -> Unit,
 	onTriggerSearch: (Boolean) -> Unit,
 	onLogout: () -> Unit,
-	onNavigateToRootDestination: (NavDestination) -> Unit
+	navigateToRootDestination: (NavDestination) -> Unit
 ) {
 	val bottomNavController = rememberNavController()
 
@@ -119,6 +120,17 @@ fun HomeScreen(
 					painter = painterResource(R.drawable.img_profile_avatar),
 					contentDescription = stringResource(R.string.profile)
 				)
+			}
+			if (currentScreen == DirectChannelDestination) {
+				IconButton(
+					modifier = Modifier.size(28.dp),
+					onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
+				) {
+					Image(
+						painter = painterResource(R.drawable.ic_add_circle),
+						contentDescription = stringResource(R.string.create_direct_message)
+					)
+				}
 			}
       /*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
           DropdownMenuItem(
@@ -251,7 +263,7 @@ fun HomeScreen(
 						onNetworkSelected(it)
 						coroutineScope.launch { scaffoldState.drawerState.close() }
 					},
-					onNavigateToRootDestination = onNavigateToRootDestination,
+					onNavigateToRootDestination = navigateToRootDestination,
 					onSettingsClicked = {
 						viewModel.onNetworkSettingSelected(null)
 						coroutineScope.launch { bottomState.show() }

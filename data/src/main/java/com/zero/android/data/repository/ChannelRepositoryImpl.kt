@@ -9,6 +9,7 @@ import com.zero.android.common.extensions.channelFlowWithAwait
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.conversion.toModel
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.chat.DirectChannelsRemoteMediator
 import com.zero.android.data.repository.chat.GroupChannelsRemoteMediator
@@ -18,6 +19,7 @@ import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
+import com.zero.android.models.Member
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiDirectChannel
@@ -38,7 +40,7 @@ constructor(
 	private val channelDao: ChannelDao,
 	private val channelService: ChannelService,
 	private val logger: Logger,
-	private val preferences: Preferences
+	preferences: Preferences
 ) : ChannelRepository {
 
 	private val userId = runBlocking { preferences.userId() }
@@ -109,6 +111,14 @@ constructor(
 				channelDao.upsert(it.toEntity(userId))
 			}
 		}
+	}
+
+	override suspend fun createGroupChannel(networkId: String, channel: GroupChannel): GroupChannel {
+		return channelService.createGroupChannel(networkId, channel).toModel()
+	}
+
+	override suspend fun createDirectChannel(members: List<Member>): DirectChannel {
+		return channelService.createDirectChannel(members).toModel(userId)
 	}
 
 	override suspend fun updateChannel(channel: Channel) {
