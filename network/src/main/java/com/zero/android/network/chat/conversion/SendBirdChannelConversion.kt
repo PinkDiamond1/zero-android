@@ -110,7 +110,7 @@ internal fun GroupChannel.toGroupApi(): ApiGroupChannel {
 internal fun DirectChannel.toParams() =
 	GroupChannelParams().apply {
 		setName(members.map { it.name }.joinToString(","))
-		setChannelUrl(id)
+		if (id.isNotEmpty()) setChannelUrl(id)
 		setCoverUrl(coverUrl)
 		setData(null)
 		setCustomType(null)
@@ -127,7 +127,7 @@ internal fun DirectChannel.toParams() =
 internal fun com.zero.android.models.GroupChannel.toOpenParams() =
 	OpenChannelParams().apply {
 		setName(name)
-		setChannelUrl(id)
+		if (id.isNotEmpty()) setChannelUrl(id)
 		setCoverUrl(coverUrl)
 		setData(Json.encodeToString(toProperties()))
 		setCustomType(networkId.encodeToNetworkId())
@@ -136,7 +136,7 @@ internal fun com.zero.android.models.GroupChannel.toOpenParams() =
 internal fun com.zero.android.models.GroupChannel.toParams() =
 	GroupChannelParams().apply {
 		setName(name)
-		setChannelUrl(id)
+		if (id.isNotEmpty()) setChannelUrl(id)
 		setCoverUrl(coverUrl)
 		setData(Json.encodeToString(toProperties()))
 		setCustomType(networkId.encodeToNetworkId())

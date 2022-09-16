@@ -22,8 +22,9 @@ fun AppLayout(
 	controller: NavHostController = rememberAnimatedNavController()
 ) {
 	val dynamicThemePalette: Int by viewModel.dynamicThemePalette.collectAsState()
+
 	ZeroTheme(randomThemePalette = dynamicThemePalette) {
-		val isLoading: Boolean by viewModel.loading.collectAsState()
+		val isLoading by viewModel.loading.collectAsState()
 
 		LoadingContainer(loading = isLoading, modifier = modifier.fillMaxSize()) {
 			AppNavHost(

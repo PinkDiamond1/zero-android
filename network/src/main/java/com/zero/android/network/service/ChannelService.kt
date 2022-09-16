@@ -1,6 +1,8 @@
 package com.zero.android.network.service
 
 import com.zero.android.models.Channel
+import com.zero.android.models.GroupChannel
+import com.zero.android.models.Member
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiChannel
@@ -28,7 +30,9 @@ interface ChannelService {
 
 	suspend fun getChannel(url: String, type: ChannelType = ChannelType.GROUP): ApiChannel
 
-	suspend fun createChannel(networkId: String, channel: Channel): ApiChannel
+	suspend fun createGroupChannel(networkId: String, channel: GroupChannel): ApiGroupChannel
+
+	suspend fun createDirectChannel(members: List<Member>): ApiDirectChannel
 
 	suspend fun updateChannel(channel: Channel): ApiChannel
 

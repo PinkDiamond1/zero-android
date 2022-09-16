@@ -1,8 +1,17 @@
 package com.zero.android.data.di
 
-import com.zero.android.data.repository.*
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.AuthRepositoryImpl
+import com.zero.android.data.repository.ChannelRepository
+import com.zero.android.data.repository.ChannelRepositoryImpl
+import com.zero.android.data.repository.ChatRepository
+import com.zero.android.data.repository.ChatRepositoryImpl
+import com.zero.android.data.repository.MemberRepository
+import com.zero.android.data.repository.MemberRepositoryImpl
+import com.zero.android.data.repository.NetworkRepository
+import com.zero.android.data.repository.NetworkRepositoryImpl
+import com.zero.android.data.repository.UserRepository
+import com.zero.android.data.repository.UserRepositoryImpl
 import com.zero.android.data.repository.mediaplayer.MediaPlayerRepository
 import com.zero.android.data.repository.mediaplayer.MediaPlayerRepositoryImpl
 import dagger.Binds
@@ -17,6 +26,8 @@ interface RepositoryModule {
 	@Binds fun bindAuthRepository(authRepository: AuthRepositoryImpl): AuthRepository
 
 	@Binds fun bindUserRepository(userRepository: UserRepositoryImpl): UserRepository
+
+	@Binds fun bindMemberRepository(userRepository: MemberRepositoryImpl): MemberRepository
 
 	@Binds fun bindNetworkRepository(networkRepository: NetworkRepositoryImpl): NetworkRepository
 

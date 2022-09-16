@@ -26,6 +26,8 @@ object FakeModel {
 		status: ConnectionStatus = ConnectionStatus.OFFLINE
 	) = Member(id = id, name = name, status = status, isActive = true)
 
+	fun members() = listOf(Member("one"), Member("two"))
+
 	fun Message(
 		id: String = "id",
 		channelId: String = "id",

@@ -6,7 +6,17 @@ import com.zero.android.network.auth.AuthService
 import com.zero.android.network.auth.AuthServiceImpl
 import com.zero.android.network.chat.sendbird.SendBirdChannelService
 import com.zero.android.network.chat.sendbird.SendBirdChatService
-import com.zero.android.network.service.*
+import com.zero.android.network.service.AccessService
+import com.zero.android.network.service.AccountService
+import com.zero.android.network.service.ChannelCategoryService
+import com.zero.android.network.service.ChannelService
+import com.zero.android.network.service.ChatMediaService
+import com.zero.android.network.service.ChatService
+import com.zero.android.network.service.MemberService
+import com.zero.android.network.service.MessageService
+import com.zero.android.network.service.NetworkService
+import com.zero.android.network.service.ProfileService
+import com.zero.android.network.service.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +30,10 @@ object ServiceModule {
 	@Singleton
 	@Provides
 	fun provideUserService(retrofit: Retrofit) = retrofit.api.create(UserService::class.java)
+
+	@Singleton
+	@Provides
+	fun provideMemberService(retrofit: Retrofit) = retrofit.api.create(MemberService::class.java)
 
 	@Singleton
 	@Provides

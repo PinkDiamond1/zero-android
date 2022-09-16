@@ -45,7 +45,7 @@ fun ChatScreenAppBarTitle(channel: Channel, isGroupChannel: Boolean) {
 		if (isGroupChannel) {
 			if ((channel as GroupChannel).hasTelegramChannel) {
 				Image(
-					painter = painterResource(R.drawable.ic_vector),
+					painter = painterResource(R.drawable.ic_chat_icon),
 					contentDescription = "",
 					modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 					contentScale = ContentScale.Fit

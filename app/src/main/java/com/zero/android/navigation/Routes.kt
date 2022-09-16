@@ -11,8 +11,10 @@ import com.zero.android.feature.auth.navigation.ForgotPasswordDestination
 import com.zero.android.feature.auth.navigation.RegisterDestination
 import com.zero.android.feature.auth.navigation.authGraph
 import com.zero.android.feature.channels.navigation.ChannelsDestination
+import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
 import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.feature.channels.ui.channels.ChannelsRoute
+import com.zero.android.feature.channels.ui.createdirectchannel.CreateDirectChannelRoute
 import com.zero.android.feature.channels.ui.directchannels.DirectChannelsRoute
 import com.zero.android.feature.feed.FeedRoute
 import com.zero.android.feature.feed.navigation.FeedDestination
@@ -24,14 +26,15 @@ import com.zero.android.models.Network
 import com.zero.android.navigation.extensions.asRoot
 import com.zero.android.navigation.extensions.composable
 import com.zero.android.navigation.extensions.composableSimple
+import com.zero.android.navigation.extensions.navigate
 
 @ExperimentalAnimationApi
 internal fun NavGraphBuilder.appGraph(controller: NavController) {
 	navigation(startDestination = AuthDestination.route, route = AppGraph.AUTH) {
 		authGraph(
-			onLogin = { controller.navigate(HomeDestination.route) { asRoot() } },
-			onForgotPassword = { controller.navigate(ForgotPasswordDestination.route) },
-			onRegister = { controller.navigate(RegisterDestination.route) },
+			onLogin = { controller.navigate(HomeDestination) { asRoot() } },
+			onForgotPassword = { controller.navigate(ForgotPasswordDestination) },
+			onRegister = { controller.navigate(RegisterDestination) },
 			onBackPress = { controller.navigateUp() }
 		)
 	}
@@ -40,11 +43,22 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 		composable(MembersDestination) { MembersRoute() }
 		composable(FeedDestination) { FeedRoute() }
 		composable(NotificationsDestination) { NotificationsRoute() }
+		composable(CreateDirectChannelDestination) {
+			CreateDirectChannelRoute(
+				onChannelCreated = {
+					controller.navigateUp()
+					controller.navigate(MessagesDestination.route(it.id, false)) {
+						popUpTo(controller.graph.startDestinationId)
+					}
+				},
+				onBack = { controller.navigateUp() }
+			)
+		}
 
 		homeGraph(
 			navController = controller,
 			onNavigateToRootDestination = {
-				controller.navigate(it.route) { popUpTo(controller.graph.startDestinationId) }
+				controller.navigate(it) { popUpTo(controller.graph.startDestinationId) }
 			},
 			onLogout = { controller.navigate(AppGraph.AUTH) { asRoot() } }
 		)

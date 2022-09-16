@@ -13,11 +13,9 @@ import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DraftMessage
-import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.model.ApiMessage
-import com.zero.android.network.model.toMember
 import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
@@ -98,12 +96,5 @@ constructor(
 	override suspend fun deleteMessage(message: Message, channel: Channel) {
 		chatService.deleteMessage(channel, message)
 		messageDao.delete(message.id)
-	}
-
-	// TODO: Use MemberDao like in `ChannelRepositoryImpl.getDirectChannel()`
-	override suspend fun getChatMembers(filter: String): List<Member> {
-		val filterObject = JSONObject().apply { putOpt("filter", filter) }
-		val networkUsers = messageService.getMembers(filterObject.toString())
-		return networkUsers.body()?.map { it.toMember() } ?: emptyList()
 	}
 }

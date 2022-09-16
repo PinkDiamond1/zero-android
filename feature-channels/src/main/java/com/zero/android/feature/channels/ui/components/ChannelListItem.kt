@@ -84,7 +84,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 				if ((channel as GroupChannel).hasTelegramChannel) {
 					Spacer(modifier = Modifier.padding(4.dp))
 					Image(
-						painter = painterResource(R.drawable.ic_vector),
+						painter = painterResource(R.drawable.ic_chat_icon),
 						contentDescription = "",
 						modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 						contentScale = ContentScale.Fit,
