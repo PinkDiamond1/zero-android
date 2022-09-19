@@ -18,6 +18,7 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
 	companion object {
 		private val USER_ID = stringPreferencesKey("USER_ID")
+		private val USER_IMAGE = stringPreferencesKey("USER_IMAGE")
 		private val AUTH_CREDENTIALS = stringPreferencesKey("AUTH_CREDENTIALS")
 	}
 
@@ -38,7 +39,16 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
 	suspend fun userId() = dataStore.data.map { preferences -> preferences[USER_ID] }.first() ?: ""
 
+	suspend fun userImage() =
+		dataStore.data.map { preferences -> preferences[USER_IMAGE] }.first() ?: ""
+
 	suspend fun setUserId(id: String) {
 		dataStore.edit { preferences -> preferences[USER_ID] = id }
+	}
+
+	suspend fun setUserImage(profileImage: String?) {
+		profileImage?.let { imageUrl ->
+			dataStore.edit { preferences -> preferences[USER_IMAGE] = imageUrl }
+		}
 	}
 }

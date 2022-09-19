@@ -44,7 +44,7 @@ fun CustomTextFieldValue(
 	shape: Shape = RectangleShape
 ) {
 	BasicTextField(
-		modifier = modifier.fillMaxWidth().background(Color(0xFF191919), shape),
+		modifier = modifier.fillMaxWidth().background(AppTheme.colors.surfaceVariant, shape),
 		value = value,
 		onValueChange = onValueChange,
 		singleLine = singleLine,

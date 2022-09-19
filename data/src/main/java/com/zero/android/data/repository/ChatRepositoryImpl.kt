@@ -1,25 +1,26 @@
 package com.zero.android.data.repository
 
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
+import android.app.DownloadManager
+import android.content.Context
+import android.content.Context.DOWNLOAD_SERVICE
+import android.net.Uri
+import android.os.Environment
+import androidx.paging.*
+import com.zero.android.common.extensions.isValidUrl
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.toModel
-import com.zero.android.models.Channel
-import com.zero.android.models.DraftMessage
-import com.zero.android.models.Message
+import com.zero.android.models.*
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatMediaService
 import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
 import com.zero.android.network.util.NetworkMediaUtil
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class ChatRepositoryImpl
 @Inject
 constructor(
+	@ApplicationContext private val applicationContext: Context,
 	private val chatService: ChatService,
 	private val messageService: MessageService,
 	private val chatMediaService: ChatMediaService,
@@ -38,6 +40,7 @@ constructor(
 ) : ChatRepository {
 
 	override val messages = MutableStateFlow<PagingData<Message>>(PagingData.empty())
+	override val chatMedia = MutableStateFlow<List<ChatMedia>>(emptyList())
 
 	@OptIn(ExperimentalPagingApi::class)
 	override suspend fun getMessages(channel: Channel) {
@@ -96,5 +99,44 @@ constructor(
 	override suspend fun deleteMessage(message: Message, channel: Channel) {
 		chatService.deleteMessage(channel, message)
 		messageDao.delete(message.id)
+	}
+
+	override suspend fun getChatMedia(channelId: String) {
+		messageDao
+			.getMediaByChannel(channelId)
+			.map { data ->
+				data.map { message ->
+					ChatMedia(message.message.id, message.message.fileUrl, message.message.type)
+				}
+			}
+			.collect { chatMedia.emit(it) }
+	}
+
+	override suspend fun downloadMedia(media: ChatMedia) {
+		val mediaUrl = media.mediaUrl
+		val fileExtension = media.mediaUrl?.split('.')?.lastOrNull() ?: "jpg"
+		val fileName = mediaUrl?.split('/')?.lastOrNull() ?: "File_${System.nanoTime()}.$fileExtension"
+		if (!mediaUrl.isNullOrEmpty() && mediaUrl.isValidUrl) {
+			downloadChatMedia(fileName, mediaUrl)
+		}
+	}
+
+	private fun downloadChatMedia(
+		fileName: String,
+		mediaUrl: String,
+		downloadDirectory: String = Environment.DIRECTORY_DOWNLOADS
+	) {
+		val request =
+			DownloadManager.Request(Uri.parse(mediaUrl))
+				.setTitle(fileName)
+				.setDescription("Downloading...")
+				.setDestinationInExternalPublicDir(downloadDirectory, "/$fileName")
+				.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+				.setAllowedOverMetered(true)
+				.setAllowedNetworkTypes(
+					DownloadManager.Request.NETWORK_MOBILE or DownloadManager.Request.NETWORK_WIFI
+				)
+		val downloadManager = applicationContext.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+		downloadManager.enqueue(request)
 	}
 }

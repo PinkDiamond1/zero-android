@@ -1,18 +1,13 @@
 package com.zero.android.ui.sidebar
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -88,30 +83,30 @@ fun AppDrawerHeader(
 					.wrapContentSize()
 					.clickable(onClick = onSettingsClick)
 			)
-			OutlinedButton(
-				onClick = onInviteClick,
-				modifier =
-				Modifier.constrainAs(inviteButton) {
-					top.linkTo(textBottom.bottom, margin = 16.dp)
-					start.linkTo(parent.start)
-				},
-				border = BorderStroke(1.dp, AppTheme.colors.glow),
-				shape = RoundedCornerShape(24.dp)
-			) {
-				Text(
-					text = stringResource(R.string.invite_members),
-					style =
-					MaterialTheme.typography.displayLarge.copy(
-						shadow =
-						Shadow(
-							color = AppTheme.colors.glow,
-							offset = Offset(2f, 2f),
-							blurRadius = 50f
-						)
-					),
-					color = AppTheme.colors.colorTextPrimary
-				)
-			}
+      /*OutlinedButton(
+      	onClick = onInviteClick,
+      	modifier =
+      	Modifier.constrainAs(inviteButton) {
+      		top.linkTo(textBottom.bottom, margin = 16.dp)
+      		start.linkTo(parent.start)
+      	},
+      	border = BorderStroke(1.dp, AppTheme.colors.glow),
+      	shape = RoundedCornerShape(24.dp)
+      ) {
+      	Text(
+      		text = stringResource(R.string.invite_members),
+      		style =
+      		MaterialTheme.typography.displayLarge.copy(
+      			shadow =
+      			Shadow(
+      				color = AppTheme.colors.glow,
+      				offset = Offset(2f, 2f),
+      				blurRadius = 50f
+      			)
+      		),
+      		color = AppTheme.colors.colorTextPrimary
+      	)
+      }*/
 		}
 
 		Divider(color = AppTheme.colors.divider, modifier = modifier.fillMaxWidth(), thickness = 0.5.dp)

@@ -39,6 +39,6 @@ val LavenderIndigo = Color(0xFFB14EFF)
 // LIGHT Mode Colors
 val CadetBlue = Color(0xFFB8AFCB)
 val Rhythm = Color(0xFF796E97)
-val Argent = Color(0xFFBFBFBF)
+val Argent = Color(0xFFF0F0F0)
 val Platinum = Color(0xFFE7E7E7)
 val TaupeGray = Color(0xFF888888)

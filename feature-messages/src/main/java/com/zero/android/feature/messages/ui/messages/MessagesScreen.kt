@@ -8,15 +8,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,8 +18,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
@@ -33,12 +27,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.dhaval2404.imagepicker.ImagePicker
-import com.zero.android.common.R
 import com.zero.android.common.extensions.getActivity
+import com.zero.android.common.extensions.isVideoFile
 import com.zero.android.common.extensions.toFile
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
-import com.zero.android.feature.messages.ui.components.ChatScreenAppBarTitle
+import com.zero.android.feature.messages.ui.components.ChatAppBar
 import com.zero.android.feature.messages.ui.components.MentionUsersList
 import com.zero.android.feature.messages.ui.components.ReplyMessage
 import com.zero.android.feature.messages.ui.components.UserInputPanel
@@ -48,7 +42,10 @@ import com.zero.android.feature.messages.util.MessageUtil
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
-import com.zero.android.ui.components.*
+import com.zero.android.ui.components.BottomBarDivider
+import com.zero.android.ui.components.CustomisedAnimation
+import com.zero.android.ui.components.FadeExpandAnimation
+import com.zero.android.ui.components.FadeSlideAnimation
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -57,6 +54,7 @@ import java.io.File
 @Composable
 fun MessagesRoute(
 	onBackClick: () -> Unit,
+	onMediaClicked: (String, String) -> Unit,
 	viewModel: MessagesViewModel = hiltViewModel(),
 	recordMemoViewModel: MemoRecorderViewModel = hiltViewModel()
 ) {
@@ -97,7 +95,9 @@ fun MessagesRoute(
 						MessageUtil.newFileMessage(
 							file = file,
 							authorId = userChannelInfo.first,
-							type = MessageType.IMAGE
+							type =
+							if (fileUri.isVideoFile(context)) MessageType.VIDEO
+							else MessageType.IMAGE
 						)
 					val replyToMessage = MessageActionStateHandler.replyToMessage.value
 					if (replyToMessage != null) {
@@ -171,7 +171,8 @@ fun MessagesRoute(
 				)
 			viewModel.replyToMessage(messageId, replyMessage)
 		},
-		onTextChanged = { viewModel.onSearchTextChanged(it) }
+		onTextChanged = { viewModel.onSearchTextChanged(it) },
+		onMediaClicked = { messageId -> onMediaClicked(viewModel.channelId, messageId) }
 	)
 }
 
@@ -193,95 +194,36 @@ fun MessagesScreen(
 	onEditMessage: (Message) -> Unit,
 	onDeleteMessage: (Message) -> Unit,
 	onReplyToMessage: (String, String) -> Unit,
-	onTextChanged: (String) -> Unit
+	onTextChanged: (String) -> Unit,
+	onMediaClicked: (String) -> Unit
 ) {
 	val context = LocalContext.current
-	val actionMessage by MessageActionStateHandler.selectedMessage.collectAsState()
+	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
 	val editableMessage by MessageActionStateHandler.editableMessage.collectAsState()
 	val replyMessage by MessageActionStateHandler.replyToMessage.collectAsState()
 	val mentionUser by MessageActionStateHandler.mentionUser.collectAsState()
 
 	if (chatChannelUiState is Result.Success) {
-		val topBar: @Composable () -> Unit = {
-			AppBar(
-				navIcon = {
-					IconButton(
-						onClick = {
-							if (actionMessage != null) {
-								MessageActionStateHandler.closeActionMode()
-							} else {
-								MessageActionStateHandler.reset()
-								onBackClick()
-							}
-						}
-					) {
-						Icon(
-							imageVector = Icons.Filled.ArrowBack,
-							contentDescription = "cd_back",
-							tint = AppTheme.colors.glow
-						)
-					}
-				},
-				title = {
-					if (actionMessage == null) {
-						ChatScreenAppBarTitle(chatChannelUiState.data, userChannelInfo.second)
-					}
-				},
-				actions = {
-					if (actionMessage != null) {
-						if (actionMessage?.isReply == false) {
-							IconButton(onClick = { MessageActionStateHandler.replyToMessage() }) {
-								Icon(
-									painter = painterResource(R.drawable.ic_reply_24),
-									contentDescription = "cd_message_action_reply",
-									tint = AppTheme.colors.surface
-								)
-							}
-						}
-						if (actionMessage!!.author?.id == userChannelInfo.first) {
-							if (actionMessage!!.type == MessageType.TEXT) {
-								IconButton(onClick = { MessageActionStateHandler.editTextMessage() }) {
-									Icon(
-										imageVector = Icons.Filled.Edit,
-										contentDescription = "cd_message_action_edit",
-										tint = AppTheme.colors.surface
-									)
-								}
-							}
-							IconButton(
-								onClick = {
-									actionMessage?.let(onDeleteMessage)
-									MessageActionStateHandler.closeActionMode()
-								}
-							) {
-								Icon(
-									imageVector = Icons.Filled.Delete,
-									contentDescription = "cd_message_action_delete",
-									tint = AppTheme.colors.surface
-								)
-							}
-						}
-					} else {
-						IconButton(onClick = {}) {
-							Icon(
-								painter = painterResource(R.drawable.ic_search),
-								contentDescription = "cd_search_message"
-							)
-						}
-						IconButton(onClick = {}) {
-							Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "cd_more_options")
-						}
-					}
-				}
-			)
-		}
-		Scaffold(topBar = { topBar() }) { innerPaddings ->
-			Box(Modifier.padding(innerPaddings)) {
+		Scaffold(
+			modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+			topBar = {
+				ChatAppBar(
+					scrollBehavior = scrollBehavior,
+					channel = chatChannelUiState.data,
+					userChannelInfo = userChannelInfo,
+					onBackClick = onBackClick,
+					onDeleteMessage = onDeleteMessage
+				)
+			}
+		) { innerPaddings ->
+			Box(modifier = Modifier.padding(top = innerPaddings.calculateTopPadding())) {
 				CustomisedAnimation(visible = messagesUiState is Result.Success) {
 					MessagesContent(
 						modifier = Modifier.fillMaxWidth(),
 						userChannelInfo = userChannelInfo,
-						messages = messages
+						messages = messages,
+						onMediaClick = onMediaClicked
 					)
 				}
 				Column(Modifier.align(Alignment.BottomCenter)) {
@@ -316,10 +258,17 @@ fun MessagesScreen(
 								modifier = Modifier.align(Alignment.BottomCenter),
 								initialText = editableMessage?.message ?: "",
 								onMessageSent = {
-									if (editableMessage != null) {
-										editableMessage?.copy(message = it.trim())?.let(onEditMessage)
-										MessageActionStateHandler.closeActionMode()
-									} else onNewMessage(it.trim())
+									when {
+										editableMessage != null -> {
+											editableMessage?.copy(message = it.trim())?.let(onEditMessage)
+											MessageActionStateHandler.closeActionMode()
+										}
+										replyMessage != null -> {
+											onReplyToMessage(replyMessage!!.id, it.trim())
+											MessageActionStateHandler.closeActionMode()
+										}
+										else -> onNewMessage(it.trim())
+									}
 								},
 								addAttachment = {
 									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
@@ -345,6 +294,7 @@ private fun showImagePicker(
 ) {
 	ImagePicker.with(activity).apply {
 		if (fromCamera) cameraOnly() else galleryOnly()
+		galleryMimeTypes(arrayOf("image/png", "image/jpg", "image/jpeg", "video/mp4"))
 		createIntent { onImagePicker(it) }
 	}
 }

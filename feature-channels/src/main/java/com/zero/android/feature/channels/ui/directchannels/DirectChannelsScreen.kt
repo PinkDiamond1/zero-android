@@ -8,12 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -103,7 +100,8 @@ fun SearchResultCount(show: Boolean, itemCount: Int) {
 				.padding(vertical = 10.dp)
 				.background(MaterialTheme.colorScheme.primary),
 			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.labelMedium
+			style = MaterialTheme.typography.labelLarge,
+			color = Color.White
 		)
 	}
 }

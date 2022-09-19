@@ -5,6 +5,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
@@ -56,7 +57,8 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 				Icon(
 					modifier = Modifier.size(32.dp),
 					painter = painterResource(iconRes),
-					contentDescription = null
+					contentDescription = null,
+					tint = Color.White
 				)
 			}
 		}
@@ -68,7 +70,7 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 			valueRange = 0f..mediaDuration.div(1000).toFloat(),
 			colors =
 			SliderDefaults.colors(
-				thumbColor = AppTheme.colors.glow,
+				thumbColor = Color.White,
 				activeTrackColor = AppTheme.colors.colorTextPrimary
 			)
 		)

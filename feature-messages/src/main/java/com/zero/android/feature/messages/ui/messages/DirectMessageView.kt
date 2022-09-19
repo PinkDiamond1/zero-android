@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.common.extensions.format
@@ -26,6 +27,7 @@ import com.zero.android.feature.messages.ui.components.MessageContent
 import com.zero.android.feature.messages.ui.components.ReplyMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
+import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.theme.AppTheme
 
@@ -38,8 +40,10 @@ fun DirectMessage(
 	isFirstMessageByAuthor: Boolean,
 	isLastMessageByAuthor: Boolean,
 	chatAttachmentViewModel: ChatAttachmentViewModel,
-	onAuthorClick: (Member) -> Unit
+	onAuthorClick: (Member) -> Unit,
+	onMediaClick: (String) -> Unit
 ) {
+	val focusManager = LocalFocusManager.current
 	val currentSelectedMessage: Message? by MessageActionStateHandler.selectedMessage.collectAsState()
 	val modifier = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
 	Column(
@@ -47,15 +51,25 @@ fun DirectMessage(
 		modifier
 			.fillMaxWidth()
 			.combinedClickable(
-				onClick = {},
-				onLongClick = { MessageActionStateHandler.setSelectedMessage(msg) }
+				onClick = {
+					focusManager.clearFocus(true)
+					if (msg.type == MessageType.IMAGE || msg.type == MessageType.VIDEO) {
+						onMediaClick(msg.id)
+					}
+				},
+				onLongClick = {
+					focusManager.clearFocus(true)
+					MessageActionStateHandler.setSelectedMessage(msg)
+				}
 			)
 	) {
 		Row(
 			modifier =
 			if (currentSelectedMessage?.id == msg.id) {
-				Modifier.fillMaxWidth().background(Color.White.copy(0.1f))
-			} else Modifier.fillMaxWidth(),
+				Modifier.fillMaxWidth()
+					.background(AppTheme.colors.surface.copy(0.1f))
+					.padding(horizontal = 12.dp)
+			} else Modifier.fillMaxWidth().padding(horizontal = 12.dp),
 			horizontalArrangement = if (isUserMe) Arrangement.End else Arrangement.Start
 		) {
 			if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
@@ -100,7 +114,7 @@ fun DMAuthorAndTextMessage(
 		if (isUserMe) {
 			listOf(AppTheme.colors.glowVariant, AppTheme.colors.glow)
 		} else {
-			listOf(Color(0xFF191919), Color(0xFF0A0A0A))
+			listOf(AppTheme.colors.chatBubblePrimaryVariant, AppTheme.colors.chatBubblePrimary)
 		}
 	Column {
 		Row {
@@ -134,6 +148,7 @@ fun DMAuthorAndTextMessage(
 					}
 					MessageContent(
 						message = message,
+						isUserMe = isUserMe,
 						authorClicked = authorClicked,
 						chatAttachmentViewModel = chatAttachmentViewModel
 					)

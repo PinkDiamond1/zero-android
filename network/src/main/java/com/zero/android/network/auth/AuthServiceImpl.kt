@@ -81,6 +81,7 @@ class AuthServiceImpl @Inject constructor(private val logger: Logger) : AuthServ
 		WebAuthProvider.login(auth0)
 			.withConnection(AUTH0_CONNECTION_GOOGLE)
 			.withScheme(APPLICATION_ID)
+			.withAudience(lockAudience)
 			.start(
 				context,
 				object : Callback<Credentials, AuthenticationException> {
@@ -100,6 +101,7 @@ class AuthServiceImpl @Inject constructor(private val logger: Logger) : AuthServ
 		WebAuthProvider.login(auth0)
 			.withConnection(AUTH0_CONNECTION_APPLE)
 			.withScheme(APPLICATION_ID)
+			.withAudience(lockAudience)
 			.start(
 				context,
 				object : Callback<Credentials, AuthenticationException> {

@@ -7,7 +7,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,8 @@ fun SearchView(
 	onSearchCancelled: () -> Unit = {}
 ) {
 	var searchText: String by remember { mutableStateOf("") }
+	val focusRequester = remember { FocusRequester() }
+
 	Row(modifier = modifier.padding(8.dp).fillMaxWidth()) {
 		CustomTextField(
 			value = searchText,
@@ -31,16 +34,17 @@ fun SearchView(
 				onValueChanged(searchText)
 			},
 			placeholderText = placeHolder,
-			textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+			textStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
 			placeHolderTextStyle =
-			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
 			shape = RoundedCornerShape(24.dp),
-			modifier = Modifier.weight(1f),
+			modifier = Modifier.focusRequester(focusRequester).weight(1f),
 			leadingIcon = {
 				Icon(
 					painterResource(R.drawable.ic_search),
 					contentDescription = "",
-					tint = AppTheme.colors.surfaceVariant
+					tint = AppTheme.colors.surface
 				)
 			},
 			trailingIcon = {
@@ -53,7 +57,7 @@ fun SearchView(
 					Icon(
 						painter = painterResource(R.drawable.ic_cancel_24),
 						contentDescription = "",
-						tint = AppTheme.colors.surfaceVariant
+						tint = AppTheme.colors.surface
 					)
 				}
 			}
@@ -68,4 +72,6 @@ fun SearchView(
 			) { Text(stringResource(R.string.cancel), color = AppTheme.colors.colorTextPrimary) }
 		}
 	}
+
+	LaunchedEffect(Unit) { focusRequester.requestFocus() }
 }

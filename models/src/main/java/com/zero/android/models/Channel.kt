@@ -68,8 +68,8 @@ data class GroupChannel(
 ) : Channel {
 
 	val hasDiscordChannel: Boolean
-		get() = discordChatId != null
+		get() = !discordChatId.isNullOrEmpty()
 
 	val hasTelegramChannel: Boolean
-		get() = telegramChatId != null
+		get() = !telegramChatId.isNullOrEmpty()
 }

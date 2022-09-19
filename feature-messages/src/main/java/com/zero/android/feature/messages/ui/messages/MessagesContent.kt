@@ -7,12 +7,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,26 +32,22 @@ import kotlinx.coroutines.launch
 fun MessagesContent(
 	modifier: Modifier = Modifier,
 	userChannelInfo: Pair<String, Boolean>,
-	messages: LazyPagingItems<Message>
+	messages: LazyPagingItems<Message>,
+	onMediaClick: (String) -> Unit
 ) {
 	val scrollState = rememberLazyListState()
-	val appbarState = rememberTopAppBarState()
-	val scrollBehavior = remember { TopAppBarDefaults.pinnedScrollBehavior(appbarState) }
 	val scope = rememberCoroutineScope()
 
 	Surface(modifier = modifier) {
 		Box(modifier = Modifier.fillMaxSize()) {
-			Column(
-				Modifier.fillMaxSize()
-					.background(AppTheme.colors.surfaceInverse)
-					.nestedScroll(scrollBehavior.nestedScrollConnection)
-			) {
+			Column(Modifier.fillMaxSize().background(AppTheme.colors.surfaceInverse)) {
 				Messages(
 					modifier = Modifier.weight(1f),
 					userChannelInfo = userChannelInfo,
 					messages = messages,
 					scrollState = scrollState,
-					coroutineScope = scope
+					coroutineScope = scope,
+					onMediaClick = onMediaClick
 				)
 			}
 		}
@@ -68,17 +61,13 @@ fun Messages(
 	messages: LazyPagingItems<Message>,
 	scrollState: LazyListState,
 	coroutineScope: CoroutineScope,
-	chatAttachmentViewModel: ChatAttachmentViewModel = hiltViewModel()
+	chatAttachmentViewModel: ChatAttachmentViewModel = hiltViewModel(),
+	onMediaClick: (String) -> Unit
 ) {
 	DisposableEffect(Unit) { onDispose { chatAttachmentViewModel.dispose() } }
-	Box(modifier = modifier.padding(14.dp)) {
+	Box {
 		chatAttachmentViewModel.configure(messages)
-		LazyColumn(
-			modifier = Modifier.fillMaxSize(),
-			reverseLayout = true,
-			state = scrollState,
-			contentPadding = WindowInsets.statusBars.add(WindowInsets(top = 90.dp)).asPaddingValues()
-		) {
+		LazyColumn(modifier = Modifier.fillMaxSize(), reverseLayout = true, state = scrollState) {
 			item { Spacer(modifier = Modifier.size(100.dp)) }
 			items(messages) { content ->
 				content ?: return@items
@@ -120,7 +109,8 @@ fun Messages(
 					isFirstMessageByAuthor = isFirstMessageByAuthor,
 					isLastMessageByAuthor = isLastMessageByAuthor,
 					chatAttachmentViewModel = chatAttachmentViewModel,
-					onAuthorClick = {}
+					onAuthorClick = {},
+					onMediaClick = onMediaClick
 				)
 
 				if (!isSameDay) {

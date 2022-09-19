@@ -1,20 +1,14 @@
 package com.zero.android.ui.appbar
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.rememberAsyncImagePainter
 import com.zero.android.common.R.drawable
 import com.zero.android.models.Network
+import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.customTextStyle
@@ -38,9 +32,9 @@ fun AppTopBar(
 		navigationIcon = {
 			IconButton(onClick = openDrawer) {
 				if (!network?.logo.isNullOrEmpty()) {
-					Icon(
-						painter = rememberAsyncImagePainter(network?.logo),
-						contentDescription = network?.name
+					SmallCircularImage(
+						imageUrl = network?.logo,
+						placeHolder = drawable.ic_circular_image_placeholder
 					)
 				} else {
 					Icon(

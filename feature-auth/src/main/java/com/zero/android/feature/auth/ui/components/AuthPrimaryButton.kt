@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.zero.android.common.R
-import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun AuthButton(text: String, onClick: () -> Unit = {}) {
@@ -36,7 +36,7 @@ fun AuthButton(text: String, onClick: () -> Unit = {}) {
 					blurRadius = 50f
 				)
 			),
-			color = AppTheme.colors.colorTextPrimary
+			color = Color.White
 		)
 	}
 }

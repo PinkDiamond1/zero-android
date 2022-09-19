@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -140,6 +141,7 @@ fun LoginScreen(
 					AuthInputField(
 						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
 						placeHolder = { Text(stringResource(R.string.email_id)) },
+						focusedByDefault = true,
 						error = emailError.value,
 						onTextChanged = {
 							email = it
@@ -164,7 +166,7 @@ fun LoginScreen(
 					StrikeLabel(
 						text = stringResource(R.string.or_continue_with),
 						textStyle = MaterialTheme.typography.displayMedium,
-						strikeColors = listOf(AppTheme.colors.surfaceInverse, AppTheme.colors.glow),
+						strikeColors = listOf(Color.Black, AppTheme.colors.glow),
 						paddingHorizontal = 20.dp,
 						strikeSize = 1.dp
 					)
@@ -222,7 +224,7 @@ fun LoginScreen(
 					Text(
 						modifier = Modifier.clickable { onForgotPassword() },
 						text = stringResource(R.string.forgot_password),
-						color = AppTheme.colors.colorTextSecondary,
+						color = AppTheme.colors.colorTextSecondaryVariant,
 						textDecoration = TextDecoration.Underline,
 						style = MaterialTheme.typography.displayMedium
 					)

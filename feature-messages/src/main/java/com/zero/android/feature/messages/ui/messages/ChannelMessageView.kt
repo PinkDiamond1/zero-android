@@ -113,6 +113,7 @@ fun CMAuthorAndTextMessage(
 					AuthorNameTimestamp(isUserMe, message)
 					MessageContent(
 						message = message,
+						isUserMe = isUserMe,
 						authorClicked = authorClicked,
 						chatAttachmentViewModel = chatAttachmentViewModel
 					)

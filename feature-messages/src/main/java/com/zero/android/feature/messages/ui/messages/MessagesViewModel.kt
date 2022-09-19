@@ -2,6 +2,7 @@ package com.zero.android.feature.messages.ui.messages
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
@@ -19,16 +20,7 @@ import com.zero.android.models.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -45,7 +37,7 @@ constructor(
 	private val channelRepository: ChannelRepository
 ) : BaseViewModel() {
 
-	private val channelId: String = checkNotNull(savedStateHandle[MessagesDestination.ARG_CHANNEL_ID])
+	val channelId: String = checkNotNull(savedStateHandle[MessagesDestination.ARG_CHANNEL_ID])
 	val isGroupChannel: Boolean =
 		checkNotNull(savedStateHandle[MessagesDestination.ARG_IS_GROUP_CHANNEL])
 
@@ -53,7 +45,7 @@ constructor(
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 
-	val messages = chatRepository.messages
+	val messages = chatRepository.messages.cachedIn(viewModelScope)
 	private val _messagesResult = messages.asResult()
 
 	private val _textSearch = MutableStateFlow("")
