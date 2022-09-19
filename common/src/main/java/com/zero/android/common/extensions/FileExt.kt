@@ -1,8 +1,10 @@
 package com.zero.android.common.extensions
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.webkit.MimeTypeMap
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -39,5 +41,18 @@ fun URL.downloadFile(path: String, progress: ((Long, Long) -> Unit)) {
 				bytesRead = input.read(buffer)
 			}
 		}
+	}
+}
+
+fun Uri.isVideoFile(context: Context) = this.getMimeType(context).contains("video", true)
+
+fun Uri.getMimeType(context: Context, fallback: String = "image/*"): String {
+	return if (ContentResolver.SCHEME_CONTENT == this.scheme) {
+		context.contentResolver.getType(this) ?: fallback
+	} else {
+		MimeTypeMap.getFileExtensionFromUrl(toString())?.run {
+			MimeTypeMap.getSingleton().getMimeTypeFromExtension(lowercase())
+		}
+			?: fallback
 	}
 }

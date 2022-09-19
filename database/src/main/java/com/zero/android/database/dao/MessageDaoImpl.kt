@@ -1,16 +1,9 @@
 package com.zero.android.database.dao
 
 import androidx.paging.PagingSource
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
-import com.zero.android.database.model.MemberEntity
-import com.zero.android.database.model.MessageEntity
-import com.zero.android.database.model.MessageMentionCrossRef
-import com.zero.android.database.model.MessageMeta
-import com.zero.android.database.model.MessageWithRefs
+import androidx.room.*
+import com.zero.android.database.model.*
+import com.zero.android.models.enums.MessageType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -23,6 +16,15 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	@Transaction
 	@Query("SELECT * FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC")
 	abstract fun getByChannel(channelId: String): PagingSource<Int, MessageWithRefs>
+
+	@Transaction
+	@Query(
+		"SELECT * FROM messages WHERE channelId = :channelId AND type IN (:mediaTypes) ORDER BY createdAt DESC"
+	)
+	abstract fun getChatMediaByChannel(
+		channelId: String,
+		mediaTypes: List<MessageType>
+	): Flow<List<MessageWithRefs>>
 
 	@Transaction
 	@Query(

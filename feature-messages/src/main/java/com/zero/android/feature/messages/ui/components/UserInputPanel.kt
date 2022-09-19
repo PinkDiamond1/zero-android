@@ -1,6 +1,7 @@
 package com.zero.android.feature.messages.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,7 +19,8 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -86,6 +89,7 @@ fun UserInputPanel(
 
 	// Used to decide if the keyboard should be shown
 	var textFieldFocusState by remember { mutableStateOf(false) }
+	var showSendButton by remember { mutableStateOf(false) }
 
 	Row(
 		modifier = modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
@@ -107,6 +111,7 @@ fun UserInputPanel(
 			onTextChanged = {
 				textState = it
 				onTextChanged(it.text)
+				showSendButton = it.text.isNotEmpty()
 			},
 			// Only show the keyboard if there's no input selector and text field has focus
 			keyboardShown = currentInputSelector == InputSelector.TEXT && textFieldFocusState,
@@ -117,34 +122,57 @@ fun UserInputPanel(
 					resetScroll()
 				}
 				textFieldFocusState = focused
+				if (!focused) {
+					keyboardController?.hide()
+				}
 			},
 			onMessageSent = {
 				if (it.isNotEmpty()) {
 					onMessageSent(it)
 					textState = TextFieldValue()
-					keyboardController?.hide()
+					showSendButton = false
 				}
 			}
 		)
-		Icon(
-			painter = painterResource(R.drawable.ic_camera),
-			contentDescription = "cd_add_attachment",
-			modifier =
-			Modifier.clickable {
-				currentInputSelector = InputSelector.IMAGE
-				addImage()
+		if (showSendButton) {
+			IconButton(
+				onClick = {
+					if (textState.text.isNotEmpty()) {
+						onMessageSent(textState.text)
+						textState = TextFieldValue()
+						showSendButton = false
+					}
+				},
+				modifier = Modifier.size(32.dp).align(CenterVertically)
+			) {
+				Image(
+					painter = painterResource(R.drawable.ic_send_24),
+					contentScale = ContentScale.Fit,
+					contentDescription = "cd_send",
+					colorFilter = ColorFilter.tint(AppTheme.colors.glow)
+				)
 			}
-		)
-		Spacer(modifier = Modifier.size(8.dp))
-		Icon(
-			painter = painterResource(R.drawable.ic_mic),
-			contentDescription = "cd_record_audio",
-			modifier =
-			Modifier.clickable {
-				currentInputSelector = InputSelector.VOICE_MEMO
-				recordMemo()
-			}
-		)
+		} else {
+			Icon(
+				painter = painterResource(R.drawable.ic_camera),
+				contentDescription = "cd_add_attachment",
+				modifier =
+				Modifier.clickable {
+					currentInputSelector = InputSelector.IMAGE
+					addImage()
+				}
+			)
+			Spacer(modifier = Modifier.size(8.dp))
+			Icon(
+				painter = painterResource(R.drawable.ic_mic),
+				contentDescription = "cd_record_audio",
+				modifier =
+				Modifier.clickable {
+					currentInputSelector = InputSelector.VOICE_MEMO
+					recordMemo()
+				}
+			)
+		}
 		Spacer(modifier = Modifier.size(8.dp))
 	}
 }
@@ -175,7 +203,6 @@ private fun UserInputText(
 	onTextFieldFocused: (Boolean) -> Unit
 ) {
 	Box(modifier = modifier.semantics { keyboardShownProperty = keyboardShown }) {
-		var lastFocusState by remember { mutableStateOf(false) }
 		CustomTextFieldValue(
 			value = textFieldValue,
 			onValueChange = {
@@ -183,16 +210,14 @@ private fun UserInputText(
 				MessageActionStateHandler.onMessageTextChanged(it.text)
 			},
 			placeholderText = stringResource(R.string.write_your_message),
-			textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+			textStyle =
+			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
 			placeHolderTextStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			modifier =
 			Modifier.fillMaxWidth().padding(10.dp).align(Alignment.CenterStart).onFocusChanged {
 					state ->
-				if (lastFocusState != state.isFocused) {
-					onTextFieldFocused(state.isFocused)
-				}
-				lastFocusState = state.isFocused
+				onTextFieldFocused(state.isFocused)
 			},
 			shape = RoundedCornerShape(24.dp),
 			keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Send),

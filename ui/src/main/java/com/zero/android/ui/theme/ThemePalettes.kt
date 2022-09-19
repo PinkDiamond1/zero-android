@@ -1,9 +1,11 @@
 package com.zero.android.ui.theme
 
+import androidx.compose.ui.graphics.Color
+
 private val DarkExtendedColorPalette =
 	ExtendedColor(
-		chatBubblePrimary = PersianIndigo,
-		chatBubblePrimaryVariant = RussianViolet,
+		chatBubblePrimary = Color(0xFF0A0A0A),
+		chatBubblePrimaryVariant = Color(0xFF191919),
 		chatBubbleSecondary = CetaceanBlue,
 		header = Platinum,
 		headerVariant = RaisinBlack,
@@ -17,43 +19,43 @@ private val DarkExtendedColorPalette =
 		glowVariant = Indigo,
 		divider = Gray,
 		surface = White,
-		surfaceVariant = Gray,
+		surfaceVariant = RaisinBlack,
 		surfaceInverse = Black
 	)
 
 private val LightExtendedColorPalette =
 	ExtendedColor(
-		chatBubblePrimary = CadetBlue,
-		chatBubblePrimaryVariant = Rhythm,
+		chatBubblePrimary = Color(0xFFF0F0F0),
+		chatBubblePrimaryVariant = Color(0xFFF0F0F0),
 		chatBubbleSecondary = CetaceanBlue,
 		header = ChineseBlack,
 		headerVariant = RaisinBlack,
 		buttonPrimary = RaisinBlack75,
 		buttonSecondary = Gray,
-		colorTextPrimary = RaisinBlack75,
-		colorTextSecondary = PhilippineSilver,
+		colorTextPrimary = Black,
+		colorTextSecondary = Gray,
 		colorTextSecondaryVariant = Gray,
 		success = EmeraldGreen,
 		glow = LavenderIndigo,
-		glowVariant = Indigo,
+		glowVariant = LavenderIndigo,
 		divider = Gray,
 		surface = Black,
-		surfaceVariant = Gray,
+		surfaceVariant = Color(0xFFF0F0F0),
 		surfaceInverse = White
 	)
 
 // LIGHT THEME PALETTES
 private val NeonCyanThemePaletteLight =
-	LightExtendedColorPalette.copy(glow = Crayola, glowVariant = DeepGreen)
+	LightExtendedColorPalette.copy(glow = Crayola, glowVariant = Crayola)
 
 private val NeonPinkThemePaletteLight =
-	LightExtendedColorPalette.copy(glow = Fuchsia, glowVariant = RoseViolet)
+	LightExtendedColorPalette.copy(glow = Fuchsia, glowVariant = Fuchsia)
 
 private val NeonRedThemePaletteLight =
-	LightExtendedColorPalette.copy(glow = DeepCarminePink, glowVariant = BloodRed)
+	LightExtendedColorPalette.copy(glow = DeepCarminePink, glowVariant = DeepCarminePink)
 
 private val NeonBlueThemePaletteLight =
-	LightExtendedColorPalette.copy(glow = VividSkyBlue, glowVariant = RichBlack)
+	LightExtendedColorPalette.copy(glow = VividSkyBlue, glowVariant = VividSkyBlue)
 
 // DARK THEME PALETTES
 private val NeonCyanThemePaletteDark =

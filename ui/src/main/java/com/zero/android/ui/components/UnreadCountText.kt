@@ -8,14 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
 fun UnreadCountText(modifier: Modifier = Modifier, text: String) {
 	Text(
-		color = Color.Black,
+		color = AppTheme.colors.surfaceInverse,
 		text = text,
 		modifier =
 		modifier

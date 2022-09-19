@@ -7,6 +7,7 @@ import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.common.usecases.ThemePaletteUseCase
+import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.NetworkRepository
@@ -24,12 +25,15 @@ import javax.inject.Inject
 class HomeViewModel
 @Inject
 constructor(
+	private val preferences: Preferences,
 	private val networkRepository: NetworkRepository,
 	private val authManager: AuthManager,
 	private val authRepository: AuthRepository,
 	private val searchTriggerUseCase: SearchTriggerUseCase,
 	private val themePaletteUseCase: ThemePaletteUseCase
 ) : BaseViewModel() {
+
+	val loggedInUserImage = runBlocking(Dispatchers.IO) { preferences.userImage() }
 
 	val currentScreen = MutableStateFlow<NavDestination>(ChannelsDestination)
 

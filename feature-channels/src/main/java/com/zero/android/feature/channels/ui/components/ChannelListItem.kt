@@ -38,9 +38,10 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 
 	ConstraintLayout(
 		modifier =
-		Modifier.fillMaxWidth().wrapContentHeight().padding(12.dp).clickable {
-			onClick(channel)
-		}
+		Modifier.fillMaxWidth()
+			.wrapContentHeight()
+			.clickable { onClick(channel) }
+			.padding(12.dp)
 	) {
 		val (image, textTop, textBottom, dateTime, unreadCount) = createRefs()
 

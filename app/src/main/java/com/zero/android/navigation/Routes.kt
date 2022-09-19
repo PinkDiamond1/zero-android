@@ -16,6 +16,7 @@ import com.zero.android.feature.channels.ui.channels.ChannelsRoute
 import com.zero.android.feature.channels.ui.directchannels.DirectChannelsRoute
 import com.zero.android.feature.feed.FeedRoute
 import com.zero.android.feature.feed.navigation.FeedDestination
+import com.zero.android.feature.messages.navigation.ChatMediaViewerDestination
 import com.zero.android.feature.messages.navigation.MessagesDestination
 import com.zero.android.feature.messages.navigation.chatGraph
 import com.zero.android.feature.people.MembersRoute
@@ -36,7 +37,12 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 		)
 	}
 	navigation(startDestination = HomeDestination.route, route = AppGraph.MAIN) {
-		chatGraph(onBackClick = { controller.navigateUp() })
+		chatGraph(
+			onBackClick = { controller.navigateUp() },
+			onMediaClicked = { channel, message ->
+				controller.navigate(ChatMediaViewerDestination.route(channel, message))
+			}
+		)
 		composable(MembersDestination) { MembersRoute() }
 		composable(FeedDestination) { FeedRoute() }
 		composable(NotificationsDestination) { NotificationsRoute() }

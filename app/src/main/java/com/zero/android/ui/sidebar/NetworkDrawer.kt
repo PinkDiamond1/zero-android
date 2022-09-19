@@ -94,14 +94,14 @@ fun NetworkDrawerContent(
 				}
 			}
 
-			AppDrawerFooter(
-				modifier =
-				modifier.constrainAs(footer) {
-					bottom.linkTo(parent.bottom)
-					start.linkTo(parent.start)
-				},
-				onCreateWorldClick = { coroutineScope.launch { drawerState.close() } }
-			)
+      /*AppDrawerFooter(
+      	modifier =
+      	modifier.constrainAs(footer) {
+      		bottom.linkTo(parent.bottom)
+      		start.linkTo(parent.start)
+      	},
+      	onCreateWorldClick = { coroutineScope.launch { drawerState.close() } }
+      )*/
 		}
 	}
 }

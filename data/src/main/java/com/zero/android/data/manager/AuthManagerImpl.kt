@@ -28,6 +28,7 @@ constructor(
 			val user = userRepository.getUser().last()
 
 			preferences.setUserId(user.id)
+			preferences.setUserImage(user.profile.profileImage)
 			authRepository.refreshChatAccessToken(credentials.accessToken)
 
 			onLogin(credentials)

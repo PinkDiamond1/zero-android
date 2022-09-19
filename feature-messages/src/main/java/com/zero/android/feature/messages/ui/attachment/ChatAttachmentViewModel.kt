@@ -15,6 +15,8 @@ class ChatAttachmentViewModel
 @Inject
 constructor(private val mediaPlayerRepository: MediaPlayerRepository) : BaseViewModel() {
 
+	val currentPosition
+		get() = mediaPlayerRepository.mediaPlayer.currentPosition
 	private val voiceMemoMediaSources = mutableMapOf<String, ChatAttachmentProvider>()
 	private var lastMediaId: String? = null
 

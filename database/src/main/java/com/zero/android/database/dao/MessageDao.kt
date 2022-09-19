@@ -2,6 +2,7 @@ package com.zero.android.database.dao
 
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
+import com.zero.android.models.enums.MessageType
 import javax.inject.Inject
 
 class MessageDao
@@ -39,4 +40,10 @@ constructor(
 	suspend fun delete(message: MessageEntity) = messageDao.delete(message)
 
 	suspend fun deleteByChannel(channelId: String) = messageDao.deleteByChannel(channelId)
+
+	suspend fun getMediaByChannel(channelId: String) =
+		messageDao.getChatMediaByChannel(
+			channelId,
+			mediaTypes = listOf(MessageType.IMAGE, MessageType.VIDEO)
+		)
 }

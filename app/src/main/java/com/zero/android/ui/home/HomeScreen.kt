@@ -4,11 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -24,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +39,7 @@ import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.components.Background
+import com.zero.android.ui.components.ExtraSmallCircularImage
 import com.zero.android.ui.components.dialog.DialogListItem
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
@@ -108,19 +106,26 @@ fun HomeScreen(
 			IconButton(onClick = { onTriggerSearch(true) }, modifier = Modifier.size(32.dp)) {
 				Image(
 					painter = painterResource(R.drawable.ic_search),
-					contentDescription = stringResource(R.string.search_channels)
+					contentDescription = stringResource(R.string.search_channels),
+					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+				)
+			}
+			IconButton(onClick = {}) {
+				ExtraSmallCircularImage(
+					imageUrl = viewModel.loggedInUserImage,
+					placeHolder = R.drawable.img_profile_avatar
 				)
 			}
       /*IconButton(onClick = { showMenu = !showMenu }) {
           Icon(Icons.Default.MoreVert, contentDescription = "")
-      }*/
-			IconButton(onClick = {}) {
-				Image(
-					painter = painterResource(R.drawable.img_profile_avatar),
-					contentDescription = stringResource(R.string.profile)
-				)
-			}
-      /*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+      }
+            IconButton(onClick = {}) {
+                Image(
+                    painter = painterResource(R.drawable.img_profile_avatar),
+                    contentDescription = stringResource(R.string.profile)
+                )
+            }
+      DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
           DropdownMenuItem(
               text = { Text(text = stringResource(R.string.profile), style = MaterialTheme.typography.customTextStyle(
                            LocalTextStyle.current
@@ -154,10 +159,10 @@ fun HomeScreen(
           )
       }*/
 		} else {
-			IconButton(onClick = {}, modifier = Modifier.size(32.dp)) {
-				Image(
-					painter = painterResource(R.drawable.img_profile_avatar),
-					contentDescription = stringResource(R.string.profile)
+			IconButton(onClick = {}) {
+				ExtraSmallCircularImage(
+					imageUrl = viewModel.loggedInUserImage,
+					placeHolder = R.drawable.img_profile_avatar
 				)
 			}
 			Spacer(modifier = Modifier.padding(4.dp))

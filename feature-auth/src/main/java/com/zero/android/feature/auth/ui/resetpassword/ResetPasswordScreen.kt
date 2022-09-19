@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -91,7 +92,7 @@ fun ResetPasswordScreen(
 						text = stringResource(R.string.reset_password),
 						style = MaterialTheme.typography.bodyLarge,
 						fontWeight = FontWeight.SemiBold,
-						color = AppTheme.colors.colorTextPrimary,
+						color = Color.White,
 						textAlign = TextAlign.Center
 					)
 				}
@@ -103,7 +104,7 @@ fun ResetPasswordScreen(
 						modifier = Modifier.padding(horizontal = 32.dp),
 						text = stringResource(R.string.reset_password_success),
 						style = MaterialTheme.typography.bodyLarge,
-						color = AppTheme.colors.colorTextPrimary,
+						color = Color.White,
 						textAlign = TextAlign.Center
 					)
 					Spacer(modifier = Modifier.size(32.dp))
@@ -121,7 +122,7 @@ fun ResetPasswordScreen(
 									blurRadius = 50f
 								)
 							),
-						color = AppTheme.colors.colorTextPrimary,
+						color = Color.White,
 						textAlign = TextAlign.Center
 					)
 				} else {
@@ -129,13 +130,14 @@ fun ResetPasswordScreen(
 						modifier = Modifier.padding(horizontal = 32.dp),
 						text = stringResource(R.string.reset_password_description),
 						style = MaterialTheme.typography.bodyMedium,
-						color = AppTheme.colors.colorTextSecondary,
+						color = AppTheme.colors.colorTextSecondaryVariant,
 						textAlign = TextAlign.Center
 					)
 					Spacer(modifier = Modifier.size(24.dp))
 					AuthInputField(
 						modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
 						placeHolder = { Text(stringResource(R.string.email_id)) },
+						focusedByDefault = true,
 						error = emailError.value,
 						onTextChanged = {
 							email = it

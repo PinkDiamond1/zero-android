@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,8 +55,8 @@ fun JumpToBottom(enabled: Boolean, onClicked: () -> Unit, modifier: Modifier = M
 				)
 			},
 			onClick = onClicked,
-			containerColor = AppTheme.colors.surface,
-			contentColor = MaterialTheme.colorScheme.primary,
+			containerColor = AppTheme.colors.glow,
+			contentColor = Color.White,
 			modifier = modifier.offset(x = 0.dp, y = -bottomOffset).height(36.dp),
 			shape = RoundedCornerShape(24.dp)
 		)
