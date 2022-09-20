@@ -15,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-class AppSocketListenerImpl
+internal class AppSocketListenerImpl
 @Inject
 constructor(
 	private val preferences: Preferences,

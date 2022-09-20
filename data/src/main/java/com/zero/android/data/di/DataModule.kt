@@ -9,6 +9,12 @@ import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.data.manager.ConnectionManagerImpl
 import com.zero.android.data.manager.DataCleaner
 import com.zero.android.data.manager.DataCleanerImpl
+import com.zero.android.data.manager.ImageLoader
+import com.zero.android.data.manager.ImageLoaderImpl
+import com.zero.android.data.manager.MediaPlayerManager
+import com.zero.android.data.manager.MediaPlayerManagerImpl
+import com.zero.android.data.manager.ThemeManager
+import com.zero.android.data.manager.ThemeManagerImpl
 import com.zero.android.network.SocketListener
 import dagger.Binds
 import dagger.Module
@@ -17,7 +23,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface DataModule {
+internal interface DataModule {
 
 	@Binds fun bindConnectionManager(connectionManager: ConnectionManagerImpl): ConnectionManager
 
@@ -28,4 +34,10 @@ interface DataModule {
 	@Binds fun provideAppSocketListener(socket: AppSocketListenerImpl): SocketListener
 
 	@Binds fun provideAuthManager(preferences: AuthManagerImpl): AuthManager
+
+	@Binds fun provideImageLoader(imageLoader: ImageLoaderImpl): ImageLoader
+
+	@Binds fun bindMediaPlayerManager(mediaPlayerManager: MediaPlayerManagerImpl): MediaPlayerManager
+
+	@Binds fun bindThemeManager(themeManager: ThemeManagerImpl): ThemeManager
 }

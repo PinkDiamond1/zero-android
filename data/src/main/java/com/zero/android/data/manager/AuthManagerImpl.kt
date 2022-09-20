@@ -10,7 +10,7 @@ import com.zero.android.models.AuthCredentials
 import kotlinx.coroutines.flow.last
 import javax.inject.Inject
 
-class AuthManagerImpl
+internal class AuthManagerImpl
 @Inject
 constructor(
 	private val authRepository: AuthRepository,

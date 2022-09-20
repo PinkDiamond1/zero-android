@@ -1,4 +1,4 @@
-package com.zero.android.data.repository.mediaplayer
+package com.zero.android.data.manager
 
 import android.content.Context
 import android.media.AudioAttributes
@@ -13,9 +13,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MediaPlayerRepositoryImpl
+internal class MediaPlayerManagerImpl
 @Inject
-constructor(@ApplicationContext private val context: Context) : MediaPlayerRepository {
+constructor(@ApplicationContext private val context: Context) : MediaPlayerManager {
 	override val baseFilePath by lazy { "${context.externalCacheDir?.absolutePath ?: ""}/Memos" }
 
 	init {
@@ -27,7 +27,7 @@ constructor(@ApplicationContext private val context: Context) : MediaPlayerRepos
 	}
 
 	private var _recorder: MediaRecorder? = null
-	var recorderFilePath: String? = null
+	override var recorderFilePath: String? = null
 
 	override val mediaPlayer =
 		MediaPlayer().apply {

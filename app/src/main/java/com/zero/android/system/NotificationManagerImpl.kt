@@ -18,7 +18,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NotificationManagerImpl
+internal class NotificationManagerImpl
 @Inject
 constructor(@ApplicationContext private val context: Context) : NotificationManager {
 

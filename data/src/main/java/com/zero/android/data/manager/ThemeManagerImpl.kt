@@ -1,10 +1,10 @@
-package com.zero.android.common.usecases
+package com.zero.android.data.manager
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-class ThemePaletteUseCaseImpl @Inject constructor() : ThemePaletteUseCase {
+internal class ThemeManagerImpl @Inject constructor() : ThemeManager {
 
 	private var lastThemePalette: Int = 0
 	private val _dynamicThemePalette = MutableStateFlow(lastThemePalette)

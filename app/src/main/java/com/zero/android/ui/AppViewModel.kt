@@ -3,9 +3,9 @@ package com.zero.android.ui
 import com.zero.android.common.extensions.emitInScope
 import com.zero.android.common.extensions.withScope
 import com.zero.android.common.ui.base.BaseViewModel
-import com.zero.android.common.usecases.ThemePaletteUseCase
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
+import com.zero.android.data.manager.ThemeManager
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.models.AuthCredentials
 import com.zero.android.navigation.AppGraph
@@ -23,13 +23,13 @@ constructor(
 	private val preferences: AppPreferences,
 	private val authManager: AuthManager,
 	private val connectionManager: ConnectionManager,
-	themePaletteUseCase: ThemePaletteUseCase
+	themeManager: ThemeManager
 ) : BaseViewModel() {
 
 	val loading = MutableStateFlow(true)
 	lateinit var startDestination: String
 
-	val dynamicThemePalette: StateFlow<Int> = themePaletteUseCase.dynamicThemePalette
+	val dynamicThemePalette: StateFlow<Int> = themeManager.dynamicThemePalette
 
 	init {
 		checkAuthOnLaunch()

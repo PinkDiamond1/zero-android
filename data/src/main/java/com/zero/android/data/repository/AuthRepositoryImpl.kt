@@ -8,7 +8,7 @@ import com.zero.android.network.service.AccessService
 import java.io.File
 import javax.inject.Inject
 
-class AuthRepositoryImpl
+internal class AuthRepositoryImpl
 @Inject
 constructor(
 	private val preferences: Preferences,

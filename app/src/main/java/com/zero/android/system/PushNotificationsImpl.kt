@@ -10,7 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
 import javax.inject.Inject
 
-class PushNotificationsImpl
+internal class PushNotificationsImpl
 @Inject
 constructor(
 	@ApplicationContext private val context: Context,

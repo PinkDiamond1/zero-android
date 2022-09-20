@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import javax.inject.Inject
 
-class MemberRepositoryImpl
+internal class MemberRepositoryImpl
 @Inject
 constructor(
 	private val memberDao: MemberDao,

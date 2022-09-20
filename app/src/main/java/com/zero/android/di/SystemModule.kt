@@ -15,7 +15,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface SystemModule {
+internal interface SystemModule {
 
 	@Binds fun bindPermissionsManager(manager: PermissionsManagerImpl): PermissionsManager
 

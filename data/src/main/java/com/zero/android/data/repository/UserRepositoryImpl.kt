@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class UserRepositoryImpl
+internal class UserRepositoryImpl
 @Inject
 constructor(private val userDao: UserDao, private val userService: UserService) : UserRepository {
 

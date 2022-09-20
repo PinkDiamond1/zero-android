@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class NetworkRepositoryImpl
+internal class NetworkRepositoryImpl
 @Inject
 constructor(
 	private val networkDao: NetworkDao,

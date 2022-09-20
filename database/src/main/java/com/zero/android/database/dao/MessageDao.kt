@@ -42,8 +42,5 @@ constructor(
 	suspend fun deleteByChannel(channelId: String) = messageDao.deleteByChannel(channelId)
 
 	suspend fun getMediaByChannel(channelId: String) =
-		messageDao.getChatMediaByChannel(
-			channelId,
-			mediaTypes = listOf(MessageType.IMAGE, MessageType.VIDEO)
-		)
+		messageDao.getByChannel(channelId, types = listOf(MessageType.IMAGE, MessageType.VIDEO))
 }

@@ -3,7 +3,7 @@ package com.zero.android.feature.messages.ui.attachment
 import android.net.Uri
 import com.zero.android.common.extensions.downloadFile
 import com.zero.android.common.extensions.toUrl
-import com.zero.android.data.repository.mediaplayer.MediaPlayerRepository
+import com.zero.android.data.manager.MediaPlayerManager
 import com.zero.android.feature.messages.ui.components.VoiceMessageState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -17,11 +17,8 @@ import javax.inject.Inject
 
 data class ChatAttachmentProvider
 @Inject
-constructor(
-	private val fileName: String?,
-	private val mediaPlayerRepository: MediaPlayerRepository
-) {
-	private val filePath by lazy { "${mediaPlayerRepository.baseFilePath}/$fileName" }
+constructor(private val fileName: String?, private val mediaPlayerManager: MediaPlayerManager) {
+	private val filePath by lazy { "${mediaPlayerManager.baseFilePath}/$fileName" }
 	private val currentFile by lazy { File(filePath) }
 
 	private val ioJob = SupervisorJob()
@@ -45,7 +42,7 @@ constructor(
 	private fun prepareMediaPlayer() {
 		ioScope.launch {
 			currentFileState.emit(VoiceMessageState.STOPPED)
-			val fileDuration = mediaPlayerRepository.getFileDuration(currentFile)?.toInt() ?: 0
+			val fileDuration = mediaPlayerManager.getFileDuration(currentFile)?.toInt() ?: 0
 			mediaFileDuration.emit(fileDuration)
 		}
 	}
@@ -62,14 +59,14 @@ constructor(
 	}
 
 	fun play() {
-		if (mediaPlayerRepository.mediaPlayer.isPlaying) {
-			mediaPlayerRepository.mediaPlayer.stop()
+		if (mediaPlayerManager.mediaPlayer.isPlaying) {
+			mediaPlayerManager.mediaPlayer.stop()
 		}
 		ioScope.launch { currentFileState.emit(VoiceMessageState.PLAYING) }
-		mediaPlayerRepository.prepareMediaPlayer(Uri.fromFile(currentFile)) {
+		mediaPlayerManager.prepareMediaPlayer(Uri.fromFile(currentFile)) {
 			ioScope.launch { currentFileState.emit(VoiceMessageState.STOPPED) }
 		}
-		mediaPlayerRepository.mediaPlayer.start()
+		mediaPlayerManager.mediaPlayer.start()
 		updateCurrentProgress()
 	}
 
@@ -77,7 +74,7 @@ constructor(
 		if (currentFileState.value == VoiceMessageState.PLAYING ||
 			currentFileState.value == VoiceMessageState.STOPPED
 		) {
-			mediaPlayerRepository.mediaPlayer.apply {
+			mediaPlayerManager.mediaPlayer.apply {
 				pause()
 				seekTo(position.times(1000).toInt())
 				start()
@@ -90,7 +87,7 @@ constructor(
 			ioScope.launch {
 				while (currentFileState.value == VoiceMessageState.PLAYING) {
 					delay(100)
-					currentPosition.emit((mediaPlayerRepository.mediaPlayer.currentPosition / 1000).toFloat())
+					currentPosition.emit((mediaPlayerManager.mediaPlayer.currentPosition / 1000).toFloat())
 				}
 			}
 		}
@@ -101,7 +98,7 @@ constructor(
 			currentFileState.emit(VoiceMessageState.STOPPED)
 			currentPosition.emit(0f)
 		}
-		mediaPlayerRepository.mediaPlayer.stop()
+		mediaPlayerManager.mediaPlayer.stop()
 	}
 
 	fun reset() {

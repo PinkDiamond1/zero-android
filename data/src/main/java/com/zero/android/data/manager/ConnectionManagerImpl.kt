@@ -7,7 +7,7 @@ import com.zero.android.network.SocketProvider
 import com.zero.android.network.chat.ChatProvider
 import javax.inject.Inject
 
-class ConnectionManagerImpl
+internal class ConnectionManagerImpl
 @Inject
 constructor(
 	private val chatProvider: ChatProvider,

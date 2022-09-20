@@ -1,15 +1,17 @@
-package com.zero.android.data.repository.mediaplayer
+package com.zero.android.data.manager
 
 import android.media.MediaPlayer
 import android.net.Uri
 import java.io.File
 import java.io.IOException
 
-interface MediaPlayerRepository {
+interface MediaPlayerManager {
 
 	val baseFilePath: String
 
 	val mediaPlayer: MediaPlayer
+
+	var recorderFilePath: String?
 
 	@Throws(IOException::class)
 	fun startRecording()

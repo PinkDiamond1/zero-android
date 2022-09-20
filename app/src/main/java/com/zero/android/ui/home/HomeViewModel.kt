@@ -6,9 +6,9 @@ import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
-import com.zero.android.common.usecases.ThemePaletteUseCase
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.manager.AuthManager
+import com.zero.android.data.manager.ThemeManager
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.NetworkRepository
 import com.zero.android.feature.channels.navigation.ChannelsDestination
@@ -16,9 +16,14 @@ import com.zero.android.models.Network
 import com.zero.android.models.enums.AlertType
 import com.zero.android.navigation.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +35,7 @@ constructor(
 	private val authManager: AuthManager,
 	private val authRepository: AuthRepository,
 	private val searchTriggerUseCase: SearchTriggerUseCase,
-	private val themePaletteUseCase: ThemePaletteUseCase
+	private val themeManager: ThemeManager
 ) : BaseViewModel() {
 
 	val loggedInUserImage = runBlocking(Dispatchers.IO) { preferences.userImage() }
@@ -71,7 +76,7 @@ constructor(
 	}
 
 	fun switchTheme() {
-		viewModelScope.launch { themePaletteUseCase.changeThemePalette() }
+		viewModelScope.launch { themeManager.changeThemePalette() }
 	}
 
 	fun onNetworkSelected(network: Network) {
@@ -101,7 +106,7 @@ constructor(
 			withContext(Dispatchers.IO) {
 				awaitAll(async { authRepository.revokeToken() }, async { authManager.logout(context) })
 				withContext(Dispatchers.Main) { onLogout() }
-				themePaletteUseCase.changeThemePalette(default = true)
+				themeManager.changeThemePalette(default = true)
 			}
 		}
 	}

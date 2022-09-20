@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-class ChannelRepositoryImpl
+internal class ChannelRepositoryImpl
 @Inject
 constructor(
 	private val channelDao: ChannelDao,

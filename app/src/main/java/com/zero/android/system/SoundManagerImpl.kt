@@ -7,5 +7,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SoundManagerImpl @Inject constructor(@ApplicationContext private val context: Context) :
-	SoundManager
+internal class SoundManagerImpl
+@Inject
+constructor(@ApplicationContext private val context: Context) : SoundManager

@@ -5,15 +5,23 @@ import android.content.Context
 import android.content.Context.DOWNLOAD_SERVICE
 import android.net.Uri
 import android.os.Environment
-import androidx.paging.*
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.zero.android.common.extensions.isValidUrl
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.manager.ImageLoader
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.toModel
-import com.zero.android.models.*
+import com.zero.android.models.Channel
+import com.zero.android.models.ChatMedia
+import com.zero.android.models.DraftMessage
+import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatMediaService
@@ -27,7 +35,7 @@ import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
 
-class ChatRepositoryImpl
+internal class ChatRepositoryImpl
 @Inject
 constructor(
 	@ApplicationContext private val applicationContext: Context,
@@ -35,6 +43,7 @@ constructor(
 	private val messageService: MessageService,
 	private val chatMediaService: ChatMediaService,
 	private val networkMediaUtil: NetworkMediaUtil,
+	private val imageLoader: ImageLoader,
 	private val messageDao: MessageDao,
 	private val logger: Logger
 ) : ChatRepository {
@@ -56,39 +65,44 @@ constructor(
 			.collect { messages.emit(it) }
 	}
 
-	override suspend fun send(channel: Channel, message: DraftMessage) {
+	override suspend fun send(channel: Channel, draft: DraftMessage) {
 		val msg =
-			if (message.type == MessageType.TEXT) {
-				chatService.send(channel, message)
+			if (draft.type == MessageType.TEXT) {
+				chatService.send(channel, draft)
 			} else {
-				sendFileMessage(channel, message)
+				sendFileMessage(channel, draft)
 			}
-		messageDao.upsert(msg.toEntity())
+
+		if (msg.type == MessageType.IMAGE) msg.fileUrl?.let { imageLoader.preload(it) }
+
+		messageDao.upsert(
+			msg.toEntity().let { it.copy(message = it.message.copy(fileUrl = draft.file?.path)) }
+		)
 	}
 
-	private suspend fun sendFileMessage(channel: Channel, message: DraftMessage): ApiMessage {
+	private suspend fun sendFileMessage(channel: Channel, draft: DraftMessage): ApiMessage {
 		val uploadInfo = chatMediaService.getUploadInfo()
 		val fileMessage =
 			if (uploadInfo.apiUrl.isNotEmpty() && uploadInfo.query != null) {
 				val fileUpload =
 					chatMediaService.uploadMediaFile(
 						networkMediaUtil.getUploadUrl(uploadInfo),
-						networkMediaUtil.getUploadBody(message.file!!)
+						networkMediaUtil.getUploadBody(draft.file!!)
 					)
-				message.copy(
+				draft.copy(
 					fileUrl = fileUpload.secureUrl,
 					fileName = fileUpload.originalFilename,
-					data = JSONObject(fileUpload.getDataMap(message.type)).toString()
+					data = JSONObject(fileUpload.getDataMap(draft.type)).toString()
 				)
 			} else {
 				Timber.e("Upload Info is required for file upload")
-				message
+				draft
 			}
 		return chatService.send(channel, fileMessage)
 	}
 
-	override suspend fun reply(channel: Channel, id: String, message: DraftMessage) {
-		send(channel, message.apply { parentMessageId = id })
+	override suspend fun reply(channel: Channel, id: String, draft: DraftMessage) {
+		send(channel, draft.apply { parentMessageId = id })
 	}
 
 	override suspend fun updateMessage(id: String, channelId: String, text: String) {

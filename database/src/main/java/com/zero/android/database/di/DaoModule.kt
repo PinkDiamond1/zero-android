@@ -16,7 +16,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DaoModule {
+internal object DaoModule {
 
 	@Provides fun provideUserDao(database: AppDatabase): UserDao = database.userDao()
 
