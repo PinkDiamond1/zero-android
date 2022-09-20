@@ -2,6 +2,7 @@
 <resources>
 
     <style name="Theme.Zero" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
         <item name="android:statusBarColor">@color/translucent</item>
     </style>
 </resources>

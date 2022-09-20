@@ -1,15 +1,20 @@
 package com.zero.android.feature.messages.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.zero.android.common.util.SymbolAnnotationType
 import com.zero.android.common.util.messageFormatter
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
@@ -17,7 +22,6 @@ import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.White
 
 @Composable
 fun ColumnScope.MessageContent(
@@ -29,11 +33,19 @@ fun ColumnScope.MessageContent(
 	when (message.type) {
 		MessageType.IMAGE ->
 			message.fileUrl?.let {
-				AsyncImage(
-					model = it,
-					contentDescription = "",
-					modifier = Modifier.wrapContentWidth().defaultMinSize(160.dp)
-				)
+				Box(modifier = Modifier.clip(RoundedCornerShape(8.dp))) {
+					AsyncImage(
+						model =
+						ImageRequest.Builder(LocalContext.current)
+							.data(it)
+							.crossfade(true)
+							.crossfade(500)
+							.build(),
+						contentDescription = "",
+						modifier =
+						Modifier.wrapContentWidth().heightIn(max = 300.dp).align(Alignment.Center)
+					)
+				}
 			}
 		MessageType.VIDEO -> {
 			message.fileUrl?.let { VideoMessage(fileUrl = it) }
@@ -67,6 +79,7 @@ private fun ClickableMessage(message: Message, isUserMe: Boolean, authorClicked:
 		)
 	val textColor = if (isUserMe) Color.White else AppTheme.colors.colorTextPrimary
 	ClickableText(
+		modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 2.dp),
 		text = styledMessage,
 		style = MaterialTheme.typography.bodyLarge.copy(color = textColor),
 		onClick = {

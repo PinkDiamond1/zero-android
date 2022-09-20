@@ -6,9 +6,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun ExtraSmallCircularImage(
@@ -17,12 +19,11 @@ fun ExtraSmallCircularImage(
 	@DrawableRes placeHolder: Int,
 	contentDescription: String = ""
 ) {
-	AsyncImage(
-		model = imageUrl,
-		placeholder = painterResource(placeHolder),
-		error = painterResource(placeHolder),
-		contentDescription = contentDescription,
-		modifier = modifier.size(24.dp).clip(CircleShape)
+	NetworkImage(
+		modifier = modifier.size(24.dp),
+		imageUrl = imageUrl,
+		placeHolder = placeHolder,
+		contentDescription = contentDescription
 	)
 }
 
@@ -33,12 +34,11 @@ fun SmallCircularImage(
 	@DrawableRes placeHolder: Int,
 	contentDescription: String = ""
 ) {
-	AsyncImage(
-		model = imageUrl,
-		placeholder = painterResource(placeHolder),
-		error = painterResource(placeHolder),
-		contentDescription = contentDescription,
-		modifier = modifier.size(36.dp).clip(CircleShape)
+	NetworkImage(
+		modifier = modifier.size(36.dp),
+		imageUrl = imageUrl,
+		placeHolder = placeHolder,
+		contentDescription = contentDescription
 	)
 }
 
@@ -49,12 +49,11 @@ fun MediumCircularImage(
 	@DrawableRes placeHolder: Int,
 	contentDescription: String = ""
 ) {
-	AsyncImage(
-		model = imageUrl,
-		placeholder = painterResource(placeHolder),
-		error = painterResource(placeHolder),
-		contentDescription = contentDescription,
-		modifier = modifier.size(42.dp).clip(CircleShape)
+	NetworkImage(
+		modifier = modifier.size(42.dp),
+		imageUrl = imageUrl,
+		placeHolder = placeHolder,
+		contentDescription = contentDescription
 	)
 }
 
@@ -65,12 +64,11 @@ fun BigCircularImage(
 	@DrawableRes placeHolder: Int,
 	contentDescription: String = ""
 ) {
-	AsyncImage(
-		model = imageUrl,
-		placeholder = painterResource(placeHolder),
-		error = painterResource(placeHolder),
-		contentDescription = contentDescription,
-		modifier = modifier.size(54.dp).clip(CircleShape)
+	NetworkImage(
+		modifier = modifier.size(54.dp),
+		imageUrl = imageUrl,
+		placeHolder = placeHolder,
+		contentDescription = contentDescription
 	)
 }
 
@@ -81,12 +79,11 @@ fun LargeCircularImage(
 	@DrawableRes placeHolder: Int,
 	contentDescription: String = ""
 ) {
-	AsyncImage(
-		model = imageUrl,
-		placeholder = painterResource(placeHolder),
-		error = painterResource(placeHolder),
-		contentDescription = contentDescription,
-		modifier = modifier.size(64.dp).clip(CircleShape)
+	NetworkImage(
+		modifier = modifier.size(64.dp),
+		imageUrl = imageUrl,
+		placeHolder = placeHolder,
+		contentDescription = contentDescription
 	)
 }
 
@@ -97,8 +94,28 @@ fun CircularImage(
 	@DrawableRes placeHolder: Int,
 	contentDescription: String = ""
 ) {
+	NetworkImage(
+		modifier = modifier,
+		imageUrl = imageUrl,
+		placeHolder = placeHolder,
+		contentDescription = contentDescription
+	)
+}
+
+@Composable
+private fun NetworkImage(
+	modifier: Modifier = Modifier,
+	imageUrl: String? = null,
+	@DrawableRes placeHolder: Int,
+	contentDescription: String = ""
+) {
 	AsyncImage(
-		model = imageUrl,
+		model =
+		ImageRequest.Builder(LocalContext.current)
+			.data(imageUrl)
+			.crossfade(true)
+			.crossfade(500)
+			.build(),
 		placeholder = painterResource(placeHolder),
 		error = painterResource(placeHolder),
 		contentDescription = contentDescription,
