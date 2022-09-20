@@ -7,6 +7,9 @@ plugins {
 apply from: '../feature_module.gradle'
 
 dependencies {
+	// UI
+	implementation "com.github.imherrera:compose-video-player:${versions.videoPlayer}"
+
 	// Data
 	implementation "androidx.paging:paging-compose:${versions.pagingCompose}"
 }

@@ -13,5 +13,7 @@ dependencies {
 	implementation project(":models")
 
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
+
+	// UI
 	implementation "androidx.compose.material:material-icons-extended:${versions.compose}"
 }
