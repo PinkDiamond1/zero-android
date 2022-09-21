@@ -12,9 +12,9 @@ interface ChatService {
 
 	suspend fun getMessages(channel: Channel, before: String): Flow<List<ApiMessage>>
 
-	suspend fun send(channel: Channel, message: DraftMessage): ApiMessage
+	suspend fun send(channel: Channel, message: DraftMessage): Flow<ApiMessage>
 
-	suspend fun reply(channel: Channel, id: String, message: DraftMessage): ApiMessage
+	suspend fun reply(channel: Channel, id: String, message: DraftMessage): Flow<ApiMessage>
 
 	suspend fun deleteMessage(channel: Channel, message: Message)
 }

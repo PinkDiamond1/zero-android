@@ -34,8 +34,25 @@ class MessageDaoTest : BaseDatabaseTest() {
 		assertEquals(message.message.id, data?.message?.id)
 		assertEquals(message.parentMessage?.id, data?.parentMessage?.id)
 		assertEquals(message.parentMessageAuthor?.id, data?.parentMessageAuthor?.id)
-		assertEquals(message.author.id, data?.author?.id)
+		assertEquals(message.author?.id, data?.author?.id)
 		assertEquals(message.mentions?.size, data?.mentions?.size)
+	}
+
+	@Test
+	fun insertMessageAndDeleteByRequest() = runTest {
+		messageDao.upsert(FakeEntity.MessageWithRefs(id = "0", requestId = "r1"))
+
+		var data = messageDao.get("0").firstOrNull()
+		assertNotNull(data)
+		assertEquals("r1", data?.message?.requestId)
+
+		messageDao.upsert(FakeEntity.MessageWithRefs(id = "id", requestId = "r1"))
+		data = messageDao.get("0").firstOrNull()
+		assertNull(data)
+
+		data = messageDao.get("id").firstOrNull()
+		assertNotNull(data)
+		assertEquals("r1", data?.message?.requestId)
 	}
 
 	@Test
@@ -53,7 +70,7 @@ class MessageDaoTest : BaseDatabaseTest() {
 		messageDao.upsert(message)
 
 		try {
-			db.memberDao().delete(message.author)
+			message.author?.let { db.memberDao().delete(it) }
 			db.memberDao().delete(message.parentMessageAuthor!!)
 			db.memberDao().delete(message.mentions!![0])
 			messageDao.delete(message.parentMessage!!)
@@ -62,7 +79,7 @@ class MessageDaoTest : BaseDatabaseTest() {
 		val data = messageDao.get(message.message.id).first()
 		assertEquals(message.parentMessage?.id, data?.parentMessage?.id)
 		assertEquals(message.parentMessageAuthor?.id, data?.parentMessageAuthor?.id)
-		assertEquals(message.author.id, data?.author?.id)
+		assertEquals(message.author?.id, data?.author?.id)
 		assertEquals(message.mentions?.size, data?.mentions?.size)
 	}
 
@@ -72,7 +89,7 @@ class MessageDaoTest : BaseDatabaseTest() {
 		messageDao.delete(message.message)
 
 		assertNull(messageDao.get(message.message.id).firstOrNull())
-		assertNotNull(db.memberDao().get(message.author.id).first())
+		assertNotNull(db.memberDao().get(message.author!!.id).first())
 		assertNotNull(db.memberDao().get(message.parentMessageAuthor!!.id).firstOrNull())
 		assertNotNull(messageDao.get(message.parentMessage!!.id).firstOrNull())
 		assertNotNull(db.memberDao().get(message.mentions!![0].id).firstOrNull())

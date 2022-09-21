@@ -66,12 +66,14 @@ object FakeEntity {
 	fun MessageWithRefs(
 		id: String = "messageId",
 		channelId: String = "channelId",
-		authorId: String = "memberOne"
+		authorId: String = "memberOne",
+		requestId: String? = null
 	) =
 		MessageWithRefs(
 			message =
 			MessageEntity(
 				id = id,
+				requestId = requestId,
 				authorId = authorId,
 				parentMessageId = "parentMessageId",
 				parentMessageAuthorId = "memberThree",

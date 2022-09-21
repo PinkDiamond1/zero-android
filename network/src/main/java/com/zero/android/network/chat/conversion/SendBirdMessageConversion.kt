@@ -47,7 +47,8 @@ internal fun BaseMessage.toApi(
 		message = message,
 		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		fileUrl = (this as? FileMessage)?.url,
-		fileName = (this as? FileMessage)?.name
+		fileName = (this as? FileMessage)?.name,
+		requestId = requestId
 	)
 }
 
@@ -65,7 +66,8 @@ internal fun UserMessage.toApi(channelId: String = channelUrl) =
 		data = data,
 		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		isMuted = isSilent,
-		message = message
+		message = message,
+		requestId = requestId
 	)
 
 internal fun FileMessage.toApi(channelId: String = channelUrl) =
@@ -85,7 +87,8 @@ internal fun FileMessage.toApi(channelId: String = channelUrl) =
 		fileUrl = url,
 		fileName = name,
 		fileThumbnails = thumbnails.map { it.toApi() },
-		fileMimeType = messageParams?.mimeType
+		fileMimeType = messageParams?.mimeType,
+		requestId = requestId
 	)
 
 internal fun FileMessage.Thumbnail.toApi() =

@@ -43,6 +43,8 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	@Transaction
 	internal open suspend fun upsert(memberDao: MemberDao, vararg data: MessageWithRefs) {
 		for (item in data) {
+			item.message.requestId?.let { deleteByRequest(item.message.requestId) }
+
 			val members = mutableListOf<MemberEntity>()
 			item.author?.let { members.add(it) }
 			item.mentions?.let { members.addAll(it) }
@@ -70,4 +72,8 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	@Transaction
 	@Query("DELETE FROM messages WHERE channelId = :channelId")
 	abstract suspend fun deleteByChannel(channelId: String)
+
+	@Transaction
+	@Query("DELETE FROM messages WHERE requestId = :requestId")
+	protected abstract suspend fun deleteByRequest(requestId: String)
 }

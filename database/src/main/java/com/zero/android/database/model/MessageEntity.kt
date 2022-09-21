@@ -48,6 +48,7 @@ data class MessageEntity(
 	val authorId: String? = null,
 	val parentMessageId: String? = null,
 	val parentMessageAuthorId: String? = null,
+	val requestId: String? = null,
 	val channelId: String,
 	val type: MessageType,
 	val mentionType: MessageMentionType = MessageMentionType.UNKNOWN,

@@ -28,7 +28,8 @@ data class ApiMessage(
 	val fileName: String? = null,
 	val fileThumbnails: List<ApiFileThumbnail>? = null,
 	val fileMimeType: String? = null,
-	val reactions: List<ApiMessageReaction>? = null
+	val reactions: List<ApiMessageReaction>? = null,
+	val requestId: String? = null
 )
 
 @Serializable

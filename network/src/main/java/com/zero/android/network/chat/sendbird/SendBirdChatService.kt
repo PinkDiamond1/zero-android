@@ -12,7 +12,7 @@ import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatService
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -46,27 +46,32 @@ internal class SendBirdChatService(
 			}
 		}
 
-	override suspend fun send(channel: Channel, message: DraftMessage) =
-		suspendCancellableCoroutine { coroutine ->
+	override suspend fun send(channel: Channel, message: DraftMessage): Flow<ApiMessage> =
+		callbackFlowWithAwait {
 			val params = message.toParams()
-			val sbChannel = runBlocking { getChannel(channel) }
-			if (params is FileMessageParams) {
-				sbChannel.sendFileMessage(params) { fileMessage, e ->
-					if (e != null) {
-						logger.e("Failed to send file message", e)
-						coroutine.resumeWithException(e)
+			val sbChannel = getChannel(channel)
+			val tempMessage =
+				if (params is FileMessageParams) {
+					sbChannel.sendFileMessage(params) { fileMessage, e ->
+						if (e != null) {
+							logger.e("Failed to send file message", e)
+							close(e)
+						} else {
+							trySend(fileMessage.toApi())
+						}
 					}
-					coroutine.resume(fileMessage.toApi())
-				}
-			} else if (params is UserMessageParams) {
-				sbChannel.sendUserMessage(params) { userMessage, e ->
-					if (e != null) {
-						logger.e("Failed to send text message", e)
-						coroutine.resumeWithException(e)
+				} else {
+					sbChannel.sendUserMessage(params as UserMessageParams) { userMessage, e ->
+						if (e != null) {
+							logger.e("Failed to send text message", e)
+							close(e)
+						} else {
+							trySend(userMessage.toApi())
+						}
 					}
-					coroutine.resume(userMessage.toApi())
 				}
-			}
+
+			trySend(tempMessage.toApi())
 		}
 
 	override suspend fun reply(channel: Channel, id: String, message: DraftMessage) =

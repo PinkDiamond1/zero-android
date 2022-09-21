@@ -29,6 +29,7 @@ import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
 import com.zero.android.network.util.NetworkMediaUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
@@ -66,21 +67,23 @@ constructor(
 	}
 
 	override suspend fun send(channel: Channel, draft: DraftMessage) {
-		val msg =
+		val flow =
 			if (draft.type == MessageType.TEXT) {
 				chatService.send(channel, draft)
 			} else {
 				sendFileMessage(channel, draft)
 			}
 
-		if (msg.type == MessageType.IMAGE) msg.fileUrl?.let { imageLoader.preload(it) }
+		flow.collect { msg ->
+			if (msg.type == MessageType.IMAGE) msg.fileUrl?.let { imageLoader.preload(it) }
 
-		messageDao.upsert(
-			msg.toEntity().let { it.copy(message = it.message.copy(fileUrl = draft.file?.path)) }
-		)
+			messageDao.upsert(
+				msg.toEntity().let { it.copy(message = it.message.copy(fileUrl = draft.file?.path)) }
+			)
+		}
 	}
 
-	private suspend fun sendFileMessage(channel: Channel, draft: DraftMessage): ApiMessage {
+	private suspend fun sendFileMessage(channel: Channel, draft: DraftMessage): Flow<ApiMessage> {
 		val uploadInfo = chatMediaService.getUploadInfo()
 		val fileMessage =
 			if (uploadInfo.apiUrl.isNotEmpty() && uploadInfo.query != null) {

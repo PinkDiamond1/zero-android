@@ -36,6 +36,7 @@ internal fun ApiMessage.toEntity(): MessageWithRefs =
 		message =
 		MessageEntity(
 			id = id,
+			requestId = requestId,
 			channelId = channelId,
 			authorId = author?.id,
 			parentMessageId = parentMessage?.id,
