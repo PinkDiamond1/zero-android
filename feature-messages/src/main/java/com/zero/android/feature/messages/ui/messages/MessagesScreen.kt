@@ -251,7 +251,7 @@ fun MessagesScreen(
 								Box(
 									modifier =
 									Modifier.fillMaxSize()
-										.background(AppTheme.colors.surfaceInverse.copy(0.8f))
+										.background(AppTheme.colors.surfaceInverse.copy(0.9f))
 								)
 							}
 							UserInputPanel(

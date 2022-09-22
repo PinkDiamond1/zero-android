@@ -129,7 +129,7 @@ fun DMAuthorAndTextMessage(
 					} else ChatDirectSame
 				)
 			) {
-				Column(modifier = Modifier.padding(8.dp)) {
+				Column(modifier = Modifier.padding(4.dp)) {
 					message.parentMessage?.let {
 						ReplyMessage(
 							modifier = Modifier.wrapContentWidth(),
@@ -142,7 +142,9 @@ fun DMAuthorAndTextMessage(
 							text = message.author?.name ?: "",
 							style = MaterialTheme.typography.titleMedium,
 							color = AppTheme.colors.glow,
-							modifier = Modifier.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
+							modifier =
+							Modifier.padding(start = 4.dp, end = 4.dp, top = 2.dp)
+								.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
 						)
 						Spacer(modifier = Modifier.width(8.dp))
 					}
@@ -156,7 +158,8 @@ fun DMAuthorAndTextMessage(
 					Text(
 						text = messageDate.format("hh:mm aa"),
 						style = MaterialTheme.typography.bodySmall,
-						modifier = Modifier.align(Alignment.End),
+						modifier =
+						Modifier.align(Alignment.End).padding(start = 4.dp, end = 4.dp, bottom = 2.dp),
 						color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
 					)
 				}
