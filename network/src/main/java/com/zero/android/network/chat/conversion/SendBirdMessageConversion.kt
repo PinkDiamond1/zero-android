@@ -5,6 +5,7 @@ import com.sendbird.android.BaseMessage
 import com.sendbird.android.BaseMessageParams
 import com.sendbird.android.FileMessage
 import com.sendbird.android.FileMessageParams
+import com.sendbird.android.MessageMetaArray
 import com.sendbird.android.MessageRetrievalParams
 import com.sendbird.android.ReactionEvent
 import com.sendbird.android.ReactionEvent.ReactionEventAction
@@ -27,6 +28,16 @@ import com.zero.android.network.model.ApiMessageReaction
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
+private const val KEY_FILE_REQUEST_META = "fileRequest"
+
+private fun BaseMessage.requestId(): String? {
+	return if (this !is FileMessage) requestId
+	else {
+		getMetaArrays(listOf(KEY_FILE_REQUEST_META))?.takeIf { it.isNotEmpty() }?.let { it[0].value[0] }
+			?: requestId
+	}
+}
+
 internal fun BaseMessage.toApi(
 	channelId: String = channelUrl,
 	mParentMessageId: Long? = null
@@ -48,7 +59,7 @@ internal fun BaseMessage.toApi(
 		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		fileUrl = (this as? FileMessage)?.url,
 		fileName = (this as? FileMessage)?.name,
-		requestId = requestId
+		requestId = requestId()
 	)
 }
 
@@ -88,7 +99,7 @@ internal fun FileMessage.toApi(channelId: String = channelUrl) =
 		fileName = name,
 		fileThumbnails = thumbnails.map { it.toApi() },
 		fileMimeType = messageParams?.mimeType,
-		requestId = requestId
+		requestId = requestId()
 	)
 
 internal fun FileMessage.Thumbnail.toApi() =
@@ -107,14 +118,14 @@ internal fun DraftMessage.toParams(): BaseMessageParams {
 		UserMessageParams().also { params ->
 			params.message = message!!
 			params.data = data
-			parentMessageId?.let { params.parentMessageId = it.toLong() }
+			parentMessage?.let { params.parentMessageId = it.id.toLong() }
 			params.customType = type.serializedName
 			params.mentionedUserIds = mentions
 		}
 	} else {
 		FileMessageParams().also { params ->
 			params.data = data
-			parentMessageId?.let { params.parentMessageId = it.toLong() }
+			parentMessage?.let { params.parentMessageId = it.id.toLong() }
 			params.customType = type.serializedName
 			params.mentionedUserIds = mentions
 
@@ -123,6 +134,10 @@ internal fun DraftMessage.toParams(): BaseMessageParams {
 			params.fileName = fileName
 			params.thumbnailSizes = fileThumbnails?.map { it.toSize() }
 			params.mimeType = fileMimeType
+
+			fileRequestId?.let {
+				params.metaArrays = listOf(MessageMetaArray(KEY_FILE_REQUEST_META, listOf(it)))
+			}
 		}
 	}
 }

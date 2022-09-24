@@ -14,7 +14,7 @@ interface ChatService {
 
 	suspend fun send(channel: Channel, message: DraftMessage): Flow<ApiMessage>
 
-	suspend fun reply(channel: Channel, id: String, message: DraftMessage): Flow<ApiMessage>
+	suspend fun reply(channel: Channel, message: Message, draft: DraftMessage): Flow<ApiMessage>
 
 	suspend fun deleteMessage(channel: Channel, message: Message)
 }

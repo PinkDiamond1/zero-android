@@ -11,6 +11,7 @@ import com.zero.android.models.MessageReaction
 import com.zero.android.models.enums.MessageMentionType
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
+import java.util.*
 
 @Entity(
 	tableName = "messages",
@@ -63,7 +64,12 @@ data class MessageEntity(
 	val fileThumbnails: List<FileThumbnail>? = null,
 	val fileMimeType: String? = null,
 	val reactions: List<MessageReaction> = emptyList()
-) : BaseEntity
+) : BaseEntity {
+
+	companion object {
+		fun generateDraftId(str: String?) = "draft_${str ?: UUID.randomUUID().toString()}"
+	}
+}
 
 data class MessageMeta(@PrimaryKey val id: String, val createdAt: Long)
 

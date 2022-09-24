@@ -16,4 +16,8 @@ abstract class MemberDao : BaseDao<MemberEntity>() {
 	@Transaction
 	@Query("SELECT * FROM members WHERE id = :id")
 	abstract fun get(id: String): Flow<MemberEntity?>
+
+	@Transaction
+	@Query("SELECT * FROM members WHERE id IN (:ids)")
+	abstract fun getAll(ids: List<String>): Flow<List<MemberEntity>?>
 }

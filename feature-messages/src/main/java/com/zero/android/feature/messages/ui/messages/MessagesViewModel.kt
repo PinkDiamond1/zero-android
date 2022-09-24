@@ -20,7 +20,16 @@ import com.zero.android.models.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -130,10 +139,10 @@ constructor(
 		}
 	}
 
-	fun replyToMessage(messageId: String, replyMessage: DraftMessage) {
+	fun replyToMessage(message: Message, replyMessage: DraftMessage) {
 		ioScope.launch {
 			(_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
-				chatRepository.reply(channel, messageId, replyMessage)
+				chatRepository.reply(channel, message, replyMessage)
 			}
 		}
 	}

@@ -16,7 +16,9 @@ import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.manager.ImageLoader
 import com.zero.android.data.repository.chat.MessagesRemoteMediator
+import com.zero.android.database.dao.MemberDao
 import com.zero.android.database.dao.MessageDao
+import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.ChatMedia
@@ -31,6 +33,7 @@ import com.zero.android.network.util.NetworkMediaUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 import timber.log.Timber
@@ -46,6 +49,7 @@ constructor(
 	private val networkMediaUtil: NetworkMediaUtil,
 	private val imageLoader: ImageLoader,
 	private val messageDao: MessageDao,
+	private val memberDao: MemberDao,
 	private val logger: Logger
 ) : ChatRepository {
 
@@ -78,12 +82,22 @@ constructor(
 			if (msg.type == MessageType.IMAGE) msg.fileUrl?.let { imageLoader.preload(it) }
 
 			messageDao.upsert(
-				msg.toEntity().let { it.copy(message = it.message.copy(fileUrl = draft.file?.path)) }
+				msg.copy(id = if (msg.isDraft) MessageEntity.generateDraftId(msg.requestId) else msg.id)
+					.toEntity()
+					.let { it.copy(message = it.message.copy(fileUrl = draft.file?.path)) }
 			)
 		}
 	}
 
 	private suspend fun sendFileMessage(channel: Channel, draft: DraftMessage): Flow<ApiMessage> {
+		val mentions =
+			draft.mentions.takeIf { it.isNotEmpty() }?.let { memberDao.getAll(it).firstOrNull() }
+		messageDao.upsert(
+			draft.copy(channelId = channel.id).toEntity(mentions = mentions).let {
+				it.copy(message = it.message.copy(fileUrl = draft.file?.path))
+			}
+		)
+
 		val uploadInfo = chatMediaService.getUploadInfo()
 		val fileMessage =
 			if (uploadInfo.apiUrl.isNotEmpty() && uploadInfo.query != null) {
@@ -104,8 +118,8 @@ constructor(
 		return chatService.send(channel, fileMessage)
 	}
 
-	override suspend fun reply(channel: Channel, id: String, draft: DraftMessage) {
-		send(channel, draft.apply { parentMessageId = id })
+	override suspend fun reply(channel: Channel, message: Message, draft: DraftMessage) {
+		send(channel, draft.apply { parentMessage = message })
 	}
 
 	override suspend fun updateMessage(id: String, channelId: String, text: String) {

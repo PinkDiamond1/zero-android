@@ -74,8 +74,8 @@ internal class SendBirdChatService(
 			trySend(tempMessage.toApi())
 		}
 
-	override suspend fun reply(channel: Channel, id: String, message: DraftMessage) =
-		send(channel, message.apply { parentMessageId = id })
+	override suspend fun reply(channel: Channel, message: Message, draft: DraftMessage) =
+		send(channel, draft.apply { parentMessage = message })
 
 	override suspend fun deleteMessage(channel: Channel, message: Message) =
 		suspendCancellableCoroutine { coroutine ->

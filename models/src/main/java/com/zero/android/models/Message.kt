@@ -5,6 +5,7 @@ import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
 import kotlinx.serialization.Serializable
 import java.io.File
+import java.util.*
 
 internal interface BaseMessage {
 	val channelId: String
@@ -58,13 +59,14 @@ data class DraftMessage(
 	override val updatedAt: Long,
 	override val status: MessageStatus,
 	override val data: String? = null,
-	var parentMessageId: String? = null,
+	var parentMessage: Message? = null,
 	override val isMuted: Boolean = false,
 	val file: File? = null,
 	val fileUrl: String? = null,
 	override val fileName: String? = null,
 	override val fileThumbnails: List<FileThumbnail>? = null,
-	override val fileMimeType: String? = null
+	override val fileMimeType: String? = null,
+	val fileRequestId: String? = if (file != null) UUID.randomUUID().toString() else null
 ) : BaseMessage
 
 @Serializable

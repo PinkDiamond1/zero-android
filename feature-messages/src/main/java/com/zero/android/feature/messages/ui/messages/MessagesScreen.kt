@@ -7,7 +7,14 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -101,7 +108,7 @@ fun MessagesRoute(
 						)
 					val replyToMessage = MessageActionStateHandler.replyToMessage.value
 					if (replyToMessage != null) {
-						viewModel.replyToMessage(replyToMessage.id, message)
+						viewModel.replyToMessage(replyToMessage, message)
 						MessageActionStateHandler.reset()
 					} else {
 						viewModel.sendMessage(message)
@@ -153,7 +160,7 @@ fun MessagesRoute(
 					)
 				val replyToMessage = MessageActionStateHandler.replyToMessage.value
 				if (replyToMessage != null) {
-					viewModel.replyToMessage(replyToMessage.id, message)
+					viewModel.replyToMessage(replyToMessage, message)
 					MessageActionStateHandler.reset()
 				} else {
 					viewModel.sendMessage(message)
@@ -162,14 +169,14 @@ fun MessagesRoute(
 		},
 		onEditMessage = { viewModel.updateMessage(it) },
 		onDeleteMessage = { viewModel.deleteMessage(it) },
-		onReplyToMessage = { messageId, reply ->
+		onReplyToMessage = { message, reply ->
 			val replyMessage =
 				MessageUtil.newTextMessage(
 					reply,
 					userChannelInfo.first,
 					channelMembers = MessageActionStateHandler.mentionedUsers
 				)
-			viewModel.replyToMessage(messageId, replyMessage)
+			viewModel.replyToMessage(message, replyMessage)
 		},
 		onTextChanged = { viewModel.onSearchTextChanged(it) },
 		onMediaClicked = { messageId -> onMediaClicked(viewModel.channelId, messageId) }
@@ -193,7 +200,7 @@ fun MessagesScreen(
 	onSendMemo: () -> Unit,
 	onEditMessage: (Message) -> Unit,
 	onDeleteMessage: (Message) -> Unit,
-	onReplyToMessage: (String, String) -> Unit,
+	onReplyToMessage: (Message, String) -> Unit,
 	onTextChanged: (String) -> Unit,
 	onMediaClicked: (String) -> Unit
 ) {
@@ -264,7 +271,7 @@ fun MessagesScreen(
 											MessageActionStateHandler.closeActionMode()
 										}
 										replyMessage != null -> {
-											onReplyToMessage(replyMessage!!.id, it.trim())
+											onReplyToMessage(replyMessage!!, it.trim())
 											MessageActionStateHandler.closeActionMode()
 										}
 										else -> onNewMessage(it.trim())

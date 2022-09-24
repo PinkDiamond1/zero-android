@@ -30,7 +30,10 @@ data class ApiMessage(
 	val fileMimeType: String? = null,
 	val reactions: List<ApiMessageReaction>? = null,
 	val requestId: String? = null
-)
+) {
+	val isDraft
+		get() = id == "0"
+}
 
 @Serializable
 data class ApiFileThumbnail(

@@ -17,7 +17,7 @@ interface ChatRepository {
 
 	suspend fun send(channel: Channel, draft: DraftMessage)
 
-	suspend fun reply(channel: Channel, id: String, draft: DraftMessage)
+	suspend fun reply(channel: Channel, message: Message, draft: DraftMessage)
 
 	suspend fun updateMessage(id: String, channelId: String, text: String)
 
