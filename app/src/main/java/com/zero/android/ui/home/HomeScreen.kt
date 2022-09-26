@@ -75,12 +75,15 @@ fun HomeRoute(
 	val currentNetwork: Network? by viewModel.selectedNetwork.collectAsState()
 	val networks: Result<List<Network>> by viewModel.networks.collectAsState()
 
+	val unreadDMs by viewModel.unreadDMsCount.collectAsState()
+
 	HomeScreen(
 		viewModel = viewModel,
 		navController = navController,
 		currentScreen = currentScreen,
 		currentNetwork = currentNetwork,
 		networks = networks,
+		unreadDMs = unreadDMs,
 		onNetworkSelected = {
 			viewModel.switchTheme()
 			viewModel.onNetworkSelected(it)
@@ -101,6 +104,7 @@ fun HomeScreen(
 	currentScreen: NavDestination,
 	currentNetwork: Network?,
 	networks: Result<List<Network>>,
+	unreadDMs: Int,
 	onNetworkSelected: (Network) -> Unit,
 	onTriggerSearch: (Boolean) -> Unit,
 	onLogout: () -> Unit,
@@ -184,6 +188,7 @@ fun HomeScreen(
 	val bottomBar: @Composable () -> Unit = {
 		AppBottomBar(
 			currentDestination = currentScreen,
+			unreadDMs = unreadDMs,
 			onNavigateToHomeDestination = {
 				coroutineScope.launch {
 					viewModel.currentScreen.emit(it)

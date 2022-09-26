@@ -10,6 +10,7 @@ import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ThemeManager
 import com.zero.android.data.repository.AuthRepository
+import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.NetworkRepository
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.models.Network
@@ -21,6 +22,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -32,6 +34,7 @@ class HomeViewModel
 constructor(
 	private val preferences: Preferences,
 	private val networkRepository: NetworkRepository,
+	private val channelRepository: ChannelRepository,
 	private val authManager: AuthManager,
 	private val authRepository: AuthRepository,
 	private val searchTriggerUseCase: SearchTriggerUseCase,
@@ -48,8 +51,14 @@ constructor(
 
 	val selectedNetworkSetting = MutableStateFlow<Network?>(null)
 
+	val unreadDMsCount = MutableStateFlow(0)
+
 	init {
 		loadNetworks()
+
+		ioScope.launch {
+			channelRepository.getUnreadDirectMessagesCount().map { unreadDMsCount.emit(it) }
+		}
 	}
 
 	private fun loadNetworks() {

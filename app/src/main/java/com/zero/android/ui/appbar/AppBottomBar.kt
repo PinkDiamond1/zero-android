@@ -52,6 +52,7 @@ val HOME_DESTINATIONS =
 fun AppBottomBar(
 	modifier: Modifier = Modifier,
 	currentDestination: NavDestination?,
+	unreadDMs: Int,
 	onNavigateToHomeDestination: (NavDestination) -> Unit
 ) {
 	Column {
@@ -71,13 +72,14 @@ fun AppBottomBar(
 		) {
 			HOME_DESTINATIONS.forEach { item ->
 				val selected = currentDestination?.route == item.destination.route
+				val showBadgeCount = item.destination == DirectChannelDestination && unreadDMs > 0
+
 				BottomNavigationItem(
 					selected = selected,
 					onClick = { onNavigateToHomeDestination(item.destination) },
 					icon = {
-						val showBadgeCount = false
 						if (showBadgeCount) {
-							BadgedBox(badge = { CountBadge(count = 1) }) {
+							BadgedBox(badge = { CountBadge(count = unreadDMs) }) {
 								BottomBarIcon(isSelected = selected, item = item)
 							}
 						} else {
@@ -106,4 +108,6 @@ fun BottomBarIcon(isSelected: Boolean, item: AppBarItem) {
 
 @Preview
 @Composable
-fun AppBottomBarPreview() = Preview { AppBottomBar(currentDestination = FeedDestination) {} }
+fun AppBottomBarPreview() = Preview {
+	AppBottomBar(currentDestination = FeedDestination, unreadDMs = 1) {}
+}

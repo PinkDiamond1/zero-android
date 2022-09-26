@@ -30,6 +30,8 @@ constructor(
 
 	fun getDirectChannel(id: String) = directChannelDao.get(id)
 
+	fun getUnreadDirectMessagesCount() = directChannelDao.getUnreadCount()
+
 	suspend fun upsert(vararg data: DirectChannelWithRefs) =
 		directChannelDao.upsert(messageDao, memberDao, *data)
 

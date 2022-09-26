@@ -136,7 +136,9 @@ constructor(
 		channelService.deleteChannel(channel)
 	}
 
-	override suspend fun markChannelRead(channel: Channel) {
+	override suspend fun markRead(channel: Channel) {
 		channelService.markChannelRead(channel)
 	}
+
+	override suspend fun getUnreadDirectMessagesCount() = channelDao.getUnreadDirectMessagesCount()
 }

@@ -24,6 +24,10 @@ abstract class DirectChannelDaoImpl : BaseChannelDao() {
 	abstract fun get(id: String): Flow<DirectChannelWithRefs?>
 
 	@Transaction
+	@Query("SELECT SUM(unreadMessageCount) as count FROM channels WHERE isDirectChannel = 1")
+	abstract fun getUnreadCount(): Flow<Int>
+
+	@Transaction
 	internal open suspend fun insert(
 		messageDao: MessageDao,
 		memberDao: MemberDao,

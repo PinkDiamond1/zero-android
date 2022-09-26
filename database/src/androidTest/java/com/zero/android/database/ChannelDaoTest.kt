@@ -51,6 +51,21 @@ class ChannelDaoTest : BaseDatabaseTest() {
 	}
 
 	@Test
+	fun getUnreadDirectMessagesCount() = runTest {
+		channelDao.upsert(
+			directChannel.copy(channel = directChannel.channel.copy(unreadMessageCount = 3))
+		)
+		channelDao.upsert(
+			directChannel.copy(
+				channel = directChannel.channel.copy(id = "directChannelId2", unreadMessageCount = 2)
+			)
+		)
+
+		val unreadCount = channelDao.getUnreadDirectMessagesCount().first()
+		assertEquals(5, unreadCount)
+	}
+
+	@Test
 	fun deleteDirectChannel() = runTest {
 		channelDao.upsert(directChannel)
 		channelDao.delete(directChannel.channel)

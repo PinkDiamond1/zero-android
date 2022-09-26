@@ -34,5 +34,7 @@ interface ChannelRepository {
 
 	suspend fun deleteChannel(channel: Channel)
 
-	suspend fun markChannelRead(channel: Channel)
+	suspend fun markRead(channel: Channel)
+
+	suspend fun getUnreadDirectMessagesCount(): Flow<Int>
 }
