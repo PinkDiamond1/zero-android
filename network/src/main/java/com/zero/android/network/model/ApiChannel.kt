@@ -75,7 +75,8 @@ data class ApiGroupChannel(
 data class ApiChannelProperties(
 	val category: ChannelCategory? = null,
 	val isAdminOnly: Boolean = false,
-	@Serializable(AccessTypeSerializer::class) val groupChannelType: AccessType,
+	@Serializable(AccessTypeSerializer::class)
+	val groupChannelType: AccessType = AccessType.PRIVATE,
 	val isVideoEnabled: Boolean = true,
 	val telegramChatId: String? = null,
 	val discordChatId: String? = null

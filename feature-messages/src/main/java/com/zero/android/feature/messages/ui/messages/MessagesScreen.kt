@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -227,7 +228,7 @@ fun MessagesScreen(
 			Box(modifier = Modifier.padding(top = innerPaddings.calculateTopPadding())) {
 				CustomisedAnimation(visible = messagesUiState is Result.Success) {
 					MessagesContent(
-						modifier = Modifier.fillMaxWidth(),
+						modifier = Modifier.fillMaxWidth().imePadding(),
 						userChannelInfo = userChannelInfo,
 						messages = messages,
 						onMediaClick = onMediaClicked
@@ -253,7 +254,7 @@ fun MessagesScreen(
 						RecordMemoView(onCancel = onRecordMemo, onSendMemo = onSendMemo)
 					}
 					if (!isMemoRecording) {
-						Box(modifier = Modifier.height(IntrinsicSize.Max)) {
+						Box(modifier = Modifier.height(IntrinsicSize.Max).imePadding()) {
 							Box(modifier = Modifier.align(Alignment.Center).blur(20.dp).fillMaxHeight()) {
 								Box(
 									modifier =
