@@ -2,22 +2,27 @@ package com.zero.android.ui.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -31,7 +36,6 @@ import com.zero.android.common.R
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
-import com.zero.android.feature.channels.navigation.DirectChannelDestination
 import com.zero.android.feature.channels.ui.components.ChannelNotificationSettingsView
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
@@ -43,6 +47,7 @@ import com.zero.android.ui.components.ExtraSmallCircularImage
 import com.zero.android.ui.components.dialog.DialogListItem
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.theme.customTextStyle
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.launch
 
@@ -93,12 +98,18 @@ fun HomeScreen(
 	val scaffoldState = rememberScaffoldState()
 	val coroutineScope = rememberCoroutineScope()
 
-	// 	var showMenu by remember { mutableStateOf(false) }
+	var showMenu by remember { mutableStateOf(false) }
 
 	bottomNavController.addOnDestinationChangedListener { _, _, _ -> onTriggerSearch(false) }
 
 	val actionItems: @Composable RowScope.() -> Unit = {
-		if (currentScreen == ChannelsDestination || currentScreen == DirectChannelDestination) {
+		IconButton(onClick = {}) {
+			ExtraSmallCircularImage(
+				imageUrl = viewModel.loggedInUserImage,
+				placeHolder = R.drawable.img_profile_avatar
+			)
+		}
+		if (currentScreen == ChannelsDestination) {
 			IconButton(onClick = { onTriggerSearch(true) }, modifier = Modifier.size(32.dp)) {
 				Image(
 					painter = painterResource(R.drawable.ic_search),
@@ -106,77 +117,46 @@ fun HomeScreen(
 					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
 				)
 			}
-			IconButton(onClick = {}) {
-				ExtraSmallCircularImage(
-					imageUrl = viewModel.loggedInUserImage,
-					placeHolder = R.drawable.img_profile_avatar
-				)
-			}
-      /*IconButton(onClick = { showMenu = !showMenu }) {
-          Icon(Icons.Default.MoreVert, contentDescription = "")
-      }*/
-			if (currentScreen == DirectChannelDestination) {
-				IconButton(
-					modifier = Modifier.size(24.dp),
-					onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
-				) {
-					Image(
-						painter = painterResource(R.drawable.ic_add_circle),
-						contentDescription = stringResource(R.string.create_direct_message)
-					)
-				}
-			}
-      /*DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-          DropdownMenuItem(
-              text = { Text(text = stringResource(R.string.profile), style = MaterialTheme.typography.customTextStyle(
-                           LocalTextStyle.current
-                       )) },
-              onClick = {},
-              leadingIcon = {
-                  Image(
-                      painter = painterResource(R.drawable.img_profile_avatar),
-                      contentDescription = stringResource(R.string.profile)
-                  )
-              }
-          )
-          DropdownMenuItem(
-              text = { Text(text = stringResource(R.string.create_a_world), style = MaterialTheme.typography.customTextStyle(
-                           LocalTextStyle.current
-                       )) },
-              onClick = {},
-              leadingIcon = {
-                  IconButton(
-                      onClick = {},
-                      modifier = Modifier
-                                   .border(1.dp, AppTheme.colors.glow, CircleShape)
-                                   .size(32.dp)
-                  ) {
-                      Icon(
-                          imageVector = Icons.Filled.Add,
-                          contentDescription = stringResource(R.string.create_a_world)
-                      )
-                  }
-              }
-          )
-      }*/
 		} else {
-			IconButton(onClick = {}) {
-				ExtraSmallCircularImage(
-					imageUrl = viewModel.loggedInUserImage,
-					placeHolder = R.drawable.img_profile_avatar
-				)
-			}
-			Spacer(modifier = Modifier.padding(4.dp))
 			IconButton(
-				onClick = {},
-				modifier = Modifier.border(1.dp, AppTheme.colors.glow, CircleShape).size(32.dp)
+				modifier = Modifier.size(24.dp),
+				onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
 			) {
-				Icon(
-					imageVector = Icons.Filled.Add,
-					contentDescription = stringResource(R.string.create_a_world)
+				Image(
+					painter = painterResource(R.drawable.ic_add_circle),
+					contentDescription = stringResource(R.string.create_direct_message),
+					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
 				)
 			}
-			Spacer(modifier = Modifier.padding(4.dp))
+			IconButton(onClick = { showMenu = !showMenu }) {
+				Icon(Icons.Default.MoreVert, contentDescription = "")
+			}
+			DropdownMenu(
+				expanded = showMenu,
+				onDismissRequest = { showMenu = false },
+				modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant)
+			) {
+				DropdownMenuItem(
+					text = {
+						Text(
+							text = stringResource(R.string.search),
+							style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current),
+							color = AppTheme.colors.surface
+						)
+					},
+					leadingIcon = {
+						Image(
+							painter = painterResource(R.drawable.ic_search),
+							contentDescription = stringResource(R.string.search_channels),
+							colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+						)
+					},
+					onClick = {
+						showMenu = false
+						onTriggerSearch(true)
+					}
+				)
+			}
 		}
 	}
 
