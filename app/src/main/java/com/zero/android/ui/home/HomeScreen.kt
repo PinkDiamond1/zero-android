@@ -4,12 +4,23 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenuItem
@@ -23,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.zero.android.BuildConfig
 import com.zero.android.common.R
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
@@ -207,8 +220,25 @@ fun HomeScreen(
 					}
 				)
 			} else {
-				DialogListItem(text = stringResource(R.string.logout)) {
-					viewModel.logout(context = context, onLogout = onLogout)
+				Column(modifier = modifier) {
+					Text(
+						text = stringResource(id = R.string.settings),
+						color = AppTheme.colors.colorTextPrimary,
+						style = MaterialTheme.typography.bodyMedium,
+						modifier =
+						Modifier.align(Alignment.CenterHorizontally)
+							.padding(top = 16.dp, bottom = 2.dp)
+					)
+					Text(
+						text = "${BuildConfig.VERSION_NAME}${if (BuildConfig.DEBUG) " (debug)" else ""}",
+						color = AppTheme.colors.colorTextPrimary,
+						style = MaterialTheme.typography.labelSmall,
+						modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+					)
+					Divider(color = AppTheme.colors.divider)
+					DialogListItem(text = stringResource(R.string.logout)) {
+						viewModel.logout(context = context, onLogout = onLogout)
+					}
 				}
 			}
 		}

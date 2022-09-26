@@ -6,6 +6,7 @@
     <string name="cd_ic_circle_add">@string/create_a_world</string>
     <string name="create_direct_message">Create new message</string>
     <string name="create">Create</string>
+    <string name="settings">Settings</string>
 
     <string name="notification_channel_messages">Messages</string>
     <string name="notification_channel_messages_description">Get notifications for channel/direct messages</string>
