@@ -2,10 +2,8 @@ package com.zero.android.feature.people.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,14 +23,17 @@ import com.zero.android.ui.theme.AppTheme
 fun MemberSearchItem(member: Member, onClick: (Member) -> Unit) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		modifier = Modifier.fillMaxWidth().padding(top = 8.dp).clickable { onClick(member) }
+		modifier =
+		Modifier.fillMaxWidth()
+			.clickable { onClick(member) }
+			.padding(horizontal = 12.dp, vertical = 8.dp)
 	) {
 		SmallCircularImage(
+			modifier = Modifier.padding(end = 8.dp),
 			placeHolder = R.drawable.ic_user_profile_placeholder,
 			imageUrl = member.profileImage,
 			contentDescription = member.id
 		)
-		Spacer(modifier = Modifier.size(8.dp))
 		Text(
 			text = member.name ?: "",
 			color = AppTheme.colors.colorTextPrimary,

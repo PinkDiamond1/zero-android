@@ -1,6 +1,10 @@
 package com.zero.android.ui.components
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,7 +68,7 @@ fun DotsBounceAnimation(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.Center
 	) {
-		dys.forEachIndexed { index, dy ->
+		dys.forEachIndexed { _, dy ->
 			Box(Modifier.size(size).scale(dy).alpha(dy).background(color = color, shape = CircleShape))
 		}
 	}

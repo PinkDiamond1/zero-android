@@ -4,8 +4,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -18,21 +24,18 @@ import com.zero.android.ui.theme.AppTheme
 @Composable
 fun SearchView(
 	modifier: Modifier = Modifier,
+	searchText: String,
 	placeHolder: String = stringResource(R.string.search),
 	showSearchCancel: Boolean = true,
 	onValueChanged: (String) -> Unit,
 	onSearchCancelled: () -> Unit = {}
 ) {
-	var searchText: String by remember { mutableStateOf("") }
 	val focusRequester = remember { FocusRequester() }
 
 	Row(modifier = modifier.padding(8.dp).fillMaxWidth()) {
 		CustomTextField(
 			value = searchText,
-			onValueChange = {
-				searchText = it
-				onValueChanged(searchText)
-			},
+			onValueChange = { onValueChanged(it) },
 			placeholderText = placeHolder,
 			textStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextPrimary),
@@ -48,12 +51,7 @@ fun SearchView(
 				)
 			},
 			trailingIcon = {
-				IconButton(
-					onClick = {
-						searchText = ""
-						onValueChanged(searchText)
-					}
-				) {
+				IconButton(onClick = { onValueChanged("") }, enabled = searchText.isNotEmpty()) {
 					Icon(
 						painter = painterResource(R.drawable.ic_cancel_24),
 						contentDescription = "",
@@ -65,8 +63,7 @@ fun SearchView(
 		if (showSearchCancel) {
 			TextButton(
 				onClick = {
-					searchText = ""
-					onValueChanged(searchText)
+					onValueChanged("")
 					onSearchCancelled()
 				}
 			) { Text(stringResource(R.string.cancel), color = AppTheme.colors.colorTextPrimary) }

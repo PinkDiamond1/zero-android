@@ -40,9 +40,9 @@ fun MemberSectionList(
 				val header = entry.key.toString()
 				val sectionMembers = entry.value
 
-				Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+				Column(modifier = Modifier.fillMaxWidth()) {
 					Row(
-						modifier = Modifier.fillMaxWidth(),
+						modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
 						horizontalArrangement = Arrangement.SpaceBetween,
 						verticalAlignment = Alignment.CenterVertically
 					) {
@@ -54,7 +54,7 @@ fun MemberSectionList(
 					}
 					Spacer(modifier = Modifier.size(8.dp))
 					if (nested) {
-						Column(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+						Column(modifier = Modifier.fillMaxWidth()) {
 							sectionMembers.forEach { MemberSearchItem(it, onMemberSelected) }
 						}
 					} else {

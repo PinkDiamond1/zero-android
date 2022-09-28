@@ -27,6 +27,7 @@ constructor(
 ) : BaseViewModel() {
 
 	private val _textSearch = MutableStateFlow("")
+	val textSearch = _textSearch.asStateFlow()
 
 	private val _users = MutableStateFlow<List<Member>>(emptyList())
 	val users = _users.asStateFlow()
@@ -66,6 +67,7 @@ constructor(
 	}
 
 	fun selectMember(member: Member) {
+		_textSearch.value = ""
 		_selectedUsers.value
 			.find { it.id == member.id }
 			.let {

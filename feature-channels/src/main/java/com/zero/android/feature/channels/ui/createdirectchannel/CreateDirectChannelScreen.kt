@@ -52,6 +52,8 @@ fun CreateDirectChannelRoute(
 	val loading by viewModel.loading.collectAsState()
 	val navState by viewModel.navState.collectAsState()
 
+	val searchText by viewModel.textSearch.collectAsState()
+
 	LaunchedEffect(navState) {
 		if (navState is Navigate) {
 			onChannelCreated((navState as Navigate<DirectChannel>).data)
@@ -59,6 +61,7 @@ fun CreateDirectChannelRoute(
 	}
 
 	CreateDirectChannelScreen(
+		searchText = searchText,
 		members = users,
 		selectedUsers = selectedUsers,
 		loading = loading,
@@ -73,6 +76,7 @@ fun CreateDirectChannelRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateDirectChannelScreen(
+	searchText: String,
 	members: List<Member>,
 	selectedUsers: List<Member>,
 	loading: Boolean,
@@ -110,6 +114,7 @@ fun CreateDirectChannelScreen(
 		Box(Modifier.padding(innerPaddings)) {
 			Column(modifier = Modifier.fillMaxWidth()) {
 				SearchView(
+					searchText = searchText,
 					placeHolder = stringResource(R.string.search_users),
 					showSearchCancel = false,
 					onValueChanged = { onSearchTextChange(it) }
@@ -117,7 +122,7 @@ fun CreateDirectChannelScreen(
 				Column(modifier = Modifier.verticalScroll(rememberScrollState()).weight(1f)) {
 					if (selectedUsers.isNotEmpty()) {
 						SelectedMembers(
-							modifier = Modifier.padding(horizontal = 12.dp, vertical = 0.dp),
+							modifier = Modifier.padding(horizontal = 4.dp, vertical = 0.dp),
 							members = selectedUsers,
 							onMemberRemoved = onMemberRemoved
 						)
@@ -145,7 +150,7 @@ private fun SelectedMembers(
 							Icon(
 								painter = painterResource(R.drawable.ic_cancel_24),
 								contentDescription = "",
-								tint = AppTheme.colors.surfaceVariant
+								tint = AppTheme.colors.surface
 							)
 						}
 					}
@@ -159,6 +164,7 @@ private fun SelectedMembers(
 @Composable
 fun CreateDirectChannelScreenPreview() = Preview {
 	CreateDirectChannelScreen(
+		searchText = "search text",
 		members = FakeModel.members(),
 		selectedUsers = listOf(FakeModel.Member("one")),
 		loading = false,

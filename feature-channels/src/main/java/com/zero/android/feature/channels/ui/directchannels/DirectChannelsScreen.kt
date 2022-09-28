@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -71,12 +76,17 @@ fun DirectChannelsScreen(
 	onSearchClosed: () -> Unit
 ) {
 	val directChannelsUiState = uiState.directChannelsUiState as? DirectChannelUiState.Success
+	var searchText: String by remember { mutableStateOf("") }
 
 	Column(modifier = Modifier.fillMaxWidth()) {
 		FadeExpandAnimation(visible = showSearchBar) {
 			SearchView(
+				searchText = searchText,
 				placeHolder = stringResource(R.string.search_channels),
-				onValueChanged = { onChannelSearched(it) },
+				onValueChanged = {
+					searchText = it
+					onChannelSearched(it)
+				},
 				onSearchCancelled = { onSearchClosed() }
 			)
 		}
