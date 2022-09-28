@@ -67,7 +67,9 @@ data class MessageEntity(
 ) : BaseEntity {
 
 	companion object {
-		fun generateDraftId(str: String?) = "draft_${str ?: UUID.randomUUID().toString()}"
+		internal const val PREFIX_DRAFT_ID = "draft_"
+
+		fun generateDraftId(str: String?) = "${PREFIX_DRAFT_ID}${str ?: UUID.randomUUID().toString()}"
 	}
 }
 

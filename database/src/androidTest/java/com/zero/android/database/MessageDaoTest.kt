@@ -3,6 +3,7 @@ package com.zero.android.database
 import android.database.sqlite.SQLiteConstraintException
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.zero.android.database.base.BaseDatabaseTest
+import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.fake.FakeEntity
 import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,14 +41,15 @@ class MessageDaoTest : BaseDatabaseTest() {
 
 	@Test
 	fun insertMessageAndDeleteByRequest() = runTest {
-		messageDao.upsert(FakeEntity.MessageWithRefs(id = "0", requestId = "r1"))
+		val draftId = MessageEntity.generateDraftId("0")
+		messageDao.upsert(FakeEntity.MessageWithRefs(id = draftId, requestId = "r1"))
 
-		var data = messageDao.get("0").firstOrNull()
+		var data = messageDao.get(draftId).firstOrNull()
 		assertNotNull(data)
 		assertEquals("r1", data?.message?.requestId)
 
 		messageDao.upsert(FakeEntity.MessageWithRefs(id = "id", requestId = "r1"))
-		data = messageDao.get("0").firstOrNull()
+		data = messageDao.get(draftId).firstOrNull()
 		assertNull(data)
 
 		data = messageDao.get("id").firstOrNull()

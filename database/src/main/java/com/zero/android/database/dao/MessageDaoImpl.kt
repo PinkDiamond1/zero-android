@@ -74,6 +74,8 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	abstract suspend fun deleteByChannel(channelId: String)
 
 	@Transaction
-	@Query("DELETE FROM messages WHERE requestId = :requestId")
+	@Query(
+		"DELETE FROM messages WHERE requestId = :requestId AND id LIKE '${MessageEntity.PREFIX_DRAFT_ID}%'"
+	)
 	protected abstract suspend fun deleteByRequest(requestId: String)
 }
