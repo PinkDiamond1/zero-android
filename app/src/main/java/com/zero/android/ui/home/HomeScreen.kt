@@ -53,6 +53,7 @@ import com.zero.android.feature.channels.ui.components.ChannelNotificationSettin
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
 import com.zero.android.navigation.NavDestination
+import com.zero.android.navigation.extensions.navigate
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.components.Background
@@ -120,12 +121,11 @@ fun HomeScreen(
 	bottomNavController.addOnDestinationChangedListener { _, _, _ -> onTriggerSearch(false) }
 
 	val actionItems: @Composable RowScope.() -> Unit = {
-		IconButton(onClick = {}) {
-			ExtraSmallCircularImage(
-				imageUrl = viewModel.loggedInUserImage,
-				placeHolder = R.drawable.img_profile_avatar
-			)
-		}
+		ExtraSmallCircularImage(
+			modifier = Modifier.padding(end = 12.dp),
+			imageUrl = viewModel.loggedInUserImage,
+			placeHolder = R.drawable.img_profile_avatar
+		)
 		if (currentScreen == ChannelsDestination) {
 			IconButton(onClick = { onTriggerSearch(true) }, modifier = Modifier.size(32.dp)) {
 				Image(
@@ -190,11 +190,12 @@ fun HomeScreen(
 			currentDestination = currentScreen,
 			unreadDMs = unreadDMs,
 			onNavigateToHomeDestination = {
+				if (currentScreen == it) return@AppBottomBar
 				coroutineScope.launch {
 					viewModel.currentScreen.emit(it)
 					scaffoldState.drawerState.close()
 				}
-				bottomNavController.navigate(it.route) {
+				bottomNavController.navigate(it) {
 					popUpTo(navController.graph.startDestinationId) { saveState = true }
 					launchSingleTop = true
 					restoreState = true
@@ -203,13 +204,20 @@ fun HomeScreen(
 		)
 	}
 
-	if (scaffoldState.drawerState.isOpen) {
-		BackHandler { coroutineScope.launch { scaffoldState.drawerState.close() } }
-	}
-
 	val bottomState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 	val selectedNetworkSetting by viewModel.selectedNetworkSetting.collectAsState()
 	val context = LocalContext.current
+
+	if (currentScreen != ChannelsDestination || scaffoldState.drawerState.isOpen) {
+		BackHandler {
+			if (scaffoldState.drawerState.isOpen) {
+				coroutineScope.launch { scaffoldState.drawerState.close() }
+			} else if (currentScreen != ChannelsDestination) {
+				coroutineScope.launch { viewModel.currentScreen.emit(ChannelsDestination) }
+				bottomNavController.navigate(ChannelsDestination)
+			}
+		}
+	}
 
 	ModalBottomSheetLayout(
 		sheetState = bottomState,

@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.feature.channels.navigation.ChannelsDestination
-import com.zero.android.feature.channels.navigation.DirectChannelDestination
+import com.zero.android.feature.channels.navigation.DirectChannelsDestination
 import com.zero.android.feature.feed.navigation.FeedDestination
 import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.components.BottomBarDivider
@@ -42,7 +42,7 @@ val HOME_DESTINATIONS =
         	R.drawable.ic_notification_unselected
         ),*/
 		AppBarItem(
-			DirectChannelDestination,
+			DirectChannelsDestination,
 			R.drawable.ic_direct_chat_selected,
 			R.drawable.ic_direct_chat_unselected
 		)
@@ -72,7 +72,7 @@ fun AppBottomBar(
 		) {
 			HOME_DESTINATIONS.forEach { item ->
 				val selected = currentDestination?.route == item.destination.route
-				val showBadgeCount = item.destination == DirectChannelDestination && unreadDMs > 0
+				val showBadgeCount = item.destination == DirectChannelsDestination && unreadDMs > 0
 
 				BottomNavigationItem(
 					selected = selected,

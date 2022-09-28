@@ -12,7 +12,7 @@ import com.zero.android.feature.auth.navigation.RegisterDestination
 import com.zero.android.feature.auth.navigation.authGraph
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
-import com.zero.android.feature.channels.navigation.DirectChannelDestination
+import com.zero.android.feature.channels.navigation.DirectChannelsDestination
 import com.zero.android.feature.channels.ui.channels.ChannelsRoute
 import com.zero.android.feature.channels.ui.createdirectchannel.CreateDirectChannelRoute
 import com.zero.android.feature.channels.ui.directchannels.DirectChannelsRoute
@@ -71,7 +71,7 @@ internal fun NavGraphBuilder.homeBottomNavGraph(controller: NavController, netwo
 	composableSimple(ChannelsDestination) {
 		ChannelsRoute(network = network) { controller.navigate(MessagesDestination.route(it.id, true)) }
 	}
-	composableSimple(DirectChannelDestination) {
+	composableSimple(DirectChannelsDestination) {
 		DirectChannelsRoute { controller.navigate(MessagesDestination.route(it.id, false)) }
 	}
 }

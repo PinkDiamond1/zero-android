@@ -81,11 +81,15 @@ constructor(
 		flow.collect { msg ->
 			if (msg.type == MessageType.IMAGE) msg.fileUrl?.let { imageLoader.preload(it) }
 
-			messageDao.upsert(
-				msg.copy(id = if (msg.isDraft) MessageEntity.generateDraftId(msg.requestId) else msg.id)
-					.toEntity()
-					.let { it.copy(message = it.message.copy(fileUrl = draft.file?.path)) }
-			)
+			if (msg.isDraft) {
+				messageDao.upsert(
+					msg.copy(id = MessageEntity.generateDraftId(msg.requestId)).toEntity().let {
+						it.copy(message = it.message.copy(fileUrl = draft.file?.path))
+					}
+				)
+			} else {
+				messageDao.upsert(msg.toEntity())
+			}
 		}
 	}
 

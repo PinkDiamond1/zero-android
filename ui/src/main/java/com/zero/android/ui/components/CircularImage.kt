@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 
 @Composable
@@ -113,6 +114,8 @@ private fun NetworkImage(
 	AsyncImage(
 		model =
 		ImageRequest.Builder(LocalContext.current)
+			.memoryCachePolicy(CachePolicy.ENABLED)
+			.diskCachePolicy(CachePolicy.ENABLED)
 			.data(imageUrl)
 			.crossfade(true)
 			.crossfade(200)
