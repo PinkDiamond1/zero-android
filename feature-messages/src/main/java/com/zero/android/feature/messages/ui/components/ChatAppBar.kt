@@ -24,7 +24,7 @@ import com.zero.android.ui.theme.AppTheme
 @Composable
 fun ChatAppBar(
 	channel: Channel,
-	userChannelInfo: Pair<String, Boolean>,
+	loggedInUser: String,
 	scrollBehavior: TopAppBarScrollBehavior? = null,
 	onBackClick: () -> Unit,
 	onDeleteMessage: (Message) -> Unit
@@ -52,7 +52,7 @@ fun ChatAppBar(
 		},
 		title = {
 			if (actionMessage == null) {
-				ChatScreenAppBarTitle(channel, userChannelInfo.second)
+				ChatScreenAppBarTitle(channel)
 			}
 		},
 		scrollBehavior = scrollBehavior,
@@ -67,7 +67,7 @@ fun ChatAppBar(
 						)
 					}
 				}
-				if (actionMessage!!.author?.id == userChannelInfo.first) {
+				if (actionMessage!!.author?.id == loggedInUser) {
 					if (actionMessage!!.type == MessageType.TEXT) {
 						IconButton(onClick = { MessageActionStateHandler.editTextMessage() }) {
 							Icon(

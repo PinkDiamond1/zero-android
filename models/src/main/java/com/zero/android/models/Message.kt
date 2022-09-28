@@ -1,5 +1,6 @@
 package com.zero.android.models
 
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageMentionType
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
@@ -16,6 +17,7 @@ internal interface BaseMessage {
 	val createdAt: Long
 	val updatedAt: Long
 	val status: MessageStatus
+	val deliveryStatus: DeliveryStatus
 	val data: String?
 	val isMuted: Boolean
 	val fileName: String?
@@ -34,6 +36,7 @@ data class Message(
 	override val createdAt: Long,
 	override val updatedAt: Long,
 	override val status: MessageStatus,
+	override val deliveryStatus: DeliveryStatus,
 	override val data: String? = null,
 	val parentMessage: Message? = null,
 	override val isMuted: Boolean = false,
@@ -58,6 +61,7 @@ data class DraftMessage(
 	override val createdAt: Long,
 	override val updatedAt: Long,
 	override val status: MessageStatus,
+	override val deliveryStatus: DeliveryStatus = DeliveryStatus.SENT,
 	override val data: String? = null,
 	var parentMessage: Message? = null,
 	override val isMuted: Boolean = false,

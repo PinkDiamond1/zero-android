@@ -14,12 +14,14 @@ import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.chat.DirectChannelsRemoteMediator
 import com.zero.android.data.repository.chat.GroupChannelsRemoteMediator
 import com.zero.android.database.dao.ChannelDao
+import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.ChannelEntity
 import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
+import com.zero.android.models.Message
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiDirectChannel
@@ -27,6 +29,7 @@ import com.zero.android.network.model.ApiGroupChannel
 import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -38,12 +41,15 @@ internal class ChannelRepositoryImpl
 @Inject
 constructor(
 	private val channelDao: ChannelDao,
+	private val messageDao: MessageDao,
 	private val channelService: ChannelService,
 	private val logger: Logger,
 	preferences: Preferences
 ) : ChannelRepository {
 
 	private val userId = runBlocking { preferences.userId() }
+
+	override val lastMessage = MutableStateFlow<Message?>(null)
 
 	@OptIn(ExperimentalPagingApi::class)
 	override fun getDirectChannels(search: String?): Flow<PagingData<DirectChannel>> {
@@ -136,9 +142,17 @@ constructor(
 		channelService.deleteChannel(channel)
 	}
 
-	override suspend fun markRead(channel: Channel) {
+	override suspend fun markChannelRead(channel: Channel) {
 		channelService.markChannelRead(channel)
 	}
 
+	override suspend fun getReadMembers(id: String): List<Member> {
+		return channelService.getReadMembers(id).map { it.toModel() }
+	}
+
 	override suspend fun getUnreadDirectMessagesCount() = channelDao.getUnreadDirectMessagesCount()
+
+	override suspend fun getLastMessage(channelId: String) {
+		messageDao.getLastMessage(channelId).collectLatest { lastMessage.emit(it.toModel()) }
+	}
 }

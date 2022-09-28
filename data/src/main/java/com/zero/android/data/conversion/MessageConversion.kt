@@ -4,6 +4,7 @@ import com.zero.android.database.model.MemberEntity
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.models.DraftMessage
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageStatus
 
 internal fun DraftMessage.toEntity(mentions: List<MemberEntity>? = null): MessageWithRefs =
@@ -21,6 +22,7 @@ internal fun DraftMessage.toEntity(mentions: List<MemberEntity>? = null): Messag
 			createdAt = createdAt,
 			updatedAt = updatedAt,
 			status = MessageStatus.PENDING,
+			deliveryStatus = DeliveryStatus.SENT,
 			data = data,
 			message = message,
 			isMuted = isMuted,

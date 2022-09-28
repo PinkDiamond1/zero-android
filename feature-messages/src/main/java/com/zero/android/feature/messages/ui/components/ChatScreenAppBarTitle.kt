@@ -18,14 +18,15 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
+import com.zero.android.models.isGroupChannel
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.SmallCircularImage
 
 @Composable
-fun ChatScreenAppBarTitle(channel: Channel, isGroupChannel: Boolean) {
+fun ChatScreenAppBarTitle(channel: Channel) {
 	Row {
 		IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = {}) {
-			if (isGroupChannel) {
+			if (channel.isGroupChannel) {
 				NameInitialsView(userName = channel.name)
 			} else {
 				SmallCircularImage(
@@ -42,7 +43,7 @@ fun ChatScreenAppBarTitle(channel: Channel, isGroupChannel: Boolean) {
 			style = MaterialTheme.typography.displayLarge
 		)
 		Spacer(modifier = Modifier.padding(6.dp))
-		if (isGroupChannel) {
+		if (channel.isGroupChannel) {
 			if ((channel as GroupChannel).hasTelegramChannel) {
 				Image(
 					painter = painterResource(R.drawable.ic_chat_icon),

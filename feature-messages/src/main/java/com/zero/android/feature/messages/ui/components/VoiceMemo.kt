@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.ui.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,7 +17,6 @@ import com.zero.android.ui.theme.AppTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 enum class VoiceMessageState {
 	DOWNLOAD,
@@ -26,7 +26,18 @@ enum class VoiceMessageState {
 }
 
 @Composable
-fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
+fun VoiceMessage(
+	message: Message,
+	isUserMe: Boolean,
+	viewModel: ChatAttachmentViewModel,
+	darkTheme: Boolean = isSystemInDarkTheme()
+) {
+	val controlsColor =
+		if (darkTheme) {
+			Color.White
+		} else {
+			if (isUserMe) Color.White else Color.Black
+		}
 	val coroutineScope = rememberCoroutineScope()
 	val mediaSourceProvider by
 	remember(message.id) { mutableStateOf(viewModel.getMediaSource(message)) }
@@ -42,17 +53,15 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 			VoiceMessageState.DOWNLOAD -> R.drawable.ic_download_circle_24
 			VoiceMessageState.PLAYING -> R.drawable.ic_stop_circle_24
 			else -> {
-				memoTimer = mediaDuration
 				timerTask?.cancel()
+				memoTimer = 0
+				memoTimer = mediaDuration
 				R.drawable.ic_play_circle_24
 			}
 		}
-	Row(modifier = Modifier.wrapContentWidth()) {
+	Row(modifier = Modifier.width(250.dp), verticalAlignment = Alignment.CenterVertically) {
 		if (mediaFileState == VoiceMessageState.DOWNLOADING) {
-			CircularProgressIndicator(
-				color = AppTheme.colors.glow,
-				modifier = Modifier.size(32.dp).align(Alignment.CenterVertically)
-			)
+			CircularProgressIndicator(color = AppTheme.colors.glow, modifier = Modifier.size(32.dp))
 		} else {
 			IconButton(
 				onClick = {
@@ -64,7 +73,7 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 							timerTask =
 								coroutineScope.launch {
 									while (memoTimer > 0) {
-										delay(1.seconds)
+										delay(1000)
 										memoTimer -= 1000
 									}
 								}
@@ -72,20 +81,19 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 						VoiceMessageState.PLAYING -> viewModel.stop()
 						else -> {}
 					}
-				},
-				modifier = Modifier.align(Alignment.CenterVertically)
+				}
 			) {
 				Icon(
 					modifier = Modifier.size(32.dp),
 					painter = painterResource(iconRes),
 					contentDescription = null,
-					tint = Color.White
+					tint = controlsColor
 				)
 			}
 		}
 		Spacer(modifier = Modifier.size(4.dp))
 		Slider(
-			modifier = Modifier.width(150.dp).align(Alignment.CenterVertically),
+			modifier = Modifier.width(150.dp),
 			value = sliderPosition,
 			onValueChange = { viewModel.seekMediaTo(message, it) },
 			onValueChangeFinished = {
@@ -95,7 +103,7 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 			valueRange = 0f..mediaDuration.div(1000).toFloat(),
 			colors =
 			SliderDefaults.colors(
-				thumbColor = Color.White,
+				thumbColor = controlsColor,
 				activeTrackColor = AppTheme.colors.colorTextPrimary
 			)
 		)
@@ -104,9 +112,9 @@ fun VoiceMessage(message: Message, viewModel: ChatAttachmentViewModel) {
 			text =
 			if (memoTimer > 0) {
 				memoTimer.convertDurationToString()
-			} else "-",
-			modifier = Modifier.align(Alignment.CenterVertically),
-			style = MaterialTheme.typography.bodyMedium
+			} else "00:00",
+			style = MaterialTheme.typography.bodyMedium,
+			color = controlsColor
 		)
 	}
 }

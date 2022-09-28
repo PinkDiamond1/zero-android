@@ -8,6 +8,7 @@ import com.zero.android.models.FileThumbnail
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.MessageReaction
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageMentionType
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
@@ -57,6 +58,7 @@ data class MessageEntity(
 	val createdAt: Long = 0,
 	val updatedAt: Long = 0,
 	val status: MessageStatus,
+	val deliveryStatus: DeliveryStatus,
 	val data: String? = null,
 	val isMuted: Boolean = false,
 	val fileUrl: String? = null,
@@ -85,6 +87,7 @@ fun MessageEntity.toModel(author: Member?) =
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		status = status,
+		deliveryStatus = deliveryStatus,
 		data = data,
 		isMuted = isMuted,
 		fileUrl = fileUrl,

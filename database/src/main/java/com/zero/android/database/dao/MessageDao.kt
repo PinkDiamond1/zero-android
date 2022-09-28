@@ -2,6 +2,7 @@ package com.zero.android.database.dao
 
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageType
 import javax.inject.Inject
 
@@ -35,6 +36,9 @@ constructor(
 
 	suspend fun update(id: String, text: String) = messageDao.update(id, text)
 
+	suspend fun markRead(id: String, deliveryStatus: DeliveryStatus = DeliveryStatus.READ) =
+		messageDao.markRead(id, deliveryStatus)
+
 	suspend fun delete(id: String) = messageDao.delete(id)
 
 	suspend fun delete(message: MessageEntity) = messageDao.delete(message)
@@ -43,4 +47,6 @@ constructor(
 
 	suspend fun getMediaByChannel(channelId: String) =
 		messageDao.getByChannel(channelId, types = listOf(MessageType.IMAGE, MessageType.VIDEO))
+
+	suspend fun getLastMessage(channelId: String) = messageDao.getLastMessage(channelId)
 }

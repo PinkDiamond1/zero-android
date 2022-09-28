@@ -18,6 +18,7 @@ internal fun Message.toApi(): ApiMessage =
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		status = status,
+		deliveryStatus = deliveryStatus,
 		data = data,
 		parentMessage = parentMessage?.toApi(),
 		isMuted = isMuted,

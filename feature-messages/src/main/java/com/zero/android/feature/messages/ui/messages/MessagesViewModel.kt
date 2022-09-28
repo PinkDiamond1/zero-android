@@ -20,16 +20,7 @@ import com.zero.android.models.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -51,6 +42,7 @@ constructor(
 		checkNotNull(savedStateHandle[MessagesDestination.ARG_IS_GROUP_CHANNEL])
 
 	val loggedInUserId = runBlocking(Dispatchers.IO) { preferences.userId() }
+	val lastMessage = channelRepository.lastMessage
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 
@@ -99,14 +91,31 @@ constructor(
 
 			request.firstOrNull()?.let { channel ->
 				_channel.emit(Result.Success(channel))
-				channelRepository.markRead(channel)
-				configureChat(channel)
+				markChannelRead()
+				chatRepository.getMessages(channel)
 			}
 		}
 	}
 
-	private fun configureChat(channel: Channel) {
-		ioScope.launch { chatRepository.getMessages(channel) }
+	fun configureChat() {
+		markChannelRead()
+		updateMessage()
+	}
+
+	private fun getLastMessageStatus() {
+		ioScope.launch {
+			(_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
+				lastMessage.firstOrNull()?.let { message ->
+					if (message.author?.id == loggedInUserId && channel.memberCount == 2) {
+						val chatMembers = channel.members.filter { it.id != loggedInUserId }.map { it.id }
+						val readMembers = channelRepository.getReadMembers(channel.id).map { it.id }
+						if (readMembers.containsAll(chatMembers)) {
+							chatRepository.markRead(message)
+						}
+					}
+				}
+			}
+		}
 	}
 
 	fun sendMessage(message: DraftMessage) {
@@ -114,6 +123,8 @@ constructor(
 			(_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
 				chatRepository.send(channel, message)
 			}
+			markChannelRead()
+			updateMessage()
 		}
 	}
 
@@ -122,6 +133,7 @@ constructor(
 			(_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
 				chatRepository.deleteMessage(message, channel)
 			}
+			updateMessage()
 		}
 	}
 
@@ -144,6 +156,21 @@ constructor(
 			(_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
 				chatRepository.reply(channel, message, replyMessage)
 			}
+		}
+	}
+
+	private fun markChannelRead() {
+		ioScope.launch {
+			(_channel.firstOrNull() as? Result.Success)?.data?.let { channel ->
+				channelRepository.markChannelRead(channel)
+			}
+		}
+	}
+
+	private fun updateMessage() {
+		ioScope.launch {
+			channelRepository.getLastMessage(channelId)
+			getLastMessageStatus()
 		}
 	}
 }

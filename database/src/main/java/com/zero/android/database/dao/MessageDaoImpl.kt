@@ -12,6 +12,7 @@ import com.zero.android.database.model.MessageEntity.Companion.PREFIX_DRAFT_ID
 import com.zero.android.database.model.MessageMentionCrossRef
 import com.zero.android.database.model.MessageMeta
 import com.zero.android.database.model.MessageWithRefs
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageType
 import kotlinx.coroutines.flow.Flow
 
@@ -42,6 +43,10 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	abstract fun getLatestMessageByChannel(channelId: String): MessageMeta?
 
 	@Transaction
+	@Query("SELECT * FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC LIMIT 1")
+	abstract fun getLastMessage(channelId: String): Flow<MessageWithRefs>
+
+	@Transaction
 	internal open suspend fun upsert(memberDao: MemberDao, vararg data: MessageWithRefs) {
 		for (item in data) {
 			item.message.requestId?.let { deleteByRequest(item.message.requestId) }
@@ -66,6 +71,9 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 
 	@Query("UPDATE messages SET message = :message WHERE id = :id")
 	abstract suspend fun update(id: String, message: String?)
+
+	@Query("UPDATE messages SET deliveryStatus = :deliveryStatus WHERE id = :id")
+	abstract suspend fun markRead(id: String, deliveryStatus: DeliveryStatus)
 
 	@Query("DELETE FROM messages WHERE id = :id")
 	abstract suspend fun delete(id: String)

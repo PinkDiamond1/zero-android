@@ -28,6 +28,7 @@ import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.isSameDay
 import com.zero.android.common.extensions.toDate
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
+import com.zero.android.models.Channel
 import com.zero.android.models.Message
 import com.zero.android.ui.components.JumpToBottom
 import com.zero.android.ui.components.StrikeLabel
@@ -38,8 +39,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun MessagesContent(
 	modifier: Modifier = Modifier,
-	userChannelInfo: Pair<String, Boolean>,
 	messages: LazyPagingItems<Message>,
+	loggedInUser: String,
+	latestMessage: Message?,
+	channel: Channel,
 	onMediaClick: (String) -> Unit
 ) {
 	val scrollState = rememberLazyListState()
@@ -50,8 +53,10 @@ fun MessagesContent(
 			Column(Modifier.fillMaxSize().background(AppTheme.colors.surfaceInverse)) {
 				Messages(
 					modifier = Modifier.weight(1f),
-					userChannelInfo = userChannelInfo,
 					messages = messages,
+					loggedInUser = loggedInUser,
+					latestMessage = latestMessage,
+					channel = channel,
 					scrollState = scrollState,
 					coroutineScope = scope,
 					onMediaClick = onMediaClick
@@ -64,8 +69,10 @@ fun MessagesContent(
 @Composable
 fun Messages(
 	modifier: Modifier = Modifier,
-	userChannelInfo: Pair<String, Boolean>,
 	messages: LazyPagingItems<Message>,
+	loggedInUser: String,
+	latestMessage: Message?,
+	channel: Channel,
 	scrollState: LazyListState,
 	coroutineScope: CoroutineScope,
 	chatAttachmentViewModel: ChatAttachmentViewModel = hiltViewModel(),
@@ -89,6 +96,10 @@ fun Messages(
 				val isSameDay = nextMessageDate.isSameDay(messageDate)
 				val isFirstMessageByAuthor = prevAuthor?.id != content.author?.id
 				val isLastMessageByAuthor = nextAuthor?.id != content.author?.id
+				val showDeliveryStatus =
+					(content.author?.id == loggedInUser) &&
+						(channel.memberCount == 2) &&
+						(content.id == latestMessage?.id)
 
         /*if (!userChannelInfo.second) {
             DirectMessage(
@@ -111,10 +122,11 @@ fun Messages(
         }*/
 				DirectMessage(
 					msg = content,
-					isUserMe = content.author?.id == userChannelInfo.first,
+					isUserMe = content.author?.id == loggedInUser,
 					isSameDay = isSameDay,
 					isFirstMessageByAuthor = isFirstMessageByAuthor,
 					isLastMessageByAuthor = isLastMessageByAuthor,
+					showDeliveryStatus = showDeliveryStatus,
 					chatAttachmentViewModel = chatAttachmentViewModel,
 					onAuthorClick = {},
 					onMediaClick = onMediaClick

@@ -70,22 +70,26 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 		memberDao: MemberDao,
 		vararg data: GroupChannelWithRefs
 	) {
-		for (item in data) {
-			val members = item.members.toMutableList()
-			item.createdBy?.let { members.add(it) }
-			memberDao.upsert(members)
+		try {
+			for (item in data) {
+				val members = item.members.toMutableList()
+				item.createdBy?.let { members.add(it) }
+				memberDao.upsert(members)
 
-			upsert(item.channel)
+				upsert(item.channel)
 
-			item.lastMessage?.let { messageDao.upsert(it, updateChannel = false) }
+				item.lastMessage?.let { messageDao.upsert(it, updateChannel = false) }
 
-			item.members
-				.map { ChannelMembersCrossRef(channelId = item.channel.id, memberId = it.id) }
-				.let { insert(*it.toTypedArray()) }
+				item.members
+					.map { ChannelMembersCrossRef(channelId = item.channel.id, memberId = it.id) }
+					.let { insert(*it.toTypedArray()) }
 
-			item.operators
-				.map { ChannelOperatorsCrossRef(channelId = item.channel.id, memberId = it.id) }
-				.let { insert(*it.toTypedArray()) }
+				item.operators
+					.map { ChannelOperatorsCrossRef(channelId = item.channel.id, memberId = it.id) }
+					.let { insert(*it.toTypedArray()) }
+			}
+		} catch (e: Exception) {
+			e.printStackTrace()
 		}
 	}
 }

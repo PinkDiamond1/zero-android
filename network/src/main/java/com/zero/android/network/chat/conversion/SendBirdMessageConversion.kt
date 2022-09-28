@@ -14,6 +14,7 @@ import com.sendbird.android.UserMessageParams
 import com.sendbird.android.constant.StringSet.value
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.FileThumbnail
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageMentionType
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
@@ -53,6 +54,7 @@ internal fun BaseMessage.toApi(
 		channelId = channelId,
 		author = sender?.toApi(),
 		status = sendingStatus.toType(),
+		deliveryStatus = DeliveryStatus.DEFAULT,
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		message = message,
@@ -74,6 +76,7 @@ internal fun UserMessage.toApi(channelId: String = channelUrl) =
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		status = sendingStatus.toType(),
+		deliveryStatus = DeliveryStatus.DEFAULT,
 		data = data,
 		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		isMuted = isSilent,
@@ -92,6 +95,7 @@ internal fun FileMessage.toApi(channelId: String = channelUrl) =
 		createdAt = createdAt,
 		updatedAt = updatedAt,
 		status = sendingStatus.toType(),
+		deliveryStatus = DeliveryStatus.DEFAULT,
 		data = data,
 		parentMessage = parentMessage?.toApi(channelId, parentMessageId),
 		isMuted = isSilent,

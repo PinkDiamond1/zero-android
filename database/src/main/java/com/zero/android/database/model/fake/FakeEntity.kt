@@ -8,6 +8,7 @@ import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.database.model.NetworkEntity
 import com.zero.android.models.ChannelCategory
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.InviteMode
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
@@ -79,7 +80,8 @@ object FakeEntity {
 				parentMessageAuthorId = "memberThree",
 				channelId = channelId,
 				type = MessageType.TEXT,
-				status = MessageStatus.PENDING
+				status = MessageStatus.PENDING,
+				deliveryStatus = DeliveryStatus.SENT
 			),
 			author = MemberEntity(id = authorId),
 			parentMessage =
@@ -88,7 +90,8 @@ object FakeEntity {
 				authorId = "memberThree",
 				channelId = channelId,
 				type = MessageType.TEXT,
-				status = MessageStatus.PENDING
+				status = MessageStatus.PENDING,
+				deliveryStatus = DeliveryStatus.SENT
 			),
 			parentMessageAuthor = MemberEntity(id = "memberThree"),
 			mentions = listOf(MemberEntity(id = "memberOne"), MemberEntity(id = "memberTwo"))

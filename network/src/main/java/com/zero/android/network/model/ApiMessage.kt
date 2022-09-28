@@ -1,8 +1,10 @@
 package com.zero.android.network.model
 
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageMentionType
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
+import com.zero.android.network.model.serializer.DeliveryStatusSerializer
 import com.zero.android.network.model.serializer.MessageMentionTypeSerializer
 import com.zero.android.network.model.serializer.MessageStatusSerializer
 import com.zero.android.network.model.serializer.MessageTypeSerializer
@@ -20,6 +22,7 @@ data class ApiMessage(
 	@SerialName("created_at") val createdAt: Long,
 	@SerialName("updated_at") val updatedAt: Long,
 	@Serializable(MessageStatusSerializer::class) val status: MessageStatus,
+	@Serializable(DeliveryStatusSerializer::class) val deliveryStatus: DeliveryStatus,
 	val message: String? = null,
 	val data: String? = null,
 	val parentMessage: ApiMessage? = null,

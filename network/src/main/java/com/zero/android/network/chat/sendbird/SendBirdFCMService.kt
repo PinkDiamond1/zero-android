@@ -2,6 +2,7 @@ package com.zero.android.network.chat.sendbird
 
 import android.content.Context
 import com.google.firebase.messaging.RemoteMessage
+import com.sendbird.android.SendBird
 import com.sendbird.android.SendBirdException
 import com.sendbird.android.SendBirdPushHandler
 import com.sendbird.android.SendBirdPushHelper
@@ -43,6 +44,7 @@ constructor(private val logger: Logger, private val notificationManager: Notific
 						body = remoteMessage.data["message"]
 					)
 				}
+				SendBird.markAsDelivered(remoteMessage.data)
 			}
 		} catch (e: JSONException) {
 			e.printStackTrace()

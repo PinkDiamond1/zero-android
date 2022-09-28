@@ -51,7 +51,7 @@ fun JumpToBottom(enabled: Boolean, onClicked: () -> Unit, modifier: Modifier = M
 			text = {
 				Text(
 					text = stringResource(R.string.latest_messages),
-					style = MaterialTheme.typography.labelSmall
+					style = MaterialTheme.typography.labelMedium
 				)
 			},
 			onClick = onClicked,

@@ -31,10 +31,7 @@ import com.zero.android.network.service.ChatService
 import com.zero.android.network.service.MessageService
 import com.zero.android.network.util.NetworkMediaUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import org.json.JSONObject
 import timber.log.Timber
 import javax.inject.Inject
@@ -129,6 +126,10 @@ constructor(
 	override suspend fun updateMessage(id: String, channelId: String, text: String) {
 		val res = messageService.updateMessage(id, channelId, text)
 		if (res.isSuccessful) messageDao.update(id, text)
+	}
+
+	override suspend fun markRead(message: Message) {
+		messageDao.markRead(message.id)
 	}
 
 	override suspend fun deleteMessage(message: Message, channel: Channel) {

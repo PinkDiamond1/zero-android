@@ -30,7 +30,6 @@ import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
-import com.zero.android.feature.messages.ui.components.ChatBubbleSpacing
 import com.zero.android.feature.messages.ui.components.MessageContent
 import com.zero.android.feature.messages.ui.components.ReplyMessage
 import com.zero.android.models.Member

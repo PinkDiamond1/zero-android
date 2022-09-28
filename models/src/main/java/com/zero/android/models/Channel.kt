@@ -73,3 +73,6 @@ data class GroupChannel(
 	val hasTelegramChannel: Boolean
 		get() = !telegramChatId.isNullOrEmpty()
 }
+
+val Channel.isGroupChannel
+	get() = this is GroupChannel

@@ -41,6 +41,7 @@ fun MessageWithRefs.toModel() =
 		createdAt = message.createdAt,
 		updatedAt = message.updatedAt,
 		status = message.status,
+		deliveryStatus = message.deliveryStatus,
 		data = message.data,
 		isMuted = message.isMuted,
 		fileUrl = message.fileUrl,

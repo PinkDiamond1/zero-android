@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.dhaval2404.imagepicker.ImagePicker
@@ -39,6 +40,7 @@ import com.zero.android.common.extensions.getActivity
 import com.zero.android.common.extensions.isVideoFile
 import com.zero.android.common.extensions.toFile
 import com.zero.android.common.ui.Result
+import com.zero.android.common.ui.isSuccess
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.components.ChatAppBar
 import com.zero.android.feature.messages.ui.components.MentionUsersList
@@ -50,10 +52,8 @@ import com.zero.android.feature.messages.util.MessageUtil
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
-import com.zero.android.ui.components.BottomBarDivider
-import com.zero.android.ui.components.CustomisedAnimation
-import com.zero.android.ui.components.FadeExpandAnimation
-import com.zero.android.ui.components.FadeSlideAnimation
+import com.zero.android.ui.components.*
+import com.zero.android.ui.extensions.OnLifecycleEvent
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -69,7 +69,8 @@ fun MessagesRoute(
 	val chatUiState: ChatScreenUiState by viewModel.uiState.collectAsState()
 	val recordingState: Boolean by recordMemoViewModel.recordingState.collectAsState()
 	val chatMentionUsers: List<Member> by viewModel.chatMentionUsers.collectAsState()
-	val userChannelInfo = viewModel.loggedInUserId to viewModel.isGroupChannel
+	val latestMessage by viewModel.lastMessage.collectAsState()
+	val loggedInUser = viewModel.loggedInUserId
 	val context = LocalContext.current
 
 	val pagedMessages = viewModel.messages.collectAsLazyPagingItems()
@@ -81,6 +82,11 @@ fun MessagesRoute(
 		} else {
 			MessageActionStateHandler.reset()
 			onBackClick()
+		}
+	}
+	OnLifecycleEvent { _, event ->
+		if (event == Lifecycle.Event.ON_RESUME && chatUiState.messagesUiState.isSuccess) {
+			viewModel.configureChat()
 		}
 	}
 
@@ -102,7 +108,7 @@ fun MessagesRoute(
 					val message =
 						MessageUtil.newFileMessage(
 							file = file,
-							authorId = userChannelInfo.first,
+							authorId = loggedInUser,
 							type =
 							if (fileUri.isVideoFile(context)) MessageType.VIDEO
 							else MessageType.IMAGE
@@ -125,9 +131,9 @@ fun MessagesRoute(
 
 	MessagesScreen(
 		onBackClick,
-		userChannelInfo,
+		loggedInUser,
+		latestMessage,
 		chatUiState.channelUiState,
-		chatUiState.messagesUiState,
 		pagedMessages,
 		recordingState,
 		chatMentionUsers,
@@ -135,7 +141,7 @@ fun MessagesRoute(
 			viewModel.sendMessage(
 				MessageUtil.newTextMessage(
 					msg = newMessage,
-					authorId = userChannelInfo.first,
+					authorId = loggedInUser,
 					channelMembers = MessageActionStateHandler.mentionedUsers
 				)
 			)
@@ -156,7 +162,7 @@ fun MessagesRoute(
 				val message =
 					MessageUtil.newFileMessage(
 						file = file,
-						authorId = userChannelInfo.first,
+						authorId = loggedInUser,
 						type = MessageType.AUDIO
 					)
 				val replyToMessage = MessageActionStateHandler.replyToMessage.value
@@ -174,13 +180,14 @@ fun MessagesRoute(
 			val replyMessage =
 				MessageUtil.newTextMessage(
 					reply,
-					userChannelInfo.first,
+					loggedInUser,
 					channelMembers = MessageActionStateHandler.mentionedUsers
 				)
 			viewModel.replyToMessage(message, replyMessage)
 		},
 		onTextChanged = { viewModel.onSearchTextChanged(it) },
-		onMediaClicked = { messageId -> onMediaClicked(viewModel.channelId, messageId) }
+		onMediaClicked = { messageId -> onMediaClicked(viewModel.channelId, messageId) },
+		onMessagesLoaded = { viewModel.configureChat() }
 	)
 }
 
@@ -189,9 +196,9 @@ fun MessagesRoute(
 @Composable
 fun MessagesScreen(
 	onBackClick: () -> Unit,
-	userChannelInfo: Pair<String, Boolean>,
+	loggedInUser: String,
+	latestMessage: Message?,
 	chatChannelUiState: ChannelUIState,
-	messagesUiState: MessagesUIState,
 	messages: LazyPagingItems<Message>,
 	isMemoRecording: Boolean,
 	chatMentionUsers: List<Member>,
@@ -203,7 +210,8 @@ fun MessagesScreen(
 	onDeleteMessage: (Message) -> Unit,
 	onReplyToMessage: (Message, String) -> Unit,
 	onTextChanged: (String) -> Unit,
-	onMediaClicked: (String) -> Unit
+	onMediaClicked: (String) -> Unit,
+	onMessagesLoaded: () -> Unit
 ) {
 	val context = LocalContext.current
 	val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -219,25 +227,32 @@ fun MessagesScreen(
 				ChatAppBar(
 					scrollBehavior = scrollBehavior,
 					channel = chatChannelUiState.data,
-					userChannelInfo = userChannelInfo,
+					loggedInUser = loggedInUser,
 					onBackClick = onBackClick,
 					onDeleteMessage = onDeleteMessage
 				)
 			}
 		) { innerPaddings ->
 			Box(modifier = Modifier.padding(top = innerPaddings.calculateTopPadding())) {
-				CustomisedAnimation(visible = messagesUiState is Result.Success) {
-					MessagesContent(
-						modifier = Modifier.fillMaxWidth().imePadding(),
-						userChannelInfo = userChannelInfo,
-						messages = messages,
-						onMediaClick = onMediaClicked
-					)
+				Box(modifier = Modifier.fillMaxHeight()) {
+					if (messages.itemCount > 0) {
+						InstantAnimation {
+							MessagesContent(
+								modifier = Modifier.fillMaxWidth().imePadding(),
+								messages = messages,
+								loggedInUser = loggedInUser,
+								latestMessage = latestMessage,
+								channel = chatChannelUiState.data,
+								onMediaClick = onMediaClicked
+							)
+							onMessagesLoaded()
+						}
+					}
 				}
 				Column(Modifier.align(Alignment.BottomCenter)) {
 					BottomBarDivider()
 					FadeSlideAnimation(visible = mentionUser) {
-						val chatMembers = chatMentionUsers.filter { it.id != userChannelInfo.first }
+						val chatMembers = chatMentionUsers.filter { it.id != loggedInUser }
 						MentionUsersList(
 							membersList = chatMembers,
 							onMemberSelected = { MessageActionStateHandler.onUserMentionSelected(it) }

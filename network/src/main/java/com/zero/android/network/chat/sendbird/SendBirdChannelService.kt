@@ -23,6 +23,7 @@ import com.zero.android.network.chat.conversion.toOpenParams
 import com.zero.android.network.chat.conversion.toOption
 import com.zero.android.network.chat.conversion.toParams
 import com.zero.android.network.model.ApiChannel
+import com.zero.android.network.model.ApiMember
 import com.zero.android.network.service.ChannelCategoryService
 import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.runBlocking
@@ -319,4 +320,16 @@ internal class SendBirdChannelService(private val logger: Logger) :
 				}
 			}
 		}
+
+	override suspend fun getReadMembers(id: String) = suspendCancellableCoroutine { coroutine ->
+		withSameScope {
+			val baseChannel = groupChannel(id)
+			val lastMessage = baseChannel.lastMessage
+			lastMessage?.let {
+				val readMembers = baseChannel.getReadMembers(lastMessage, true).map { it.toApi() }
+				coroutine.resume(readMembers)
+			}
+				?: coroutine.resume(emptyList<ApiMember>())
+		}
+	}
 }

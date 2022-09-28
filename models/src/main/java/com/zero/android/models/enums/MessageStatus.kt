@@ -14,3 +14,20 @@ fun String?.toMessageStatus() =
 		else -> MessageStatus.values().firstOrNull { type -> type.serializedName == this }
 			?: MessageStatus.NONE
 	}
+
+enum class DeliveryStatus(val serializedName: String) {
+	SENT("sent"),
+	DELIVERED("delivered"),
+	READ("read");
+
+	companion object {
+		val DEFAULT = DELIVERED
+	}
+}
+
+fun String?.toDeliveryStatus() =
+	when (this) {
+		null -> DeliveryStatus.SENT
+		else -> DeliveryStatus.values().firstOrNull { type -> type.serializedName == this }
+			?: DeliveryStatus.SENT
+	}

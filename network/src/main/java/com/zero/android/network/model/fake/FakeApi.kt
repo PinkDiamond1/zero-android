@@ -1,5 +1,6 @@
 package com.zero.android.network.model.fake
 
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageMentionType
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
@@ -17,6 +18,7 @@ object FakeApi {
 			updatedAt = 0,
 			mentionType = MessageMentionType.UNKNOWN,
 			status = MessageStatus.SUCCEEDED,
+			deliveryStatus = DeliveryStatus.SENT,
 			type = MessageType.TEXT
 		)
 

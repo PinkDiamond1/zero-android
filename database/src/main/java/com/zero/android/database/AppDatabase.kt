@@ -39,7 +39,7 @@ import com.zero.android.database.model.UserEntity
 		ChannelOperatorsCrossRef::class
 	],
 	views = [MessageWithRefs::class],
-	version = 1,
+	version = 2,
 	exportSchema = false
 )
 @TypeConverters(DateConverters::class, ListConverters::class)

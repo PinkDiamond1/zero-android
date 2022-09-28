@@ -1,27 +1,15 @@
 package com.zero.android.feature.messages.ui.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.zero.android.common.util.SymbolAnnotationType
 import com.zero.android.common.util.messageFormatter
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
@@ -38,42 +26,14 @@ fun ColumnScope.MessageContent(
 	authorClicked: (Member) -> Unit
 ) {
 	when (message.type) {
-		MessageType.IMAGE ->
+		MessageType.AUDIO ->
 			message.fileUrl?.let {
-				Box(modifier = Modifier.clip(RoundedCornerShape(8.dp))) {
-					AsyncImage(
-						model =
-						ImageRequest.Builder(LocalContext.current)
-							.data(it)
-							.crossfade(true)
-							.crossfade(500)
-							.diskCachePolicy(CachePolicy.ENABLED)
-							.build(),
-						contentDescription = "",
-						modifier =
-						Modifier.wrapContentWidth().heightIn(max = 300.dp).align(Alignment.Center)
-					)
-				}
+				VoiceMessage(message = message, isUserMe = isUserMe, viewModel = chatAttachmentViewModel)
 			}
-		MessageType.VIDEO -> {
-			message.fileUrl?.let { VideoMessage(fileUrl = it) }
-		}
-		MessageType.AUDIO -> message.fileUrl?.let { VoiceMessage(message, chatAttachmentViewModel) }
 		else ->
 			message.message?.let {
 				ClickableMessage(message = message, isUserMe = isUserMe, authorClicked = authorClicked)
 			}
-	}
-}
-
-@Composable
-fun ColumnScope.ChatBubbleSpacing(isFirstMessageByAuthor: Boolean) {
-	if (isFirstMessageByAuthor) {
-		// Last bubble before next author
-		Spacer(modifier = Modifier.height(6.dp))
-	} else {
-		// Between bubbles
-		Spacer(modifier = Modifier.height(2.dp))
 	}
 }
 

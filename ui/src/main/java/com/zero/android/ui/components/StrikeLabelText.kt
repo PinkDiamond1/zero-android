@@ -18,7 +18,7 @@ import com.zero.android.ui.theme.AppTheme
 @Composable
 fun StrikeLabel(
 	text: String,
-	textStyle: TextStyle = MaterialTheme.typography.labelSmall,
+	textStyle: TextStyle = MaterialTheme.typography.labelMedium,
 	textColor: Color = AppTheme.colors.colorTextSecondaryVariant,
 	strikeColors: List<Color> = listOf(AppTheme.colors.surfaceInverse, AppTheme.colors.surface),
 	paddingVertical: Dp = 8.dp,

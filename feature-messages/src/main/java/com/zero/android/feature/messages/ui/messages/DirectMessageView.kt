@@ -17,14 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.zero.android.common.R
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
-import com.zero.android.feature.messages.ui.components.ChatBubbleSpacing
-import com.zero.android.feature.messages.ui.components.MessageContent
-import com.zero.android.feature.messages.ui.components.ReplyMessage
+import com.zero.android.feature.messages.ui.components.*
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
@@ -39,6 +38,7 @@ fun DirectMessage(
 	isSameDay: Boolean,
 	isFirstMessageByAuthor: Boolean,
 	isLastMessageByAuthor: Boolean,
+	showDeliveryStatus: Boolean,
 	chatAttachmentViewModel: ChatAttachmentViewModel,
 	onAuthorClick: (Member) -> Unit,
 	onMediaClick: (String) -> Unit
@@ -81,15 +81,31 @@ fun DirectMessage(
 			} else {
 				Spacer(modifier = Modifier.width(36.dp))
 			}
-			DMAuthorAndTextMessage(
-				modifier = Modifier.padding(end = 16.dp).weight(1f),
-				message = msg,
-				isUserMe = isUserMe,
-				isSameDay = isSameDay,
-				isFirstMessageByAuthor = isFirstMessageByAuthor,
-				isLastMessageByAuthor = isLastMessageByAuthor,
-				authorClicked = onAuthorClick,
-				chatAttachmentViewModel = chatAttachmentViewModel
+			when (msg.type) {
+				MessageType.IMAGE ->
+					msg.fileUrl?.let { ImageMessage(it, msg.createdAt, isUserMe, isFirstMessageByAuthor) }
+				MessageType.VIDEO -> {
+					msg.fileUrl?.let { VideoMessage(it, msg.createdAt, isUserMe, isFirstMessageByAuthor) }
+				}
+				else ->
+					DMAuthorAndTextMessage(
+						modifier = Modifier.padding(end = 16.dp).weight(1f),
+						message = msg,
+						isUserMe = isUserMe,
+						isSameDay = isSameDay,
+						isFirstMessageByAuthor = isFirstMessageByAuthor,
+						isLastMessageByAuthor = isLastMessageByAuthor,
+						authorClicked = onAuthorClick,
+						chatAttachmentViewModel = chatAttachmentViewModel
+					)
+			}
+		}
+		if (showDeliveryStatus) {
+			Text(
+				modifier = Modifier.align(Alignment.End).padding(end = 16.dp),
+				style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+				text = msg.deliveryStatus.name.lowercase().replaceFirstChar { it.uppercase() },
+				color = AppTheme.colors.colorTextSecondaryVariant
 			)
 		}
 	}
@@ -166,5 +182,16 @@ fun DMAuthorAndTextMessage(
 			}
 		}
 		ChatBubbleSpacing(isFirstMessageByAuthor)
+	}
+}
+
+@Composable
+fun ColumnScope.ChatBubbleSpacing(isFirstMessageByAuthor: Boolean) {
+	if (isFirstMessageByAuthor) {
+		// Last bubble before next author
+		Spacer(modifier = Modifier.height(6.dp))
+	} else {
+		// Between bubbles
+		Spacer(modifier = Modifier.height(3.dp))
 	}
 }

@@ -4,6 +4,7 @@ import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.Network
 import com.zero.android.models.enums.ConnectionStatus
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
 
@@ -31,7 +32,8 @@ object FakeModel {
 	fun Message(
 		id: String = "id",
 		channelId: String = "id",
-		status: MessageStatus = MessageStatus.SUCCEEDED
+		status: MessageStatus = MessageStatus.SUCCEEDED,
+		deliveryStatus: DeliveryStatus = DeliveryStatus.SENT
 	) =
 		Message(
 			id = id,
@@ -40,6 +42,7 @@ object FakeModel {
 			createdAt = 0,
 			updatedAt = 0,
 			status = status,
+			deliveryStatus = deliveryStatus,
 			type = MessageType.TEXT
 		)
 

@@ -8,6 +8,7 @@ import com.zero.android.models.enums.ChannelType
 import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiDirectChannel
 import com.zero.android.network.model.ApiGroupChannel
+import com.zero.android.network.model.ApiMember
 
 interface ChannelService {
 
@@ -47,4 +48,6 @@ interface ChannelService {
 	suspend fun deleteChannel(channel: Channel)
 
 	suspend fun markChannelRead(channel: Channel)
+
+	suspend fun getReadMembers(id: String): List<ApiMember>
 }

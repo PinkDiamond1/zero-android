@@ -3,6 +3,7 @@ package com.zero.android.data.manager
 import com.zero.android.common.extensions.withScope
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.delegates.Preferences
+import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.models.enums.ChannelType
@@ -20,7 +21,8 @@ internal class AppSocketListenerImpl
 constructor(
 	private val preferences: Preferences,
 	private val messageDao: MessageDao,
-	private val channelDao: ChannelDao
+	private val channelDao: ChannelDao,
+	private val channelRepository: ChannelRepository
 ) : SocketListener {
 
 	val userId
@@ -39,7 +41,10 @@ constructor(
 		withScope(Dispatchers.IO) { channelDao.delete(id) }
 	}
 
-	override fun onReadReceiptUpdated(channel: ApiChannel) = onChannelChanged(channel)
+	override fun onReadReceiptUpdated(channel: ApiChannel) {
+		onChannelChanged(channel)
+		withScope(Dispatchers.IO) { updateMessagesStatus(channel) }
+	}
 
 	override fun onOperatorUpdated(channel: ApiChannel) = onChannelChanged(channel)
 
@@ -67,6 +72,19 @@ constructor(
 		withScope(Dispatchers.IO) {
 			updateChannel(channel)
 			messageDao.upsert(message.toEntity())
+		}
+	}
+
+	private suspend fun updateMessagesStatus(channel: ApiChannel) {
+		val loggedInUser = preferences.userId()
+		channel.lastMessage?.let { message ->
+			if (message.author?.id == loggedInUser && channel.memberCount == 2) {
+				val chatMembers = channel.members.filter { it.id != loggedInUser }.map { it.id }
+				val readMembers = channelRepository.getReadMembers(channel.id).map { it.id }
+				if (readMembers.containsAll(chatMembers)) {
+					messageDao.markRead(message.id)
+				}
+			}
 		}
 	}
 }
