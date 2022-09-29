@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.zero.android.database.model.MemberEntity
 import com.zero.android.database.model.MessageEntity
+import com.zero.android.database.model.MessageEntity.Companion.PREFIX_DRAFT_ID
 import com.zero.android.database.model.MessageMentionCrossRef
 import com.zero.android.database.model.MessageMeta
 import com.zero.android.database.model.MessageWithRefs
@@ -74,8 +75,6 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	abstract suspend fun deleteByChannel(channelId: String)
 
 	@Transaction
-	@Query(
-		"DELETE FROM messages WHERE requestId = :requestId AND id LIKE '${MessageEntity.PREFIX_DRAFT_ID}%'"
-	)
+	@Query("DELETE FROM messages WHERE requestId = :requestId AND id LIKE '$PREFIX_DRAFT_ID%'")
 	protected abstract suspend fun deleteByRequest(requestId: String)
 }
