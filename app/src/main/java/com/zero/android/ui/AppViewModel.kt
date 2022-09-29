@@ -5,10 +5,10 @@ import com.zero.android.common.extensions.withScope
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
-import com.zero.android.data.manager.ThemeManager
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.models.AuthCredentials
 import com.zero.android.navigation.AppGraph
+import com.zero.android.ui.maanger.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,6 +1,7 @@
 plugins {
 	id 'com.android.library'
 	id 'org.jetbrains.kotlin.android'
+	id 'dagger.hilt.android.plugin'
 	id 'kotlin-kapt'
 }
 
@@ -14,6 +15,9 @@ android {
 
 dependencies {
 	implementation project(":common")
+
+	implementation "com.google.dagger:hilt-android:${versions.hilt}"
+	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
 
 	// UI
 	api "androidx.compose.ui:ui:${versions.compose}"

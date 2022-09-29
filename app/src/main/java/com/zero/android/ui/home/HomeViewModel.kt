@@ -8,7 +8,6 @@ import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.manager.AuthManager
-import com.zero.android.data.manager.ThemeManager
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.data.repository.NetworkRepository
@@ -16,6 +15,7 @@ import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.models.Network
 import com.zero.android.models.enums.AlertType
 import com.zero.android.navigation.NavDestination
+import com.zero.android.ui.maanger.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

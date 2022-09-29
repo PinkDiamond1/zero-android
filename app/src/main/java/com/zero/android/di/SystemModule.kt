@@ -8,6 +8,8 @@ import com.zero.android.system.NotificationManagerImpl
 import com.zero.android.system.PermissionsManagerImpl
 import com.zero.android.system.PushNotificationsImpl
 import com.zero.android.system.SoundManagerImpl
+import com.zero.android.system.ThemeManagerImpl
+import com.zero.android.ui.maanger.ThemeManager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,4 +26,6 @@ internal interface SystemModule {
 	@Binds fun bindNotificationManager(manager: NotificationManagerImpl): NotificationManager
 
 	@Binds fun bindSoundManager(manager: SoundManagerImpl): SoundManager
+
+	@Binds fun bindThemeManager(themeManager: ThemeManagerImpl): ThemeManager
 }

@@ -13,8 +13,6 @@ import com.zero.android.data.manager.ImageLoader
 import com.zero.android.data.manager.ImageLoaderImpl
 import com.zero.android.data.manager.MediaPlayerManager
 import com.zero.android.data.manager.MediaPlayerManagerImpl
-import com.zero.android.data.manager.ThemeManager
-import com.zero.android.data.manager.ThemeManagerImpl
 import com.zero.android.network.SocketListener
 import dagger.Binds
 import dagger.Module
@@ -38,6 +36,4 @@ internal interface DataModule {
 	@Binds fun provideImageLoader(imageLoader: ImageLoaderImpl): ImageLoader
 
 	@Binds fun bindMediaPlayerManager(mediaPlayerManager: MediaPlayerManagerImpl): MediaPlayerManager
-
-	@Binds fun bindThemeManager(themeManager: ThemeManagerImpl): ThemeManager
 }
