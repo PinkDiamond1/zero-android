@@ -18,7 +18,7 @@ import com.zero.android.ui.theme.AppTheme
 private val DEFAULT_MODIFIER = Modifier.size(36.dp)
 
 @Composable
-fun NameInitialsView(modifier: Modifier = DEFAULT_MODIFIER, userName: String) {
+fun NameInitialsView(modifier: Modifier = DEFAULT_MODIFIER, displayName: String) {
 	Box(
 		modifier =
 		modifier
@@ -26,7 +26,7 @@ fun NameInitialsView(modifier: Modifier = DEFAULT_MODIFIER, userName: String) {
 			.border(BorderStroke(1.dp, AppTheme.colors.colorTextSecondaryVariant), CircleShape)
 	) {
 		Text(
-			userName.initials(),
+			displayName.initials(),
 			modifier = Modifier.align(Alignment.Center),
 			color = AppTheme.colors.surface,
 			style = MaterialTheme.typography.displayLarge

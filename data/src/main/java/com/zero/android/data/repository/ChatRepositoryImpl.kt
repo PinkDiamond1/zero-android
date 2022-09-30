@@ -24,6 +24,7 @@ import com.zero.android.models.Channel
 import com.zero.android.models.ChatMedia
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatMediaService
@@ -130,6 +131,10 @@ constructor(
 
 	override suspend fun markRead(message: Message) {
 		messageDao.markRead(message.id)
+	}
+
+	override suspend fun markMessagesRead(channelId: String) {
+		messageDao.updateDeliveryReceipt(channelId, DeliveryStatus.READ)
 	}
 
 	override suspend fun deleteMessage(message: Message, channel: Channel) {

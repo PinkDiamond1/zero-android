@@ -39,6 +39,9 @@ constructor(
 	suspend fun markRead(id: String, deliveryStatus: DeliveryStatus = DeliveryStatus.READ) =
 		messageDao.markRead(id, deliveryStatus)
 
+	suspend fun updateDeliveryReceipt(channelId: String, deliveryStatus: DeliveryStatus) =
+		messageDao.updateDeliveryReceipt(channelId, deliveryStatus)
+
 	suspend fun delete(id: String) = messageDao.delete(id)
 
 	suspend fun delete(message: MessageEntity) = messageDao.delete(message)

@@ -24,17 +24,20 @@ import com.zero.android.common.util.messageFormatter
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
-import com.zero.android.models.enums.MessageStatus
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.ui.components.LargeCircularImage
 import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.UnreadCountText
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.theme.Blue300
 
 @Composable
 fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (Channel) -> Unit) {
 	val isDirectChannel = channel is DirectChannel
 	val styledMessage =
-		(channel.lastMessage?.message ?: "").messageFormatter(annotationColor = AppTheme.colors.glow)
+		(channel.lastMessage?.message ?: "").messageFormatter(
+			annotationColor = AppTheme.colors.colorTextPrimary
+		)
 
 	ConstraintLayout(
 		modifier =
@@ -60,7 +63,7 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 				contentDescription = channel.id
 			)
 		} else {
-			NameInitialsView(modifier = imageModifier.size(64.dp), userName = channel.name)
+			NameInitialsView(modifier = imageModifier.size(64.dp), displayName = channel.name)
 		}
 		Row(
 			modifier =
@@ -133,18 +136,22 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 		)
 		if (channel is DirectChannel) {
 			if (channel.lastMessage?.author?.id?.equals(loggedInUserId, true) == true) {
-				Icon(
-					painter =
-					if (channel.lastMessage?.status == MessageStatus.PENDING) {
+				val deliveryReceiptIcon =
+					if (channel.lastMessage?.deliveryStatus == DeliveryStatus.SENT) {
 						painterResource(R.drawable.ic_check)
-					} else painterResource(R.drawable.ic_double_check),
+					} else painterResource(R.drawable.ic_double_check)
+				val iconColor =
+					if (channel.lastMessage?.deliveryStatus == DeliveryStatus.READ) Blue300
+					else AppTheme.colors.colorTextPrimary
+				Icon(
+					painter = deliveryReceiptIcon,
 					contentDescription = "cd_message_status",
 					modifier =
 					Modifier.width(18.dp).constrainAs(unreadCount) {
 						bottom.linkTo(image.bottom)
 						end.linkTo(parent.end)
 					},
-					tint = AppTheme.colors.colorTextPrimary
+					tint = iconColor
 				)
 			} else {
 				if (channel.unreadMessageCount > 0) {

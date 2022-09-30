@@ -7,6 +7,7 @@ import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.models.enums.ChannelType
+import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.network.SocketListener
 import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiDirectChannel
@@ -43,12 +44,15 @@ constructor(
 
 	override fun onReadReceiptUpdated(channel: ApiChannel) {
 		onChannelChanged(channel)
-		withScope(Dispatchers.IO) { updateMessagesStatus(channel) }
+		withScope(Dispatchers.IO) { updateMessagesStatus(channel, DeliveryStatus.READ) }
 	}
 
 	override fun onOperatorUpdated(channel: ApiChannel) = onChannelChanged(channel)
 
-	override fun onDeliveryReceiptUpdated(channel: ApiChannel) = onChannelChanged(channel)
+	override fun onDeliveryReceiptUpdated(channel: ApiChannel) {
+		onChannelChanged(channel)
+		withScope(Dispatchers.IO) { updateMessagesStatus(channel, DeliveryStatus.DELIVERED) }
+	}
 
 	override fun onMessageReceived(channel: ApiChannel, message: ApiMessage) {
 		withScope(Dispatchers.IO) {
@@ -75,14 +79,15 @@ constructor(
 		}
 	}
 
-	private suspend fun updateMessagesStatus(channel: ApiChannel) {
+	private suspend fun updateMessagesStatus(channel: ApiChannel, deliveryStatus: DeliveryStatus) {
 		val loggedInUser = preferences.userId()
 		channel.lastMessage?.let { message ->
 			if (message.author?.id == loggedInUser && channel.memberCount == 2) {
 				val chatMembers = channel.members.filter { it.id != loggedInUser }.map { it.id }
 				val readMembers = channelRepository.getReadMembers(channel.id).map { it.id }
 				if (readMembers.containsAll(chatMembers)) {
-					messageDao.markRead(message.id)
+					// messageDao.markRead(message.id)
+					messageDao.updateDeliveryReceipt(channel.id, deliveryStatus)
 				}
 			}
 		}

@@ -27,7 +27,7 @@ fun ChatScreenAppBarTitle(channel: Channel) {
 	Row {
 		IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = {}) {
 			if (channel.isGroupChannel) {
-				NameInitialsView(userName = channel.name)
+				NameInitialsView(displayName = channel.name)
 			} else {
 				SmallCircularImage(
 					imageUrl = channel.members.firstOrNull()?.profileImage,

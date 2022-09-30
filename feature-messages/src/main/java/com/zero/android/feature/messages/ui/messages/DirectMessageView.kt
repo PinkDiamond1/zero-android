@@ -23,7 +23,10 @@ import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
-import com.zero.android.feature.messages.ui.components.*
+import com.zero.android.feature.messages.ui.components.ImageMessage
+import com.zero.android.feature.messages.ui.components.MessageContent
+import com.zero.android.feature.messages.ui.components.ReplyMessage
+import com.zero.android.feature.messages.ui.components.VideoMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
@@ -82,10 +85,9 @@ fun DirectMessage(
 				Spacer(modifier = Modifier.width(36.dp))
 			}
 			when (msg.type) {
-				MessageType.IMAGE ->
-					msg.fileUrl?.let { ImageMessage(it, msg.createdAt, isUserMe, isFirstMessageByAuthor) }
+				MessageType.IMAGE -> msg.fileUrl?.let { ImageMessage(it, msg.createdAt) }
 				MessageType.VIDEO -> {
-					msg.fileUrl?.let { VideoMessage(it, msg.createdAt, isUserMe, isFirstMessageByAuthor) }
+					msg.fileUrl?.let { VideoMessage(it, msg.createdAt) }
 				}
 				else ->
 					DMAuthorAndTextMessage(
@@ -93,7 +95,6 @@ fun DirectMessage(
 						message = msg,
 						isUserMe = isUserMe,
 						isSameDay = isSameDay,
-						isFirstMessageByAuthor = isFirstMessageByAuthor,
 						isLastMessageByAuthor = isLastMessageByAuthor,
 						authorClicked = onAuthorClick,
 						chatAttachmentViewModel = chatAttachmentViewModel
@@ -108,6 +109,7 @@ fun DirectMessage(
 				color = AppTheme.colors.colorTextSecondaryVariant
 			)
 		}
+		ChatBubbleSpacing(isFirstMessageByAuthor)
 	}
 }
 
@@ -121,7 +123,6 @@ fun DMAuthorAndTextMessage(
 	message: Message,
 	isUserMe: Boolean,
 	isSameDay: Boolean,
-	isFirstMessageByAuthor: Boolean,
 	isLastMessageByAuthor: Boolean,
 	chatAttachmentViewModel: ChatAttachmentViewModel,
 	authorClicked: (Member) -> Unit
@@ -132,56 +133,53 @@ fun DMAuthorAndTextMessage(
 		} else {
 			listOf(AppTheme.colors.chatBubblePrimaryVariant, AppTheme.colors.chatBubblePrimary)
 		}
-	Column {
-		Row {
-			Spacer(modifier = Modifier.width(12.dp))
-			Box(
-				modifier =
-				Modifier.background(
-					brush = Brush.linearGradient(colors = backgroundColorsList),
-					shape =
-					if (isLastMessageByAuthor || !isSameDay) {
-						if (isUserMe) ChatDirectAuthor else ChatDirectOther
-					} else ChatDirectSame
-				)
-			) {
-				Column(modifier = Modifier.padding(4.dp)) {
-					message.parentMessage?.let {
-						ReplyMessage(
-							modifier = Modifier.wrapContentWidth(),
-							message = it,
-							showCloseButton = false
-						)
-					}
-					if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
-						Text(
-							text = message.author?.name ?: "",
-							style = MaterialTheme.typography.titleMedium,
-							color = AppTheme.colors.glow,
-							modifier =
-							Modifier.padding(start = 4.dp, end = 4.dp, top = 2.dp)
-								.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
-						)
-						Spacer(modifier = Modifier.width(8.dp))
-					}
-					MessageContent(
-						message = message,
-						isUserMe = isUserMe,
-						authorClicked = authorClicked,
-						chatAttachmentViewModel = chatAttachmentViewModel
-					)
-					val messageDate = message.createdAt.toDate()
-					Text(
-						text = messageDate.format("hh:mm aa"),
-						style = MaterialTheme.typography.bodySmall,
-						modifier =
-						Modifier.align(Alignment.End).padding(start = 4.dp, end = 4.dp, bottom = 2.dp),
-						color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
+	Row {
+		Spacer(modifier = Modifier.width(12.dp))
+		Box(
+			modifier =
+			Modifier.background(
+				brush = Brush.linearGradient(colors = backgroundColorsList),
+				shape =
+				if (isLastMessageByAuthor || !isSameDay) {
+					if (isUserMe) ChatDirectAuthor else ChatDirectOther
+				} else ChatDirectSame
+			)
+		) {
+			Column(modifier = Modifier.padding(4.dp)) {
+				message.parentMessage?.let {
+					ReplyMessage(
+						modifier = Modifier.wrapContentWidth(),
+						message = it,
+						showCloseButton = false
 					)
 				}
+				if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
+					Text(
+						text = message.author?.name ?: "",
+						style = MaterialTheme.typography.titleMedium,
+						color = AppTheme.colors.glow,
+						modifier =
+						Modifier.padding(start = 4.dp, end = 4.dp, top = 2.dp)
+							.paddingFrom(LastBaseline, after = 8.dp) // Space to 1st bubble
+					)
+					Spacer(modifier = Modifier.width(8.dp))
+				}
+				MessageContent(
+					message = message,
+					isUserMe = isUserMe,
+					authorClicked = authorClicked,
+					chatAttachmentViewModel = chatAttachmentViewModel
+				)
+				val messageDate = message.createdAt.toDate()
+				Text(
+					text = messageDate.format("hh:mm aa"),
+					style = MaterialTheme.typography.bodySmall,
+					modifier =
+					Modifier.align(Alignment.End).padding(start = 4.dp, end = 4.dp, bottom = 2.dp),
+					color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
+				)
 			}
 		}
-		ChatBubbleSpacing(isFirstMessageByAuthor)
 	}
 }
 

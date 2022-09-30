@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.ui.components
 
+import android.view.MotionEvent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -91,11 +93,8 @@ fun UserInputPanel(
 	var textFieldFocusState by remember { mutableStateOf(false) }
 	var showSendButton by remember { mutableStateOf(false) }
 
-	Row(
-		modifier = modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
-		verticalAlignment = CenterVertically
-	) {
-		Spacer(modifier = Modifier.size(8.dp))
+	Row(modifier = modifier.fillMaxWidth(), verticalAlignment = CenterVertically) {
+		Spacer(modifier = Modifier.size(4.dp))
 		Icon(
 			imageVector = Icons.Filled.Add,
 			contentDescription = "cd_add_attachment",
@@ -104,6 +103,7 @@ fun UserInputPanel(
 				currentInputSelector = InputSelector.ATTACHMENT
 				addAttachment()
 			}
+				.padding(8.dp)
 		)
 		UserInputText(
 			modifier = Modifier.weight(1f),
@@ -135,6 +135,7 @@ fun UserInputPanel(
 			}
 		)
 		if (showSendButton) {
+			Spacer(modifier = Modifier.size(4.dp))
 			IconButton(
 				onClick = {
 					if (textState.text.isNotEmpty()) {
@@ -161,19 +162,26 @@ fun UserInputPanel(
 					currentInputSelector = InputSelector.IMAGE
 					addImage()
 				}
+					.padding(8.dp)
 			)
-			Spacer(modifier = Modifier.size(8.dp))
 			Icon(
 				painter = painterResource(R.drawable.ic_mic),
 				contentDescription = "cd_record_audio",
 				modifier =
-				Modifier.clickable {
-					currentInputSelector = InputSelector.VOICE_MEMO
-					recordMemo()
+				Modifier.pointerInteropFilter {
+					when (it.action) {
+						MotionEvent.ACTION_DOWN -> {
+							currentInputSelector = InputSelector.VOICE_MEMO
+							recordMemo()
+						}
+						else -> false
+					}
+					true
 				}
+					.padding(8.dp)
 			)
 		}
-		Spacer(modifier = Modifier.size(8.dp))
+		Spacer(modifier = Modifier.size(4.dp))
 	}
 }
 
@@ -215,10 +223,10 @@ private fun UserInputText(
 			placeHolderTextStyle =
 			MaterialTheme.typography.bodyMedium.copy(color = AppTheme.colors.colorTextSecondary),
 			modifier =
-			Modifier.fillMaxWidth().padding(10.dp).align(Alignment.CenterStart).onFocusChanged {
-					state ->
-				onTextFieldFocused(state.isFocused)
-			},
+			Modifier.fillMaxWidth()
+				.padding(vertical = 10.dp)
+				.align(Alignment.CenterStart)
+				.onFocusChanged { state -> onTextFieldFocused(state.isFocused) },
 			shape = RoundedCornerShape(24.dp),
 			keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Send),
 			keyboardActions = KeyboardActions(onSend = { onMessageSent(textFieldValue.text) })

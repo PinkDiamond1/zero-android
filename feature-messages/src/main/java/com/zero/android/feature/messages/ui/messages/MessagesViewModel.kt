@@ -46,7 +46,7 @@ constructor(
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 
-	val messages = chatRepository.messages.cachedIn(viewModelScope)
+	val messages = chatRepository.messages.onEach { markChannelRead() }.cachedIn(viewModelScope)
 	private val _messagesResult = messages.asResult()
 
 	private val _textSearch = MutableStateFlow("")
@@ -110,7 +110,8 @@ constructor(
 						val chatMembers = channel.members.filter { it.id != loggedInUserId }.map { it.id }
 						val readMembers = channelRepository.getReadMembers(channel.id).map { it.id }
 						if (readMembers.containsAll(chatMembers)) {
-							chatRepository.markRead(message)
+							// chatRepository.markRead(message)
+							chatRepository.markMessagesRead(channel.id)
 						}
 					}
 				}

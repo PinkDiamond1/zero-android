@@ -8,6 +8,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.zero.android.common.R.drawable
 import com.zero.android.models.Network
+import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
@@ -31,17 +32,20 @@ fun AppTopBar(
 		},
 		navigationIcon = {
 			IconButton(onClick = openDrawer) {
-				if (!network?.logo.isNullOrEmpty()) {
-					SmallCircularImage(
-						imageUrl = network?.logo,
-						placeHolder = drawable.ic_circular_image_placeholder
-					)
-				} else {
-					Icon(
-						painter = painterResource(id = drawable.ic_menu),
-						contentDescription = "Menu Icon",
-						tint = AppTheme.colors.surface
-					)
+				when {
+					!network?.logo.isNullOrEmpty() ->
+						SmallCircularImage(
+							imageUrl = network?.logo,
+							placeHolder = drawable.ic_circular_image_placeholder
+						)
+					!network?.displayName.isNullOrEmpty() ->
+						NameInitialsView(displayName = network?.displayName!!)
+					else ->
+						Icon(
+							painter = painterResource(id = drawable.ic_menu),
+							contentDescription = "Menu Icon",
+							tint = AppTheme.colors.surface
+						)
 				}
 			}
 		},

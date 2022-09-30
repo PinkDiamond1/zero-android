@@ -70,7 +70,7 @@ fun ReplyMessage(
 						message.message!!
 					} else "${message.type.name} Message"
 				Text(
-					text = replyMessage.messageFormatter(AppTheme.colors.glow),
+					text = replyMessage.messageFormatter(AppTheme.colors.colorTextPrimary),
 					color = Color.White.copy(0.75f),
 					style = MaterialTheme.typography.displayMedium,
 					fontWeight = FontWeight.Normal,

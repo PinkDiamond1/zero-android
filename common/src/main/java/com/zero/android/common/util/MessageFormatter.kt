@@ -135,12 +135,29 @@ private fun getSymbolAnnotation(
 				null
 			)
 		'h',
-		'w',
+		'w' ->
+			SymbolAnnotation(
+				AnnotatedString(
+					text = matchResult.value,
+					spanStyle =
+					SpanStyle(
+						color = annotationColor,
+						fontStyle = FontStyle.Italic,
+						textDecoration = TextDecoration.Underline
+					)
+				),
+				StringAnnotation(
+					item = matchResult.value,
+					start = matchResult.range.first,
+					end = matchResult.range.last,
+					tag = SymbolAnnotationType.LINK.name
+				)
+			)
 		'#' ->
 			SymbolAnnotation(
 				AnnotatedString(
 					text = matchResult.value,
-					spanStyle = SpanStyle(color = annotationColor)
+					spanStyle = SpanStyle(color = annotationColor, fontStyle = FontStyle.Italic)
 				),
 				StringAnnotation(
 					item = matchResult.value,

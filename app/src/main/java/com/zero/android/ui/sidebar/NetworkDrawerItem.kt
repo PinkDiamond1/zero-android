@@ -2,12 +2,7 @@ package com.zero.android.ui.sidebar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,14 +14,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.zero.android.common.R
 import com.zero.android.models.Network
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.CountBadge
 import com.zero.android.ui.components.MediumCircularImage
+import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 
@@ -39,70 +33,39 @@ fun NetworkDrawerItem(
 ) {
 	Row(
 		modifier =
-		modifier.fillMaxWidth().wrapContentHeight().padding(horizontal = 12.dp, vertical = 6.dp),
+		modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp).clickable {
+			onItemClick()
+		},
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
-		ConstraintLayout(
-			modifier =
-			modifier
-				.weight(1f)
-				.wrapContentHeight()
-				.padding(end = 4.dp)
-				.clickable(onClick = onItemClick)
-		) {
-			val (image, textTop, textBottom, textEnd) = createRefs()
-
+		if (item.logo.isNullOrEmpty()) {
+			NameInitialsView(modifier = Modifier.size(42.dp), displayName = item.displayName)
+		} else {
 			MediumCircularImage(
-				modifier =
-				modifier
-					.constrainAs(image) {
-						top.linkTo(parent.top)
-						bottom.linkTo(parent.bottom)
-						start.linkTo(parent.start)
-					}
-					.padding(end = 8.dp),
 				placeHolder = R.drawable.ic_circular_image_placeholder,
 				imageUrl = item.logo,
 				contentDescription = item.name
 			)
+		}
+		Spacer(modifier = Modifier.size(10.dp))
+		Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
 			Text(
 				text = item.displayName,
-				modifier =
-				modifier.constrainAs(textTop) {
-					top.linkTo(parent.top)
-					bottom.linkTo(textBottom.top)
-					linkTo(start = image.end, end = textEnd.start, bias = 0f)
-				},
 				color = AppTheme.colors.colorTextPrimary,
 				style = MaterialTheme.typography.bodyLarge
 			)
 			Text(
 				text = item.displayName,
-				modifier =
-				modifier.constrainAs(textBottom) {
-					top.linkTo(textTop.bottom)
-					bottom.linkTo(parent.bottom)
-					start.linkTo(textTop.start)
-					end.linkTo(textTop.end)
-					width = Dimension.fillToConstraints
-				},
 				color = AppTheme.colors.colorTextSecondaryVariant,
 				style = MaterialTheme.typography.bodyMedium
 			)
-			if (item.unreadCount > 0) {
-				CountBadge(
-					count = item.unreadCount,
-					modifier =
-					modifier.constrainAs(textEnd) {
-						top.linkTo(parent.top)
-						bottom.linkTo(parent.bottom)
-						end.linkTo(parent.end)
-					}
-				)
-			}
 		}
-
+		Spacer(modifier = Modifier.size(10.dp))
+		if (item.unreadCount > 0) {
+			CountBadge(count = item.unreadCount)
+			Spacer(modifier = Modifier.size(4.dp))
+		}
 		Image(
 			painter =
 			painterResource(

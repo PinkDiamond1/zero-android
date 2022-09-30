@@ -75,6 +75,9 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	@Query("UPDATE messages SET deliveryStatus = :deliveryStatus WHERE id = :id")
 	abstract suspend fun markRead(id: String, deliveryStatus: DeliveryStatus)
 
+	@Query("UPDATE messages SET deliveryStatus = :deliveryStatus WHERE channelId = :channelId")
+	abstract suspend fun updateDeliveryReceipt(channelId: String, deliveryStatus: DeliveryStatus)
+
 	@Query("DELETE FROM messages WHERE id = :id")
 	abstract suspend fun delete(id: String)
 
