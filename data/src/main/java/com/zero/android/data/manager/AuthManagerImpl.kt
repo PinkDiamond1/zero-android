@@ -13,6 +13,7 @@ import com.zero.android.models.AuthCredentials
 import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
 internal class AuthManagerImpl
@@ -39,15 +40,19 @@ constructor(
 			preferences.setUserImage(user.profile.profileImage)
 			authRepository.refreshChatAccessToken(credentials.accessToken)
 
+			onLogin(credentials)
+
 			// Joining Public Channels
-			networkRepository.getNetworks().lastOrNull()?.let { networks ->
+			networkRepository.getNetworks().take(2).lastOrNull()?.let { networks ->
 				networks.forEach { network ->
 					val channels = channelService.getPublicChannels(network.id)
-					for (channel in channels) channelRepository.joinChannel(channel.toModel())
+					for (channel in channels) {
+						if (channel.members.find { it.id == user.id } == null) {
+							channelRepository.joinChannel(channel.toModel())
+						}
+					}
 				}
 			}
-
-			onLogin(credentials)
 		} catch (e: Exception) {
 			logger.e(e)
 			dataCleaner.clean()
