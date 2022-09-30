@@ -4,7 +4,7 @@ import com.zero.android.common.R
 import com.zero.android.common.util.ValidationUtil
 import javax.inject.Inject
 
-class AuthUtil @Inject constructor() {
+class AuthValidator @Inject constructor() {
 
 	class LoginValidator(
 		val emailError: Int? = null,

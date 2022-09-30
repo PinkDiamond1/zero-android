@@ -4,6 +4,7 @@ import com.sendbird.android.GroupChannel
 import com.sendbird.android.GroupChannelListQuery
 import com.sendbird.android.OpenChannel
 import com.sendbird.android.OpenChannelListQuery
+import com.sendbird.android.PublicGroupChannelListQuery
 import com.zero.android.common.extensions.withSameScope
 import com.zero.android.common.system.Logger
 import com.zero.android.models.Channel
@@ -138,6 +139,27 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			}
 		}
 	}
+
+	override suspend fun getPublicChannels(networkId: String) =
+		suspendCancellableCoroutine { coroutine ->
+			val publicChannelQuery =
+				GroupChannel.createPublicGroupChannelListQuery().apply {
+					limit = 100
+					isIncludeEmpty = true
+					membershipFilter = PublicGroupChannelListQuery.MembershipFilter.ALL
+					superChannelFilter = PublicGroupChannelListQuery.SuperChannelFilter.ALL
+					customTypeStartsWithFilter = networkId.encodeToNetworkId()
+				}
+
+			publicChannelQuery.next { channels, e ->
+				if (e != null) {
+					logger.e("Failed to get group channels", e)
+					coroutine.resumeWithException(e)
+				} else {
+					coroutine.resume(channels.map { it.toGroupApi() })
+				}
+			}
+		}
 
 	override suspend fun createGroupChannel(
 		networkId: String,

@@ -29,6 +29,8 @@ interface ChannelService {
 		refresh: Boolean = false
 	): List<ApiDirectChannel>
 
+	suspend fun getPublicChannels(networkId: String): List<ApiGroupChannel>
+
 	suspend fun getChannel(url: String, type: ChannelType = ChannelType.GROUP): ApiChannel
 
 	suspend fun createGroupChannel(networkId: String, channel: GroupChannel): ApiGroupChannel

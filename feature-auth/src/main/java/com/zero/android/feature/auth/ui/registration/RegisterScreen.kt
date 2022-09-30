@@ -30,7 +30,7 @@ import com.zero.android.common.extensions.getActivity
 import com.zero.android.common.extensions.toFile
 import com.zero.android.feature.auth.AuthViewModel
 import com.zero.android.feature.auth.ui.components.*
-import com.zero.android.feature.auth.util.AuthUtil
+import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.ui.components.AppAlertDialog
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -82,7 +82,7 @@ fun RegisterRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () -> Unit
 @Composable
 fun RegisterScreen(
 	isLoading: Boolean,
-	registerValidator: AuthUtil.RegistrationValidator,
+	registerValidator: AuthValidator.RegistrationValidator,
 	requestError: String?,
 	onBack: () -> Unit,
 	onPickImage: (Intent) -> Unit,

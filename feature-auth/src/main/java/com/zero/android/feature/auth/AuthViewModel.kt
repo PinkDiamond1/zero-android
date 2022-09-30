@@ -6,7 +6,7 @@ import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.repository.AuthRepository
-import com.zero.android.feature.auth.util.AuthUtil
+import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.models.AuthCredentials
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ class AuthViewModel
 constructor(
 	private val authManager: AuthManager,
 	private val authRepository: AuthRepository,
-	private val authUtil: AuthUtil
+	private val authValidator: AuthValidator
 ) : BaseViewModel() {
 
 	enum class AuthScreenUIState {
@@ -32,14 +32,14 @@ constructor(
 	val loading = MutableStateFlow(false)
 	val error = MutableStateFlow<String?>(null)
 
-	val loginValidator = MutableStateFlow(AuthUtil.LoginValidator())
-	val registerValidator = MutableStateFlow(AuthUtil.RegistrationValidator())
-	val forgotPasswordValidator = MutableStateFlow(AuthUtil.ResetPasswordValidator())
+	val loginValidator = MutableStateFlow(AuthValidator.LoginValidator())
+	val registerValidator = MutableStateFlow(AuthValidator.RegistrationValidator())
+	val forgotPasswordValidator = MutableStateFlow(AuthValidator.ResetPasswordValidator())
 	val forgotPasswordRequestState: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	fun login(email: String?, password: String?) {
 		ioScope.launch {
-			val formValidator = authUtil.validateLogin(email, password)
+			val formValidator = authValidator.validateLogin(email, password)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
 				authRepository.login(email!!, password!!).asResult().collect {
@@ -92,7 +92,7 @@ constructor(
 
 	fun resetPassword(email: String?) {
 		ioScope.launch {
-			val formValidator = authUtil.validateForgotPassword(email)
+			val formValidator = authValidator.validateForgotPassword(email)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
 				authRepository.forgotPassword(email!!).asResult().collect {
@@ -122,7 +122,7 @@ constructor(
 		profilePic: File? = null
 	) {
 		ioScope.launch {
-			val formValidator = authUtil.validateRegistration(name, email, password, confirmPassword)
+			val formValidator = authValidator.validateRegistration(name, email, password, confirmPassword)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
 				authRepository.register(name!!, email!!, password!!, profilePic).asResult().collect {
@@ -153,9 +153,9 @@ constructor(
 		ioScope.launch {
 			error.emit(null)
 			if (resetValidations) {
-				loginValidator.emit(AuthUtil.LoginValidator())
-				forgotPasswordValidator.emit(AuthUtil.ResetPasswordValidator())
-				registerValidator.emit(AuthUtil.RegistrationValidator())
+				loginValidator.emit(AuthValidator.LoginValidator())
+				forgotPasswordValidator.emit(AuthValidator.ResetPasswordValidator())
+				registerValidator.emit(AuthValidator.RegistrationValidator())
 			}
 		}
 	}

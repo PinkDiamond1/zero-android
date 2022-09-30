@@ -3,11 +3,16 @@ package com.zero.android.data.manager
 import android.content.Context
 import com.zero.android.common.system.Logger
 import com.zero.android.common.system.PushNotifications
+import com.zero.android.data.conversion.toModel
 import com.zero.android.data.repository.AuthRepository
+import com.zero.android.data.repository.ChannelRepository
+import com.zero.android.data.repository.NetworkRepository
 import com.zero.android.data.repository.UserRepository
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.models.AuthCredentials
+import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
 import javax.inject.Inject
 
 internal class AuthManagerImpl
@@ -15,6 +20,9 @@ internal class AuthManagerImpl
 constructor(
 	private val authRepository: AuthRepository,
 	private val userRepository: UserRepository,
+	private val channelService: ChannelService,
+	private val channelRepository: ChannelRepository,
+	private val networkRepository: NetworkRepository,
 	private val preferences: AppPreferences,
 	private val connectionManager: ConnectionManager,
 	private val pushNotifications: PushNotifications,
@@ -30,6 +38,14 @@ constructor(
 			preferences.setUserId(user.id)
 			preferences.setUserImage(user.profile.profileImage)
 			authRepository.refreshChatAccessToken(credentials.accessToken)
+
+			// Joining Public Channels
+			networkRepository.getNetworks().lastOrNull()?.let { networks ->
+				networks.forEach { network ->
+					val channels = channelService.getPublicChannels(network.id)
+					for (channel in channels) channelRepository.joinChannel(channel.toModel())
+				}
+			}
 
 			onLogin(credentials)
 		} catch (e: Exception) {
