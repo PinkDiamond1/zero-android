@@ -34,7 +34,7 @@ import com.zero.android.feature.auth.ui.components.AuthBackground
 import com.zero.android.feature.auth.ui.components.AuthButton
 import com.zero.android.feature.auth.ui.components.AuthInputField
 import com.zero.android.feature.auth.ui.components.PasswordTextField
-import com.zero.android.feature.auth.util.AuthUtil
+import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.ui.components.AppAlertDialog
 import com.zero.android.ui.components.CircularImage
 import com.zero.android.ui.components.StrikeLabel
@@ -49,7 +49,7 @@ fun LoginRoute(
 	onRegister: () -> Unit
 ) {
 	val uiState: AuthScreenUIState by viewModel.uiState.collectAsState()
-	val loginValidator: AuthUtil.LoginValidator by viewModel.loginValidator.collectAsState()
+	val loginValidator: AuthValidator.LoginValidator by viewModel.loginValidator.collectAsState()
 	val isLoading: Boolean by viewModel.loading.collectAsState()
 	val requestError: String? by viewModel.error.collectAsState()
 	val context = LocalContext.current
@@ -77,7 +77,7 @@ fun LoginRoute(
 fun LoginScreen(
 	requestError: String?,
 	isLoading: Boolean,
-	loginValidator: AuthUtil.LoginValidator,
+	loginValidator: AuthValidator.LoginValidator,
 	onForgotPassword: () -> Unit,
 	onRegister: () -> Unit,
 	onLogin: (String?, String?) -> Unit,

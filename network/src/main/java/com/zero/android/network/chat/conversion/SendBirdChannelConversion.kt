@@ -98,7 +98,7 @@ internal fun GroupChannel.toGroupApi(): ApiGroupChannel {
 		coverUrl = coverUrl,
 		properties = properties,
 		isTemporary = isEphemeral,
-		createdBy = creator.toApi(),
+		createdBy = creator?.toApi(),
 		alerts = myPushTriggerOption.toType(),
 		isPublic = isPublic && isDiscoverable,
 		isDiscoverable = isDiscoverable,

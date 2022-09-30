@@ -29,7 +29,7 @@ import com.zero.android.feature.auth.AuthViewModel
 import com.zero.android.feature.auth.ui.components.AuthBackground
 import com.zero.android.feature.auth.ui.components.AuthButton
 import com.zero.android.feature.auth.ui.components.AuthInputField
-import com.zero.android.feature.auth.util.AuthUtil
+import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.ui.components.AppAlertDialog
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.customTextStyle
@@ -59,7 +59,7 @@ fun ResetPasswordRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () ->
 @Composable
 fun ResetPasswordScreen(
 	isLoading: Boolean,
-	forgotPasswordValidator: AuthUtil.ResetPasswordValidator,
+	forgotPasswordValidator: AuthValidator.ResetPasswordValidator,
 	isForgotPasswordSuccess: Boolean,
 	requestError: String?,
 	onBack: () -> Unit,
