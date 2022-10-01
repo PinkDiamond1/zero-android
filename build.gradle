@@ -3,7 +3,7 @@ buildscript {
 		"id"         : "com.zero.android",
 
 		"version"    : 1,
-		"versionName": "1.1",
+		"versionName": "1.3",
 
 		"minSdk"     : 21,
 		"compileSdk" : 33,

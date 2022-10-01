@@ -1,5 +1,6 @@
 package com.zero.android.feature.messages.ui.messages
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -23,7 +24,10 @@ import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
-import com.zero.android.feature.messages.ui.components.*
+import com.zero.android.feature.messages.ui.components.ImageMessage
+import com.zero.android.feature.messages.ui.components.MessageContent
+import com.zero.android.feature.messages.ui.components.ReplyMessage
+import com.zero.android.feature.messages.ui.components.VideoMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
@@ -100,9 +104,11 @@ fun DirectMessage(
 					)
 			}
 		}
-		if (showDeliveryStatus) {
+		AnimatedVisibility(
+			visible = showDeliveryStatus,
+			modifier = Modifier.align(Alignment.End).padding(end = 16.dp)
+		) {
 			Text(
-				modifier = Modifier.align(Alignment.End).padding(end = 16.dp),
 				style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
 				text = msg.deliveryStatus.name.lowercase().replaceFirstChar { it.uppercase() },
 				color = AppTheme.colors.colorTextSecondaryVariant
