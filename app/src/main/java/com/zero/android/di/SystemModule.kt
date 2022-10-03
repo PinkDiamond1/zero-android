@@ -9,7 +9,7 @@ import com.zero.android.system.PermissionsManagerImpl
 import com.zero.android.system.PushNotificationsImpl
 import com.zero.android.system.SoundManagerImpl
 import com.zero.android.system.ThemeManagerImpl
-import com.zero.android.ui.maanger.ThemeManager
+import com.zero.android.ui.manager.ThemeManager
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

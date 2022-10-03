@@ -4,7 +4,7 @@ import android.content.Context
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
-import com.zero.android.data.manager.AuthManager
+import com.zero.android.data.manager.SessionManager
 import com.zero.android.data.repository.AuthRepository
 import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.models.AuthCredentials
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class AuthViewModel
 @Inject
 constructor(
-	private val authManager: AuthManager,
+	private val sessionManager: SessionManager,
 	private val authRepository: AuthRepository,
 	private val authValidator: AuthValidator
 ) : BaseViewModel() {
@@ -143,7 +143,7 @@ constructor(
 
 	private fun onAuth(authCredentials: AuthCredentials) {
 		ioScope.launch {
-			authManager.login(authCredentials)
+			sessionManager.login(authCredentials)
 			uiState.emit(AuthScreenUIState.LOGIN)
 			loading.emit(false)
 		}

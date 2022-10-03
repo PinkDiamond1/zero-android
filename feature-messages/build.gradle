@@ -7,8 +7,9 @@ plugins {
 apply from: '../feature_module.gradle'
 
 dependencies {
+	// UI
+	implementation "io.coil-kt:coil-video:${versions.coilVideo}"
+
 	// Data
 	implementation "androidx.paging:paging-compose:${versions.pagingCompose}"
-	//Coil - Video Frame
-	implementation "io.coil-kt:coil-video:${versions.coilVideo}"
 }

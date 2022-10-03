@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
-internal class AuthManagerImpl
+internal class SessionManagerImpl
 @Inject
 constructor(
 	private val authRepository: AuthRepository,
@@ -29,7 +29,7 @@ constructor(
 	private val pushNotifications: PushNotifications,
 	private val dataCleaner: DataCleaner,
 	private val logger: Logger
-) : AuthManager {
+) : SessionManager {
 
 	override suspend fun login(credentials: AuthCredentials) {
 		preferences.setAuthCredentials(credentials)

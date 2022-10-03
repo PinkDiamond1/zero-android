@@ -4,7 +4,18 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +48,7 @@ import com.zero.android.ui.theme.AppTheme
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DirectMessage(
+	modifier: Modifier = Modifier,
 	msg: Message,
 	isUserMe: Boolean,
 	isSameDay: Boolean,
@@ -49,10 +61,10 @@ fun DirectMessage(
 ) {
 	val focusManager = LocalFocusManager.current
 	val currentSelectedMessage: Message? by MessageActionStateHandler.selectedMessage.collectAsState()
-	val modifier = if (isLastMessageByAuthor) Modifier.padding(top = 8.dp) else Modifier
+	val mModifier = if (isLastMessageByAuthor) modifier.padding(top = 8.dp) else modifier
 	Column(
 		modifier =
-		modifier
+		mModifier
 			.fillMaxWidth()
 			.combinedClickable(
 				onClick = {

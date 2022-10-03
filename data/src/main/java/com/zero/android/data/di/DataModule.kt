@@ -3,8 +3,6 @@ package com.zero.android.data.di
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.delegates.PreferencesImpl
 import com.zero.android.data.manager.AppSocketListenerImpl
-import com.zero.android.data.manager.AuthManager
-import com.zero.android.data.manager.AuthManagerImpl
 import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.data.manager.ConnectionManagerImpl
 import com.zero.android.data.manager.DataCleaner
@@ -13,6 +11,8 @@ import com.zero.android.data.manager.ImageLoader
 import com.zero.android.data.manager.ImageLoaderImpl
 import com.zero.android.data.manager.MediaPlayerManager
 import com.zero.android.data.manager.MediaPlayerManagerImpl
+import com.zero.android.data.manager.SessionManager
+import com.zero.android.data.manager.SessionManagerImpl
 import com.zero.android.network.SocketListener
 import dagger.Binds
 import dagger.Module
@@ -31,7 +31,7 @@ internal interface DataModule {
 
 	@Binds fun provideAppSocketListener(socket: AppSocketListenerImpl): SocketListener
 
-	@Binds fun provideAuthManager(preferences: AuthManagerImpl): AuthManager
+	@Binds fun provideSessionManager(preferences: SessionManagerImpl): SessionManager
 
 	@Binds fun provideImageLoader(imageLoader: ImageLoaderImpl): ImageLoader
 

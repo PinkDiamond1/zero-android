@@ -60,21 +60,6 @@ fun MediumCircularImage(
 }
 
 @Composable
-fun BigCircularImage(
-	modifier: Modifier = Modifier,
-	imageUrl: String? = null,
-	@DrawableRes placeHolder: Int,
-	contentDescription: String = ""
-) {
-	NetworkImage(
-		modifier = modifier.size(54.dp),
-		imageUrl = imageUrl,
-		placeHolder = placeHolder,
-		contentDescription = contentDescription
-	)
-}
-
-@Composable
 fun LargeCircularImage(
 	modifier: Modifier = Modifier,
 	imageUrl: String? = null,
@@ -121,7 +106,6 @@ private fun NetworkImage(
 			.crossfade(200)
 			.build(),
 		contentScale = ContentScale.Crop,
-		placeholder = painterResource(placeHolder),
 		error = painterResource(placeHolder),
 		contentDescription = contentDescription,
 		modifier = modifier.clip(CircleShape)

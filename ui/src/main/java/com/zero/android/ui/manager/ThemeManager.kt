@@ -1,4 +1,4 @@
-package com.zero.android.ui.maanger
+package com.zero.android.ui.manager
 
 import kotlinx.coroutines.flow.StateFlow
 

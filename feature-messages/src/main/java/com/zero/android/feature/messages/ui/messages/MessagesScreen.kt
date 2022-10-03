@@ -35,7 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.github.dhaval2404.imagepicker.ImagePicker
 import com.zero.android.common.extensions.getActivity
 import com.zero.android.common.extensions.isVideoFile
 import com.zero.android.common.extensions.toFile
@@ -52,9 +51,13 @@ import com.zero.android.feature.messages.util.MessageUtil
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
-import com.zero.android.ui.components.*
+import com.zero.android.ui.components.BottomBarDivider
+import com.zero.android.ui.components.FadeExpandAnimation
+import com.zero.android.ui.components.FadeSlideAnimation
+import com.zero.android.ui.components.InstantAnimation
 import com.zero.android.ui.extensions.OnLifecycleEvent
 import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.manager.GalleryManager
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
 import java.io.File
@@ -294,10 +297,14 @@ fun MessagesScreen(
 									}
 								},
 								addAttachment = {
-									context.getActivity()?.let { showImagePicker(false, it, onPickImage) }
+									context.getActivity()?.let {
+										GalleryManager.getChatMediaPicker(it, false, onPickImage)
+									}
 								},
 								addImage = {
-									context.getActivity()?.let { showImagePicker(true, it, onPickImage) }
+									context.getActivity()?.let {
+										GalleryManager.getChatMediaPicker(it, true, onPickImage)
+									}
 								},
 								recordMemo = onRecordMemo,
 								onTextChanged = { if (mentionUser) onTextChanged(it) }
@@ -307,18 +314,6 @@ fun MessagesScreen(
 				}
 			}
 		}
-	}
-}
-
-private fun showImagePicker(
-	fromCamera: Boolean = false,
-	activity: Activity,
-	onImagePicker: (Intent) -> Unit
-) {
-	ImagePicker.with(activity).apply {
-		if (fromCamera) cameraOnly() else galleryOnly()
-		galleryMimeTypes(arrayOf("image/png", "image/jpg", "image/jpeg", "video/mp4"))
-		createIntent { onImagePicker(it) }
 	}
 }
 

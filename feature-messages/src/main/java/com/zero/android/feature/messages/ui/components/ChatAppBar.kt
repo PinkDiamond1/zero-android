@@ -11,7 +11,9 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import com.zero.android.common.R
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.models.Channel
@@ -30,6 +32,7 @@ fun ChatAppBar(
 	onDeleteMessage: (Message) -> Unit
 ) {
 	val actionMessage by MessageActionStateHandler.selectedMessage.collectAsState()
+	val clipboardManager = LocalClipboardManager.current
 
 	AppBar(
 		navIcon = {
@@ -58,6 +61,23 @@ fun ChatAppBar(
 		scrollBehavior = scrollBehavior,
 		actions = {
 			if (actionMessage != null) {
+				actionMessage
+					?.message
+					?.takeIf { it.isNotEmpty() }
+					?.let { message ->
+						IconButton(
+							onClick = {
+								clipboardManager.setText(AnnotatedString(message))
+								MessageActionStateHandler.closeActionMode()
+							}
+						) {
+							Icon(
+								painter = painterResource(R.drawable.ic_copy_24),
+								contentDescription = "cd_message_copy",
+								tint = AppTheme.colors.surface
+							)
+						}
+					}
 				if (actionMessage?.isReply == false) {
 					IconButton(onClick = { MessageActionStateHandler.replyToMessage() }) {
 						Icon(

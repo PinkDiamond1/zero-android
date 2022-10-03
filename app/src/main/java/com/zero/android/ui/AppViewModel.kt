@@ -3,12 +3,12 @@ package com.zero.android.ui
 import com.zero.android.common.extensions.emitInScope
 import com.zero.android.common.extensions.withScope
 import com.zero.android.common.ui.base.BaseViewModel
-import com.zero.android.data.manager.AuthManager
 import com.zero.android.data.manager.ConnectionManager
+import com.zero.android.data.manager.SessionManager
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.models.AuthCredentials
 import com.zero.android.navigation.AppGraph
-import com.zero.android.ui.maanger.ThemeManager
+import com.zero.android.ui.manager.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ class AppViewModel
 @Inject
 constructor(
 	private val preferences: AppPreferences,
-	private val authManager: AuthManager,
+	private val sessionManager: SessionManager,
 	private val connectionManager: ConnectionManager,
 	themeManager: ThemeManager
 ) : BaseViewModel() {
@@ -45,7 +45,7 @@ constructor(
 
 	private fun onLoggedIn(authCredentials: AuthCredentials) =
 		withScope(Dispatchers.IO) {
-			authManager.onLogin(authCredentials)
+			sessionManager.onLogin(authCredentials)
 			loading.emit(false)
 		}
 

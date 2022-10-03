@@ -5,14 +5,30 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,14 +40,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.github.dhaval2404.imagepicker.ImagePicker
 import com.zero.android.common.R
 import com.zero.android.common.extensions.getActivity
 import com.zero.android.common.extensions.toFile
 import com.zero.android.feature.auth.AuthViewModel
-import com.zero.android.feature.auth.ui.components.*
+import com.zero.android.feature.auth.ui.components.AuthBackground
+import com.zero.android.feature.auth.ui.components.AuthButton
+import com.zero.android.feature.auth.ui.components.AuthInputField
+import com.zero.android.feature.auth.ui.components.PasswordStrengthMeter
+import com.zero.android.feature.auth.ui.components.PasswordTextField
 import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.ui.components.AppAlertDialog
+import com.zero.android.ui.manager.GalleryManager
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
 import java.io.File
@@ -133,7 +153,9 @@ fun RegisterScreen(
 				Spacer(modifier = Modifier.size(24.dp))
 				OutlinedButton(
 					modifier = Modifier.size(100.dp),
-					onClick = { context.getActivity()?.let { showImagePicker(it, onPickImage) } },
+					onClick = {
+						context.getActivity()?.let { GalleryManager.getGalleryImagePicker(it, onPickImage) }
+					},
 					shape = CircleShape,
 					border = BorderStroke(1.dp, AppTheme.colors.glow)
 				) {
@@ -202,12 +224,5 @@ fun RegisterScreen(
 				}
 			}
 		}
-	}
-}
-
-private fun showImagePicker(activity: Activity, onImagePicker: (Intent) -> Unit) {
-	ImagePicker.with(activity).apply {
-		galleryOnly()
-		createIntent { onImagePicker(it) }
 	}
 }

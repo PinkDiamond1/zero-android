@@ -1,6 +1,6 @@
 package com.zero.android.system
 
-import com.zero.android.ui.maanger.ThemeManager
+import com.zero.android.ui.manager.ThemeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

@@ -8,7 +8,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.zero.android.common.R
+import com.zero.android.ui.R
 
 val InterFontFamily =
 	FontFamily(
