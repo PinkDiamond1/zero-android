@@ -14,16 +14,10 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
-import com.zero.android.feature.messages.ui.messages.ChatBubbleSpacing
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
-fun ImageMessage(
-	imageUrl: String,
-	messageDate: Long,
-	isUserMe: Boolean,
-	isFirstMessageByAuthor: Boolean
-) {
+fun ImageMessage(imageUrl: String, messageDate: Long) {
 	val date = messageDate.toDate()
 	Column {
 		Row {
@@ -47,6 +41,5 @@ fun ImageMessage(
 			modifier = Modifier.align(Alignment.End).padding(start = 4.dp, end = 4.dp, bottom = 2.dp),
 			color = AppTheme.colors.colorTextSecondary
 		)
-		ChatBubbleSpacing(isFirstMessageByAuthor)
 	}
 }

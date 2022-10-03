@@ -21,7 +21,6 @@ import coil.request.ImageRequest
 import com.zero.android.common.R
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
-import com.zero.android.feature.messages.ui.messages.ChatBubbleSpacing
 import com.zero.android.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 
@@ -29,12 +28,7 @@ private val frameDecoder = VideoFrameDecoder.Factory()
 private val decoderDispatcher = Dispatchers.IO
 
 @Composable
-fun VideoMessage(
-	fileUrl: String,
-	messageDate: Long,
-	isUserMe: Boolean,
-	isFirstMessageByAuthor: Boolean
-) {
+fun VideoMessage(fileUrl: String, messageDate: Long) {
 	val date = messageDate.toDate()
 	val model =
 		ImageRequest.Builder(LocalContext.current)
@@ -77,6 +71,5 @@ fun VideoMessage(
 			modifier = Modifier.align(Alignment.End).padding(start = 4.dp, end = 4.dp, bottom = 2.dp),
 			color = AppTheme.colors.colorTextSecondary
 		)
-		ChatBubbleSpacing(isFirstMessageByAuthor)
 	}
 }

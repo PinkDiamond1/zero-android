@@ -2,24 +2,17 @@ package com.zero.android.ui.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.DropdownMenu
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +32,7 @@ import com.zero.android.common.R
 import com.zero.android.common.ui.Result
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
+import com.zero.android.feature.channels.navigation.DirectChannelsDestination
 import com.zero.android.feature.channels.ui.components.ChannelNotificationSettingsView
 import com.zero.android.models.Network
 import com.zero.android.navigation.HomeNavHost
@@ -47,11 +41,9 @@ import com.zero.android.navigation.extensions.navigate
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.components.Background
-import com.zero.android.ui.components.ExtraSmallCircularImage
 import com.zero.android.ui.components.dialog.DialogListItem
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
-import com.zero.android.ui.theme.customTextStyle
 import com.zero.android.ui.util.BackHandler
 import kotlinx.coroutines.launch
 
@@ -111,20 +103,12 @@ fun HomeScreen(
 	bottomNavController.addOnDestinationChangedListener { _, _, _ -> onTriggerSearch(false) }
 
 	val actionItems: @Composable RowScope.() -> Unit = {
-		ExtraSmallCircularImage(
-			imageUrl = viewModel.loggedInUserImage,
-			placeHolder = R.drawable.img_profile_avatar
-		)
-		Spacer(modifier = modifier.size(6.dp))
-		if (currentScreen == ChannelsDestination) {
-			IconButton(onClick = { onTriggerSearch(true) }, modifier = Modifier.size(32.dp)) {
-				Image(
-					painter = painterResource(R.drawable.ic_search),
-					contentDescription = stringResource(R.string.search_channels),
-					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
-				)
-			}
-		} else {
+    /*ExtraSmallCircularImage(
+    	imageUrl = viewModel.loggedInUserImage,
+    	placeHolder = R.drawable.img_profile_avatar
+    )
+    Spacer(modifier = modifier.size(6.dp))*/
+		if (currentScreen == ChannelsDestination || currentScreen == DirectChannelsDestination) {
 			IconButton(
 				modifier = Modifier.size(24.dp),
 				onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
@@ -135,35 +119,54 @@ fun HomeScreen(
 					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
 				)
 			}
-			IconButton(onClick = { showMenu = !showMenu }) {
-				Icon(Icons.Default.MoreVert, contentDescription = "", tint = AppTheme.colors.surface)
-			}
-			DropdownMenu(
-				expanded = showMenu,
-				onDismissRequest = { showMenu = false },
-				modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant)
-			) {
-				DropdownMenuItem(
-					text = {
-						Text(
-							text = stringResource(R.string.search),
-							style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current),
-							color = AppTheme.colors.surface
-						)
-					},
-					leadingIcon = {
-						Image(
-							painter = painterResource(R.drawable.ic_search),
-							contentDescription = stringResource(R.string.search_channels),
-							colorFilter = ColorFilter.tint(AppTheme.colors.surface)
-						)
-					},
-					onClick = {
-						showMenu = false
-						onTriggerSearch(true)
-					}
+			Spacer(modifier = modifier.size(6.dp))
+			IconButton(onClick = { onTriggerSearch(true) }, modifier = Modifier.size(32.dp)) {
+				Image(
+					painter = painterResource(R.drawable.ic_search),
+					contentDescription = stringResource(R.string.search_channels),
+					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
 				)
 			}
+		} else {
+      /*IconButton(
+      	modifier = Modifier.size(24.dp),
+      	onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
+      ) {
+      	Image(
+      		painter = painterResource(R.drawable.ic_add_circle),
+      		contentDescription = stringResource(R.string.create_direct_message),
+      		colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+      	)
+      }
+      IconButton(onClick = { showMenu = !showMenu }) {
+      	Icon(Icons.Default.MoreVert, contentDescription = "", tint = AppTheme.colors.surface)
+      }
+      DropdownMenu(
+      	expanded = showMenu,
+      	onDismissRequest = { showMenu = false },
+      	modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant)
+      ) {
+      	DropdownMenuItem(
+      		text = {
+      			Text(
+      				text = stringResource(R.string.search),
+      				style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current),
+      				color = AppTheme.colors.surface
+      			)
+      		},
+      		leadingIcon = {
+      			Image(
+      				painter = painterResource(R.drawable.ic_search),
+      				contentDescription = stringResource(R.string.search_channels),
+      				colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+      			)
+      		},
+      		onClick = {
+      			showMenu = false
+      			onTriggerSearch(true)
+      		}
+      	)
+      }*/
 		}
 	}
 

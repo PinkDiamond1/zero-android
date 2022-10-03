@@ -77,7 +77,7 @@ fun ChannelSearchItem(
 						verticalAlignment = Alignment.CenterVertically,
 						modifier = Modifier.fillMaxWidth().clickable { onClick(channel) }
 					) {
-						NameInitialsView(modifier = Modifier.size(32.dp), userName = channel.name)
+						NameInitialsView(modifier = Modifier.size(32.dp), displayName = channel.name)
 						Spacer(modifier = Modifier.size(8.dp))
 						Text(
 							text = channel.name,

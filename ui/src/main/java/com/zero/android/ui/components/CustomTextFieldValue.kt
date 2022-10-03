@@ -65,7 +65,7 @@ fun CustomTextFieldValue(
 					leadingIcon()
 					Spacer(modifier = Modifier.size(12.dp))
 				}
-				Box(Modifier.weight(1f)) {
+				Box(Modifier.weight(1f).padding(horizontal = 10.dp)) {
 					if (value.text.isEmpty()) Text(placeholderText, style = placeHolderTextStyle)
 					innerTextField()
 				}

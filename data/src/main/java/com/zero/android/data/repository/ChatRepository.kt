@@ -23,6 +23,8 @@ interface ChatRepository {
 
 	suspend fun markRead(message: Message)
 
+	suspend fun markMessagesRead(channelId: String)
+
 	suspend fun deleteMessage(message: Message, channel: Channel)
 
 	suspend fun getChatMedia(channelId: String)

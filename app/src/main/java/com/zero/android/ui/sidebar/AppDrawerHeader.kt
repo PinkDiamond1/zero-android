@@ -18,6 +18,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.zero.android.common.R
 import com.zero.android.models.Network
 import com.zero.android.models.fake.FakeModel
+import com.zero.android.ui.components.NameInitialsView
 import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
@@ -35,16 +36,27 @@ fun AppDrawerHeader(
 		) {
 			val (imageStart, textTop, textBottom, imageEnd, inviteButton) = createRefs()
 
-			SmallCircularImage(
-				imageUrl = network.logo,
-				contentDescription = network.name,
-				modifier =
-				Modifier.constrainAs(imageStart) {
-					top.linkTo(parent.top)
-					start.linkTo(parent.start)
-				},
-				placeHolder = R.drawable.ic_circular_image_placeholder
-			)
+			if (network.logo.isNullOrEmpty()) {
+				NameInitialsView(
+					modifier =
+					Modifier.size(42.dp).constrainAs(imageStart) {
+						top.linkTo(parent.top)
+						start.linkTo(parent.start)
+					},
+					displayName = network.name
+				)
+			} else {
+				SmallCircularImage(
+					imageUrl = network.logo,
+					contentDescription = network.name,
+					modifier =
+					Modifier.constrainAs(imageStart) {
+						top.linkTo(parent.top)
+						start.linkTo(parent.start)
+					},
+					placeHolder = R.drawable.ic_circular_image_placeholder
+				)
+			}
 			Text(
 				text = network.displayName,
 				modifier =
