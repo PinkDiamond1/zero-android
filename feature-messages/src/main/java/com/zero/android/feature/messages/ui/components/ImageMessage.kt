@@ -28,7 +28,7 @@ fun ImageMessage(imageUrl: String, messageDate: Long) {
 					ImageRequest.Builder(LocalContext.current)
 						.data(imageUrl)
 						.crossfade(true)
-						.crossfade(500)
+						.crossfade(400)
 						.build(),
 					contentDescription = "",
 					modifier = Modifier.wrapContentWidth().heightIn(max = 300.dp).align(Alignment.Center)

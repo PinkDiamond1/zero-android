@@ -2,7 +2,11 @@ package com.zero.android.ui.home
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -16,7 +20,13 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -104,68 +114,66 @@ fun HomeScreen(
 
 	val actionItems: @Composable RowScope.() -> Unit = {
     /*ExtraSmallCircularImage(
-    	imageUrl = viewModel.loggedInUserImage,
-    	placeHolder = R.drawable.img_profile_avatar
+        imageUrl = viewModel.loggedInUserImage,
+        placeHolder = R.drawable.img_profile_avatar
     )
     Spacer(modifier = modifier.size(6.dp))*/
 		if (currentScreen == ChannelsDestination || currentScreen == DirectChannelsDestination) {
-			IconButton(
-				modifier = Modifier.size(24.dp),
-				onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
-			) {
+			IconButton(onClick = { navigateToRootDestination(CreateDirectChannelDestination) }) {
 				Image(
 					painter = painterResource(R.drawable.ic_add_circle),
 					contentDescription = stringResource(R.string.create_direct_message),
-					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+					colorFilter = ColorFilter.tint(AppTheme.colors.surface),
+					modifier = Modifier.size(28.dp)
 				)
 			}
-			Spacer(modifier = modifier.size(6.dp))
-			IconButton(onClick = { onTriggerSearch(true) }, modifier = Modifier.size(32.dp)) {
+			IconButton(onClick = { onTriggerSearch(true) }) {
 				Image(
 					painter = painterResource(R.drawable.ic_search),
 					contentDescription = stringResource(R.string.search_channels),
-					colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+					colorFilter = ColorFilter.tint(AppTheme.colors.surface),
+					modifier = Modifier.size(22.dp)
 				)
 			}
 		} else {
       /*IconButton(
-      	modifier = Modifier.size(24.dp),
-      	onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
+          modifier = Modifier.size(24.dp),
+          onClick = { navigateToRootDestination(CreateDirectChannelDestination) }
       ) {
-      	Image(
-      		painter = painterResource(R.drawable.ic_add_circle),
-      		contentDescription = stringResource(R.string.create_direct_message),
-      		colorFilter = ColorFilter.tint(AppTheme.colors.surface)
-      	)
+          Image(
+              painter = painterResource(R.drawable.ic_add_circle),
+              contentDescription = stringResource(R.string.create_direct_message),
+              colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+          )
       }
       IconButton(onClick = { showMenu = !showMenu }) {
-      	Icon(Icons.Default.MoreVert, contentDescription = "", tint = AppTheme.colors.surface)
+          Icon(Icons.Default.MoreVert, contentDescription = "", tint = AppTheme.colors.surface)
       }
       DropdownMenu(
-      	expanded = showMenu,
-      	onDismissRequest = { showMenu = false },
-      	modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant)
+          expanded = showMenu,
+          onDismissRequest = { showMenu = false },
+          modifier = Modifier.background(color = MaterialTheme.colorScheme.surfaceVariant)
       ) {
-      	DropdownMenuItem(
-      		text = {
-      			Text(
-      				text = stringResource(R.string.search),
-      				style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current),
-      				color = AppTheme.colors.surface
-      			)
-      		},
-      		leadingIcon = {
-      			Image(
-      				painter = painterResource(R.drawable.ic_search),
-      				contentDescription = stringResource(R.string.search_channels),
-      				colorFilter = ColorFilter.tint(AppTheme.colors.surface)
-      			)
-      		},
-      		onClick = {
-      			showMenu = false
-      			onTriggerSearch(true)
-      		}
-      	)
+          DropdownMenuItem(
+              text = {
+                  Text(
+                      text = stringResource(R.string.search),
+                      style = MaterialTheme.typography.customTextStyle(LocalTextStyle.current),
+                      color = AppTheme.colors.surface
+                  )
+              },
+              leadingIcon = {
+                  Image(
+                      painter = painterResource(R.drawable.ic_search),
+                      contentDescription = stringResource(R.string.search_channels),
+                      colorFilter = ColorFilter.tint(AppTheme.colors.surface)
+                  )
+              },
+              onClick = {
+                  showMenu = false
+                  onTriggerSearch(true)
+              }
+          )
       }*/
 		}
 	}

@@ -103,7 +103,7 @@ private fun NetworkImage(
 			.diskCachePolicy(CachePolicy.ENABLED)
 			.data(imageUrl)
 			.crossfade(true)
-			.crossfade(200)
+			.crossfade(400)
 			.build(),
 		contentScale = ContentScale.Crop,
 		error = painterResource(placeHolder),
