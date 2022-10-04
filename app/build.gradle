@@ -78,7 +78,6 @@ dependencies {
 	implementation project(":feature-people")
 
 	implementation "androidx.core:core-ktx:${versions.coreKtx}"
-	implementation "androidx.activity:activity-compose:${versions.composeActivity}"
 	implementation "com.google.dagger:hilt-android:${versions.hilt}"
 	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
 
@@ -87,6 +86,7 @@ dependencies {
 	implementation "com.onesignal:OneSignal:${versions.onesignal}"
 
 	// UI
+	implementation "androidx.activity:activity-compose:${versions.composeActivity}"
 	implementation "androidx.core:core-splashscreen:${versions.splashscreen}"
 	implementation "io.coil-kt:coil-compose:${versions.coil}"
 

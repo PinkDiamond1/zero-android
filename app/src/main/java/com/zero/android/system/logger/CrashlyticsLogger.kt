@@ -1,17 +1,17 @@
 package com.zero.android.system.logger
 
-import android.annotation.SuppressLint
 import android.util.Log
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.zero.android.common.system.Logger
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class ConsoleLogger @Inject constructor() : Logger {
+internal class CrashlyticsLogger @Inject constructor() : Logger {
 
 	override fun setup(release: Boolean) {
-		Timber.plant(if (release) Timber.DebugTree() else ConsoleLoggingTree())
+		Timber.plant(CrashReportingTree())
 	}
 
 	override fun d(message: String) = Timber.d(message)
@@ -30,12 +30,10 @@ internal class ConsoleLogger @Inject constructor() : Logger {
 
 	override fun e(t: Throwable) = Timber.e(t)
 
-	private class ConsoleLoggingTree : Timber.Tree() {
-
-		@SuppressLint("LogNotTimber")
+	private class CrashReportingTree : Timber.Tree() {
 		override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
 			if (priority == Log.VERBOSE || priority == Log.DEBUG) return
-			Log.e(tag, message, t ?: Exception(message))
+			FirebaseCrashlytics.getInstance().recordException(t ?: Exception(message))
 		}
 	}
 }

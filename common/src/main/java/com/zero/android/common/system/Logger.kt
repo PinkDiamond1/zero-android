@@ -2,10 +2,7 @@ package com.zero.android.common.system
 
 interface Logger {
 
-	fun setup(debug: Boolean)
-
-	fun v(message: String)
-	fun v(t: Throwable, message: String? = null)
+	fun setup(release: Boolean)
 
 	fun d(message: String)
 	fun d(t: Throwable, message: String? = null)
