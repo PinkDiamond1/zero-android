@@ -9,13 +9,15 @@ import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.zero.android.common.extensions.callbackFlowWithAwait
 import com.zero.android.common.system.Logger
+import com.zero.android.common.util.APPLICATION_ID
 import com.zero.android.network.BuildConfig
 import com.zero.android.network.auth.conversion.toAuthCredentials
 import com.zero.android.network.auth.conversion.toException
+import com.zero.android.network.service.AuthService
 import java.io.File
 import javax.inject.Inject
 
-class AuthServiceImpl @Inject constructor(private val logger: Logger) : AuthService {
+internal class AuthServiceImpl @Inject constructor(private val logger: Logger) : AuthService {
 	private val auth0 by lazy { Auth0(BuildConfig.AUTH0_CLIENT_ID, BuildConfig.AUTH0_DOMAIN) }
 	private val authenticationClient by lazy { AuthenticationAPIClient(auth0) }
 	private val lockAudience by lazy { BuildConfig.AUTH0_AUDIENCE }
@@ -57,25 +59,30 @@ class AuthServiceImpl @Inject constructor(private val logger: Logger) : AuthServ
 			)
 	}
 
-	override suspend fun register(name: String, email: String, password: String, profilePic: File?) =
-		callbackFlowWithAwait {
-			val userMeta = mapOf("status" to "pending", "invite" to "TtXFrLVdmSsW")
-			authenticationClient
-				.signUp(email, password, name, AUTH0_REALM_CONNECTION, userMeta)
-				.validateClaims()
-				.start(
-					object : Callback<Credentials, AuthenticationException> {
-						override fun onFailure(error: AuthenticationException) {
-							logger.e(error.getDescription())
-							close(error.toException())
-						}
-
-						override fun onSuccess(result: Credentials) {
-							trySend(result.toAuthCredentials())
-						}
+	override suspend fun register(
+		name: String,
+		email: String,
+		password: String,
+		inviteCode: String,
+		profilePic: File?
+	) = callbackFlowWithAwait {
+		val userMeta = mapOf("status" to "pending", "invite" to inviteCode)
+		authenticationClient
+			.signUp(email, password, name, AUTH0_REALM_CONNECTION, userMeta)
+			.validateClaims()
+			.start(
+				object : Callback<Credentials, AuthenticationException> {
+					override fun onFailure(error: AuthenticationException) {
+						logger.e(error.getDescription())
+						close(error.toException())
 					}
-				)
-		}
+
+					override fun onSuccess(result: Credentials) {
+						trySend(result.toAuthCredentials())
+					}
+				}
+			)
+	}
 
 	override suspend fun loginWithGoogle(context: Context) = callbackFlowWithAwait {
 		WebAuthProvider.login(auth0)
@@ -135,7 +142,6 @@ class AuthServiceImpl @Inject constructor(private val logger: Logger) : AuthServ
 	}
 
 	companion object {
-		private const val APPLICATION_ID = "com.zero.android"
 		private const val AUTH0_REALM_CONNECTION = "Username-Password-Authentication"
 		private const val AUTH0_SCOPE = "openid profile offline_access"
 		private const val AUTH0_CONNECTION_GOOGLE = "google-oauth2"

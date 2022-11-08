@@ -60,6 +60,7 @@ constructor(
 					it.resume(Unit)
 				} else {
 					// Proceed in online mode.
+					registerNotificationHandler()
 					it.resume(Unit)
 				}
 			} else {
@@ -100,7 +101,9 @@ constructor(
 
 	override fun registerNotificationHandler() {
 		logger.d("Registering to SendBird Notifications")
-		SendBirdPushHelper.registerPushHandler(fcmService)
+		if (SendBird.getConnectionState() == SendBird.ConnectionState.OPEN) {
+			SendBirdPushHelper.registerPushHandler(fcmService)
+		}
 	}
 
 	private suspend fun unregisterNotificationHandler() = suspendCoroutine {

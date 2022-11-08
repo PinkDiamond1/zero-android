@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.zero.android.database.base.BaseDatabaseTest
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.fake.FakeEntity
+import com.zero.android.database.util.result
 import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -24,6 +25,7 @@ class MessageDaoTest : BaseDatabaseTest() {
 	fun setup() = runTest {
 		db.networkDao().insert(FakeEntity.NetworkEntity())
 		channelDao.upsert(FakeEntity.DirectChannelWithRefs(id = "channelId", lastMessage = null))
+		channelDao.upsert(FakeEntity.DirectChannelWithRefs(id = "channelId2", lastMessage = null))
 	}
 
 	@Test
@@ -37,6 +39,18 @@ class MessageDaoTest : BaseDatabaseTest() {
 		assertEquals(message.parentMessageAuthor?.id, data?.parentMessageAuthor?.id)
 		assertEquals(message.author?.id, data?.author?.id)
 		assertEquals(message.mentions?.size, data?.mentions?.size)
+	}
+
+	@Test
+	fun insertMessageWithVerification() = runTest {
+		messageDao.upsert(message)
+		messageDao.upsert(
+			FakeEntity.MessageWithRefs(id = "messageId2", channelId = "channelId4"),
+			verifyChannel = true
+		)
+
+		assertNotNull(messageDao.get(message.message.id).first())
+		assertNull(messageDao.get("messageId2").first())
 	}
 
 	@Test
@@ -55,6 +69,23 @@ class MessageDaoTest : BaseDatabaseTest() {
 		data = messageDao.get("id").firstOrNull()
 		assertNotNull(data)
 		assertEquals("r1", data?.message?.requestId)
+	}
+
+	@Test
+	fun getMessages() = runTest {
+		messageDao.upsert(message)
+		messageDao.upsert(
+			FakeEntity.MessageWithRefs(id = "messageId2", channelId = "channelId", reply = true)
+		)
+		messageDao.upsert(
+			FakeEntity.MessageWithRefs(id = "messageId3", channelId = "channelId2", reply = false)
+		)
+
+		var data = messageDao.getByChannel("channelId").result()
+		assertEquals(3, data?.size) // 1 Parent Message
+
+		data = messageDao.getByChannel("channelId2").result()
+		assertEquals(1, data?.size)
 	}
 
 	@Test

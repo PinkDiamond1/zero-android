@@ -1,5 +1,6 @@
 package com.zero.android.models
 
+import com.zero.android.common.R
 import com.zero.android.models.enums.AccessType
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
@@ -9,7 +10,7 @@ interface Channel {
 	val name: String
 	val members: List<Member>
 	val memberCount: Int
-	val coverUrl: String?
+	val image: String?
 	val createdAt: Long
 	val isTemporary: Boolean
 	val unreadMentionCount: Int
@@ -27,7 +28,7 @@ data class DirectChannel(
 	override val name: String,
 	override val members: List<Member>,
 	override val memberCount: Int,
-	override val coverUrl: String? = null,
+	override val image: String? = null,
 	override val lastMessage: Message? = null,
 	override val createdAt: Long,
 	override val isTemporary: Boolean = false,
@@ -46,7 +47,7 @@ data class GroupChannel(
 	val operators: List<Member>,
 	override val members: List<Member>,
 	override val memberCount: Int,
-	override val coverUrl: String? = null,
+	override val image: String? = null,
 	override val lastMessage: Message? = null,
 	override val createdAt: Long,
 	override val isTemporary: Boolean = false,
@@ -67,11 +68,17 @@ data class GroupChannel(
 	val accessType: AccessType = AccessType.PUBLIC
 ) : Channel {
 
-	val hasDiscordChannel: Boolean
+	val isDiscordChannel: Boolean
 		get() = !discordChatId.isNullOrEmpty()
 
-	val hasTelegramChannel: Boolean
+	val isTelegramChannel: Boolean
 		get() = !telegramChatId.isNullOrEmpty()
+
+	val icon: Int?
+		get() = run {
+			if (isTelegramChannel) R.drawable.ic_chat_icon
+			else if (isDiscordChannel) R.drawable.ic_discord else null
+		}
 }
 
 val Channel.isGroupChannel

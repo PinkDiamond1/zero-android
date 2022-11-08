@@ -14,7 +14,6 @@ interface ApiChannel {
 	val id: String
 	val members: List<ApiMember>
 	val memberCount: Int
-	val coverUrl: String?
 	val createdAt: Long
 	val isTemporary: Boolean
 	val unreadMentionCount: Int
@@ -29,7 +28,6 @@ data class ApiDirectChannel(
 	override val id: String,
 	override val members: List<ApiMember>,
 	override val memberCount: Int,
-	override val coverUrl: String? = null,
 	override val lastMessage: ApiMessage? = null,
 	override val createdAt: Long,
 	override val isTemporary: Boolean = false,
@@ -40,7 +38,9 @@ data class ApiDirectChannel(
 ) : ApiChannel {
 
 	fun name(loggedInUserId: String?) =
-		members.filter { it.id != loggedInUserId }.joinToString { it.nickname ?: "" }.trim()
+		members.filter { it.id != loggedInUserId }.joinToString { it.nickname?.trim() ?: "" }.trim()
+
+	fun image(loggedInUserId: String?) = members.firstOrNull { it.id != loggedInUserId }?.profileImage
 }
 
 @Serializable
@@ -52,7 +52,7 @@ data class ApiGroupChannel(
 	val operators: List<ApiMember>,
 	override val members: List<ApiMember>,
 	override val memberCount: Int,
-	override val coverUrl: String? = null,
+	val image: String? = null,
 	override val lastMessage: ApiMessage? = null,
 	override val createdAt: Long,
 	@SerialName("data") val properties: ApiChannelProperties? = null,
@@ -79,5 +79,6 @@ data class ApiChannelProperties(
 	val groupChannelType: AccessType = AccessType.PRIVATE,
 	val isVideoEnabled: Boolean = true,
 	val telegramChatId: String? = null,
-	val discordChatId: String? = null
+	val discordChatId: String? = null,
+	val discordChannelId: String? = null
 )

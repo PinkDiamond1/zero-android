@@ -1,12 +1,11 @@
 package com.zero.android.feature.messages.util
 
+import com.zero.android.common.util.DateUtil
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.Member
 import com.zero.android.models.enums.MessageMentionType
-import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
 import java.io.File
-import java.util.*
 
 object MessageUtil {
 
@@ -17,9 +16,8 @@ object MessageUtil {
 			type = MessageType.TEXT,
 			mentionType = MessageMentionType.USER,
 			message = prepareMessage(msg, channelMembers).trim(),
-			createdAt = Calendar.getInstance().timeInMillis,
-			updatedAt = Calendar.getInstance().timeInMillis,
-			status = MessageStatus.SUCCEEDED,
+			createdAt = DateUtil.currentTimeMillis(),
+			updatedAt = DateUtil.currentTimeMillis(),
 			mentions = getMentionedUsers(msg, channelMembers).map { it.id }
 		)
 
@@ -59,9 +57,9 @@ object MessageUtil {
 			type = type,
 			mentionType = MessageMentionType.USER,
 			file = file,
+			fileName = file.name,
 			fileMimeType = type.serializedName,
-			createdAt = Calendar.getInstance().timeInMillis,
-			updatedAt = Calendar.getInstance().timeInMillis,
-			status = MessageStatus.SUCCEEDED
+			createdAt = DateUtil.currentTimeMillis(),
+			updatedAt = DateUtil.currentTimeMillis()
 		)
 }

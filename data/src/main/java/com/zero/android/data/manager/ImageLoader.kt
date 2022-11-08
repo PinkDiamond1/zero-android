@@ -1,13 +1,19 @@
 package com.zero.android.data.manager
 
 import android.content.Context
+import android.graphics.Bitmap
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import kotlinx.coroutines.flow.Flow
 
 interface ImageLoader {
 
 	fun preload(url: String)
+
+	suspend fun load(url: String, size: Int? = null): Flow<Bitmap?>
+
+	suspend fun load(url: String, width: Int? = null, height: Int? = null): Flow<Bitmap?>
 
 	companion object {
 

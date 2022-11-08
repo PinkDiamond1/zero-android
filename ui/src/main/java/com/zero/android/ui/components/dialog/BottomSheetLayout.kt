@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
+import com.zero.android.ui.components.TextIconListItem
 import com.zero.android.ui.extensions.Preview
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -42,7 +43,9 @@ fun BottomSheetLayoutPreview() = Preview {
 	BottomSheetLayout(
 		state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Expanded),
 		content = {
-			Column { DialogListItem(icon = R.drawable.ic_settings, text = "Item Text", onClick = {}) }
+			Column { TextIconListItem(icon = R.drawable.ic_settings, text = "Item Text", onClick = {}) }
 		}
-	) { Text(text = "Testing") }
+	) {
+		Text(text = "Testing")
+	}
 }

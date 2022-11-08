@@ -47,6 +47,8 @@ interface ChannelService {
 
 	suspend fun joinChannel(channel: Channel)
 
+	suspend fun leaveChannel(channel: Channel)
+
 	suspend fun deleteChannel(channel: Channel)
 
 	suspend fun markChannelRead(channel: Channel)

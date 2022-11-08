@@ -1,16 +1,20 @@
 package com.zero.android.feature.channels.ui.directchannels
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.zero.android.common.system.NetworkManager
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.common.usecases.SearchTriggerUseCase
+import com.zero.android.common.util.ConnectionState
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.data.repository.ChannelRepository
 import com.zero.android.models.DirectChannel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +27,7 @@ import javax.inject.Inject
 class DirectChannelsViewModel
 @Inject
 constructor(
+	@ApplicationContext context: Context,
 	private val preferences: Preferences,
 	private val channelRepository: ChannelRepository,
 	private val searchTriggerUseCase: SearchTriggerUseCase
@@ -40,6 +45,14 @@ constructor(
 
 	init {
 		loadChannels()
+
+		viewModelScope.launch {
+			NetworkManager.observeConnection(context).collect {
+				if (it is ConnectionState.Available && !showSearchBar.value) {
+					loadChannels()
+				}
+			}
+		}
 	}
 
 	fun filterChannels(query: String?) = loadChannels(search = query)

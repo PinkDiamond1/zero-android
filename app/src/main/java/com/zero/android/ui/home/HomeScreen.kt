@@ -1,37 +1,20 @@
 package com.zero.android.ui.home
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,7 +34,8 @@ import com.zero.android.navigation.extensions.navigate
 import com.zero.android.ui.appbar.AppBottomBar
 import com.zero.android.ui.appbar.AppTopBar
 import com.zero.android.ui.components.Background
-import com.zero.android.ui.components.dialog.DialogListItem
+import com.zero.android.ui.components.SmallClickableIcon
+import com.zero.android.ui.components.TextIconListItem
 import com.zero.android.ui.sidebar.NetworkDrawerContent
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
@@ -61,30 +45,37 @@ import kotlinx.coroutines.launch
 fun HomeRoute(
 	navController: NavController,
 	viewModel: HomeViewModel = hiltViewModel(),
-	onLogout: () -> Unit,
+	onLogout: (String?) -> Unit,
 	navigateToRootDestination: (NavDestination) -> Unit
 ) {
+	val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsState()
 	val currentScreen by viewModel.currentScreen.collectAsState()
 	val currentNetwork: Network? by viewModel.selectedNetwork.collectAsState()
 	val networks: Result<List<Network>> by viewModel.networks.collectAsState()
 
 	val unreadDMs by viewModel.unreadDMsCount.collectAsState()
 
-	HomeScreen(
-		viewModel = viewModel,
-		navController = navController,
-		currentScreen = currentScreen,
-		currentNetwork = currentNetwork,
-		networks = networks,
-		unreadDMs = unreadDMs,
-		onNetworkSelected = {
-			viewModel.switchTheme()
-			viewModel.onNetworkSelected(it)
-		},
-		onTriggerSearch = { viewModel.triggerSearch(it) },
-		onLogout = onLogout,
-		navigateToRootDestination = navigateToRootDestination
-	)
+	isUserLoggedIn?.let {
+		if (it) {
+			HomeScreen(
+				viewModel = viewModel,
+				navController = navController,
+				currentScreen = currentScreen,
+				currentNetwork = currentNetwork,
+				networks = networks,
+				unreadDMs = unreadDMs,
+				onNetworkSelected = {
+					viewModel.switchTheme()
+					viewModel.onNetworkSelected(it)
+				},
+				onTriggerSearch = { viewModel.triggerSearch(it) },
+				onLogout = { onLogout(viewModel.inviteCode) },
+				navigateToRootDestination = navigateToRootDestination
+			)
+		} else {
+			onLogout(viewModel.inviteCode)
+		}
+	}
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -119,22 +110,16 @@ fun HomeScreen(
     )
     Spacer(modifier = modifier.size(6.dp))*/
 		if (currentScreen == ChannelsDestination || currentScreen == DirectChannelsDestination) {
-			IconButton(onClick = { navigateToRootDestination(CreateDirectChannelDestination) }) {
-				Image(
-					painter = painterResource(R.drawable.ic_add_circle),
-					contentDescription = stringResource(R.string.create_direct_message),
-					colorFilter = ColorFilter.tint(AppTheme.colors.surface),
-					modifier = Modifier.size(28.dp)
-				)
-			}
-			IconButton(onClick = { onTriggerSearch(true) }) {
-				Image(
-					painter = painterResource(R.drawable.ic_search),
-					contentDescription = stringResource(R.string.search_channels),
-					colorFilter = ColorFilter.tint(AppTheme.colors.surface),
-					modifier = Modifier.size(22.dp)
-				)
-			}
+			SmallClickableIcon(
+				icon = R.drawable.ic_add_circle,
+				onClick = { navigateToRootDestination(CreateDirectChannelDestination) },
+				contentDescription = stringResource(R.string.create_direct_message)
+			)
+			SmallClickableIcon(
+				icon = R.drawable.ic_search,
+				onClick = { onTriggerSearch(true) },
+				contentDescription = stringResource(R.string.search_channels)
+			)
 		} else {
       /*IconButton(
           modifier = Modifier.size(24.dp),
@@ -211,7 +196,9 @@ fun HomeScreen(
 
 	if (currentScreen != ChannelsDestination || scaffoldState.drawerState.isOpen) {
 		BackHandler {
-			if (scaffoldState.drawerState.isOpen) {
+			if (bottomState.isVisible) {
+				coroutineScope.launch { bottomState.hide() }
+			} else if (scaffoldState.drawerState.isOpen) {
 				coroutineScope.launch { scaffoldState.drawerState.close() }
 			} else if (currentScreen != ChannelsDestination) {
 				coroutineScope.launch { viewModel.currentScreen.emit(ChannelsDestination) }
@@ -225,14 +212,12 @@ fun HomeScreen(
 		sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
 		sheetContent = {
 			if (selectedNetworkSetting != null) {
-				ChannelNotificationSettingsView(
-					onItemSelected = { alertType ->
-						selectedNetworkSetting?.let {
-							viewModel.updateNetworkNotificationSetting(it, alertType)
-						}
-						coroutineScope.launch { bottomState.hide() }
+				ChannelNotificationSettingsView { alertType ->
+					selectedNetworkSetting?.let {
+						viewModel.updateNetworkNotificationSetting(it, alertType)
 					}
-				)
+					coroutineScope.launch { bottomState.hide() }
+				}
 			} else {
 				Column(modifier = modifier) {
 					Text(
@@ -250,7 +235,7 @@ fun HomeScreen(
 						modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
 					)
 					Divider(color = AppTheme.colors.divider)
-					DialogListItem(text = stringResource(R.string.logout)) {
+					TextIconListItem(text = stringResource(R.string.logout)) {
 						viewModel.logout(context = context, onLogout = onLogout)
 					}
 				}
@@ -293,8 +278,7 @@ fun HomeScreen(
 						}
 					}
 				)
-			},
-			drawerGesturesEnabled = scaffoldState.drawerState.isOpen
+			}
 		) { innerPadding ->
 			Background {
 				Box(modifier = Modifier.padding(innerPadding)) {

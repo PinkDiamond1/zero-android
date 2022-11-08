@@ -1,126 +1,127 @@
 package com.zero.android.feature.messages.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.models.Channel
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
-import com.zero.android.ui.components.AppBar
+import com.zero.android.ui.components.SmallClickableIcon
 import com.zero.android.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatAppBar(
+	modifier: Modifier,
 	channel: Channel,
 	loggedInUser: String,
 	scrollBehavior: TopAppBarScrollBehavior? = null,
 	onBackClick: () -> Unit,
-	onDeleteMessage: (Message) -> Unit
+	onDeleteMessage: (Message) -> Unit,
+	onCopyMedia: (Message) -> Unit,
+	onChannelDetailsClick: () -> Unit
 ) {
 	val actionMessage by MessageActionStateHandler.selectedMessage.collectAsState()
 	val clipboardManager = LocalClipboardManager.current
 
-	AppBar(
-		navIcon = {
-			IconButton(
-				onClick = {
-					if (actionMessage != null) {
-						MessageActionStateHandler.closeActionMode()
-					} else {
-						MessageActionStateHandler.reset()
-						onBackClick()
-					}
-				}
+	Box(
+		modifier =
+		modifier
+			.fillMaxWidth()
+			.background(color = AppTheme.colors.surfaceInverse.copy(alpha = 0.8f))
+	) {
+		Box(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+			Row(
+				modifier = Modifier.align(Alignment.CenterStart),
+				verticalAlignment = Alignment.CenterVertically
 			) {
-				Icon(
-					imageVector = Icons.Filled.ArrowBack,
-					contentDescription = "cd_back",
-					tint = AppTheme.colors.glow
-				)
-			}
-		},
-		title = {
-			if (actionMessage == null) {
+				IconButton(
+					onClick = {
+						if (actionMessage != null) {
+							MessageActionStateHandler.closeActionMode()
+						} else {
+							MessageActionStateHandler.reset()
+							onBackClick()
+						}
+					}
+				) {
+					Icon(
+						imageVector = Icons.Filled.ArrowBack,
+						contentDescription = "",
+						tint = AppTheme.colors.glow
+					)
+				}
 				ChatScreenAppBarTitle(channel)
 			}
-		},
-		scrollBehavior = scrollBehavior,
-		actions = {
-			if (actionMessage != null) {
-				actionMessage
-					?.message
-					?.takeIf { it.isNotEmpty() }
-					?.let { message ->
-						IconButton(
+			Row(
+				modifier = Modifier.align(Alignment.CenterEnd),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				// 			if (actionMessage == null) {
+				// 				SmallClickableIcon(
+				// 					icon = R.drawable.ic_more_vertical,
+				// 					contentDescription = "Channel Info",
+				// 					onClick = onChannelDetailsClick
+				// 				)
+				// 			} else {
+				if (actionMessage != null) {
+					val message = actionMessage!!
+					if ((message.type == MessageType.IMAGE) ||
+						(message.type == MessageType.TEXT && !message.message.isNullOrEmpty())
+					) {
+						SmallClickableIcon(
+							icon = R.drawable.ic_copy_24,
+							contentDescription = "Copy",
 							onClick = {
-								clipboardManager.setText(AnnotatedString(message))
+								if (message.type == MessageType.IMAGE) {
+									onCopyMedia(message)
+								} else {
+									clipboardManager.setText(AnnotatedString(message.message!!))
+								}
 								MessageActionStateHandler.closeActionMode()
 							}
-						) {
-							Icon(
-								painter = painterResource(R.drawable.ic_copy_24),
-								contentDescription = "cd_message_copy",
-								tint = AppTheme.colors.surface
+						)
+					}
+					if (!message.isReply) {
+						SmallClickableIcon(
+							icon = R.drawable.ic_reply_24,
+							contentDescription = "Reply",
+							onClick = { MessageActionStateHandler.replyToMessage() }
+						)
+					}
+					if (message.author?.id == loggedInUser) {
+						if (message.type !in MessageType.mediaMessageTypes) {
+							SmallClickableIcon(
+								vector = Icons.Filled.Edit,
+								contentDescription = "Edit",
+								onClick = { MessageActionStateHandler.editTextMessage() }
 							)
 						}
-					}
-				if (actionMessage?.isReply == false) {
-					IconButton(onClick = { MessageActionStateHandler.replyToMessage() }) {
-						Icon(
-							painter = painterResource(R.drawable.ic_reply_24),
-							contentDescription = "cd_message_action_reply",
-							tint = AppTheme.colors.surface
+						SmallClickableIcon(
+							vector = Icons.Filled.Delete,
+							contentDescription = "Delete",
+							onClick = {
+								message.let(onDeleteMessage)
+								MessageActionStateHandler.closeActionMode()
+							}
 						)
 					}
 				}
-				if (actionMessage!!.author?.id == loggedInUser) {
-					if (actionMessage!!.type == MessageType.TEXT) {
-						IconButton(onClick = { MessageActionStateHandler.editTextMessage() }) {
-							Icon(
-								imageVector = Icons.Filled.Edit,
-								contentDescription = "cd_message_action_edit",
-								tint = AppTheme.colors.surface
-							)
-						}
-					}
-					IconButton(
-						onClick = {
-							actionMessage?.let(onDeleteMessage)
-							MessageActionStateHandler.closeActionMode()
-						}
-					) {
-						Icon(
-							imageVector = Icons.Filled.Delete,
-							contentDescription = "cd_message_action_delete",
-							tint = AppTheme.colors.surface
-						)
-					}
-				}
-			} else {
-          /*IconButton(onClick = {}) {
-              Icon(
-                  painter = painterResource(R.drawable.ic_search),
-                  contentDescription = "cd_search_message"
-              )
-          }
-          IconButton(onClick = {}) {
-              Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "cd_more_options")
-          }*/
 			}
 		}
-	)
+	}
 }

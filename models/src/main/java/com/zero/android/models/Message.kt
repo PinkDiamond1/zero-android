@@ -49,6 +49,12 @@ data class Message(
 
 	val isReply
 		get() = parentMessage != null
+
+	val isDraft
+		get() = status == MessageStatus.DRAFT
+
+	val isSent
+		get() = status != MessageStatus.DRAFT && !id.startsWith(DraftMessage.PREFIX_DRAFT_ID)
 }
 
 data class DraftMessage(
@@ -60,18 +66,23 @@ data class DraftMessage(
 	override val message: String? = null,
 	override val createdAt: Long,
 	override val updatedAt: Long,
-	override val status: MessageStatus,
+	override val status: MessageStatus = MessageStatus.NONE,
 	override val deliveryStatus: DeliveryStatus = DeliveryStatus.SENT,
 	override val data: String? = null,
 	var parentMessage: Message? = null,
 	override val isMuted: Boolean = false,
 	val file: File? = null,
 	val fileUrl: String? = null,
+	val fileRequestId: String? = if (file != null) UUID.randomUUID().toString() else null,
 	override val fileName: String? = null,
 	override val fileThumbnails: List<FileThumbnail>? = null,
-	override val fileMimeType: String? = null,
-	val fileRequestId: String? = if (file != null) UUID.randomUUID().toString() else null
-) : BaseMessage
+	override val fileMimeType: String? = null
+) : BaseMessage {
+
+	companion object {
+		const val PREFIX_DRAFT_ID = "draft_"
+	}
+}
 
 @Serializable
 data class FileThumbnail(

@@ -50,7 +50,9 @@ fun WaveAnimation(@DrawableRes iconResId: Int, iconTint: Color) {
 					scaleY = dy * 4 + 1
 					alpha = 1 - dy
 				}
-			) { Box(Modifier.fillMaxSize().background(color = Color.White, shape = CircleShape)) }
+			) {
+				Box(Modifier.fillMaxSize().background(color = Color.White, shape = CircleShape))
+			}
 		}
 		// Center Icon
 		Box(Modifier.size(26.dp).align(Center).background(color = Color.White, shape = CircleShape)) {

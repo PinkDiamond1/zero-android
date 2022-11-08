@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,14 +52,19 @@ import com.zero.android.feature.auth.ui.components.AuthInputField
 import com.zero.android.feature.auth.ui.components.PasswordStrengthMeter
 import com.zero.android.feature.auth.ui.components.PasswordTextField
 import com.zero.android.feature.auth.util.AuthValidator
-import com.zero.android.ui.components.AppAlertDialog
+import com.zero.android.ui.components.ErrorDialog
 import com.zero.android.ui.manager.GalleryManager
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
 import java.io.File
 
 @Composable
-fun RegisterRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () -> Unit) {
+fun RegisterRoute(
+	viewModel: AuthViewModel = hiltViewModel(),
+	onRegister: (String?) -> Unit,
+	onBack: () -> Unit
+) {
+	val uiState: AuthViewModel.AuthScreenUIState by viewModel.uiState.collectAsState()
 	val registerValidator by viewModel.registerValidator.collectAsState()
 	val isLoading: Boolean by viewModel.loading.collectAsState()
 	val requestError: String? by viewModel.error.collectAsState()
@@ -86,17 +93,21 @@ fun RegisterRoute(viewModel: AuthViewModel = hiltViewModel(), onBack: () -> Unit
 				}
 			}
 		)
-	RegisterScreen(
-		isLoading,
-		registerValidator,
-		requestError,
-		onBack = onBack,
-		onPickImage = { imageSelectorLauncher.launch(it) },
-		onRegister = { name, email, password, confirmPassword ->
-			viewModel.register(name, email, password, confirmPassword, profilePic)
-		},
-		onErrorShown = { viewModel.resetErrorState() }
-	)
+	if (uiState == AuthViewModel.AuthScreenUIState.LOGIN) {
+		LaunchedEffect(Unit) { onRegister(viewModel.inviteCode) }
+	} else {
+		RegisterScreen(
+			isLoading,
+			registerValidator,
+			requestError,
+			onBack = onBack,
+			onPickImage = { imageSelectorLauncher.launch(it) },
+			onRegister = { name, email, password, confirmPassword ->
+				viewModel.register(name, email, password, confirmPassword, profilePic)
+			},
+			onErrorShown = { viewModel.resetErrorState() }
+		)
+	}
 }
 
 @Composable
@@ -127,7 +138,7 @@ fun RegisterScreen(
 	AuthBackground(isLoading) {
 		Box {
 			if (!requestError.isNullOrEmpty()) {
-				AppAlertDialog(requestError) { onErrorShown() }
+				ErrorDialog(requestError) { onErrorShown() }
 			}
 			Column(
 				modifier = Modifier.fillMaxSize(),
@@ -146,7 +157,7 @@ fun RegisterScreen(
 						text = stringResource(R.string.create_account),
 						style = MaterialTheme.typography.bodyLarge,
 						fontWeight = FontWeight.SemiBold,
-						color = AppTheme.colors.colorTextPrimary,
+						color = Color.White,
 						textAlign = TextAlign.Center
 					)
 				}
@@ -154,7 +165,9 @@ fun RegisterScreen(
 				OutlinedButton(
 					modifier = Modifier.size(100.dp),
 					onClick = {
-						context.getActivity()?.let { GalleryManager.getGalleryImagePicker(it, onPickImage) }
+						context.getActivity()?.let {
+							GalleryManager.getGalleryImagePicker(it, onPickImage)
+						}
 					},
 					shape = CircleShape,
 					border = BorderStroke(1.dp, AppTheme.colors.glow)

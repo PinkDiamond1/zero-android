@@ -2,21 +2,10 @@ package com.zero.android.network.di
 
 import com.zero.android.common.system.Logger
 import com.zero.android.network.Retrofit
-import com.zero.android.network.auth.AuthService
 import com.zero.android.network.auth.AuthServiceImpl
 import com.zero.android.network.chat.sendbird.SendBirdChannelService
 import com.zero.android.network.chat.sendbird.SendBirdChatService
-import com.zero.android.network.service.AccessService
-import com.zero.android.network.service.AccountService
-import com.zero.android.network.service.ChannelCategoryService
-import com.zero.android.network.service.ChannelService
-import com.zero.android.network.service.ChatMediaService
-import com.zero.android.network.service.ChatService
-import com.zero.android.network.service.MemberService
-import com.zero.android.network.service.MessageService
-import com.zero.android.network.service.NetworkService
-import com.zero.android.network.service.ProfileService
-import com.zero.android.network.service.UserService
+import com.zero.android.network.service.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,7 +30,7 @@ object ServiceModule {
 
 	@Singleton
 	@Provides
-	fun provideAccountService(retrofit: Retrofit) = retrofit.api.create(AccountService::class.java)
+	fun provideAccountService(retrofit: Retrofit) = retrofit.base.create(AccountService::class.java)
 
 	@Singleton
 	@Provides
@@ -70,9 +59,17 @@ object ServiceModule {
 
 	@Singleton
 	@Provides
-	fun provideChatMediaService(retrofit: Retrofit): ChatMediaService =
-		retrofit.base.create(ChatMediaService::class.java)
+	fun provideChatMediaService(retrofit: Retrofit): FileService =
+		retrofit.base.create(FileService::class.java)
 
 	@Singleton @Provides
 	fun provideAuthService(logger: Logger): AuthService = AuthServiceImpl(logger)
+
+	@Singleton
+	@Provides
+	fun provideZeroAuthService(retrofit: Retrofit) = retrofit.base.create(ZeroAuthService::class.java)
+
+	@Singleton
+	@Provides
+	fun provideInviteService(retrofit: Retrofit) = retrofit.api.create(InviteService::class.java)
 }

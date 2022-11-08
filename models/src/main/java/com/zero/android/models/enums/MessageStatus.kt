@@ -2,6 +2,7 @@ package com.zero.android.models.enums
 
 enum class MessageStatus(val serializedName: String) {
 	NONE("none"),
+	DRAFT("draft"),
 	PENDING("pending"),
 	FAILED("failed"),
 	SUCCEEDED("succeeded"),

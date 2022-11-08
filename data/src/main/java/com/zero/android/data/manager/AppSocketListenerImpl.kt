@@ -26,8 +26,7 @@ constructor(
 	private val channelRepository: ChannelRepository
 ) : SocketListener {
 
-	val userId
-		get() = runBlocking(Dispatchers.IO) { preferences.userId() }
+	val userId = runBlocking(Dispatchers.IO) { preferences.userId() }
 
 	private suspend fun updateChannel(channel: ApiChannel) {
 		if (channel is ApiDirectChannel) channelDao.upsert(channel.toEntity(userId))
@@ -57,14 +56,14 @@ constructor(
 	override fun onMessageReceived(channel: ApiChannel, message: ApiMessage) {
 		withScope(Dispatchers.IO) {
 			updateChannel(channel)
-			messageDao.upsert(message.toEntity())
+			messageDao.upsert(message.toEntity(), verifyChannel = true)
 		}
 	}
 
 	override fun onMessageUpdated(channel: ApiChannel, message: ApiMessage) {
 		withScope(Dispatchers.IO) {
 			updateChannel(channel)
-			messageDao.upsert(message.toEntity())
+			messageDao.upsert(message.toEntity(), verifyChannel = true)
 		}
 	}
 
@@ -75,7 +74,7 @@ constructor(
 	override fun onMentionReceived(channel: ApiChannel, message: ApiMessage) {
 		withScope(Dispatchers.IO) {
 			updateChannel(channel)
-			messageDao.upsert(message.toEntity())
+			messageDao.upsert(message.toEntity(), verifyChannel = true)
 		}
 	}
 
@@ -86,7 +85,6 @@ constructor(
 				val chatMembers = channel.members.filter { it.id != loggedInUser }.map { it.id }
 				val readMembers = channelRepository.getReadMembers(channel.id).map { it.id }
 				if (readMembers.containsAll(chatMembers)) {
-					// messageDao.markRead(message.id)
 					messageDao.updateDeliveryReceipt(channel.id, deliveryStatus)
 				}
 			}

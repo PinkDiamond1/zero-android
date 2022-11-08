@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -97,7 +98,12 @@ fun CreateDirectChannelScreen(
 					)
 				}
 			},
-			title = { stringResource(id = R.string.new_chat) },
+			title = {
+				Text(
+					text = stringResource(id = R.string.new_chat),
+					style = MaterialTheme.typography.displayLarge
+				)
+			},
 			actions = {
 				OutlinedButton(enabled = selectedUsers.isNotEmpty() || loading, onClick = onDone) {
 					Text(
@@ -162,7 +168,7 @@ private fun SelectedMembers(
 
 @Preview
 @Composable
-fun CreateDirectChannelScreenPreview() = Preview {
+private fun CreateDirectChannelScreenPreview() = Preview {
 	CreateDirectChannelScreen(
 		searchText = "search text",
 		members = FakeModel.members(),

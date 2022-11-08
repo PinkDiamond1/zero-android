@@ -34,7 +34,7 @@ fun MentionUsersList(membersList: List<Member>, onMemberSelected: (Member) -> Un
 				) {
 					SmallCircularImage(
 						imageUrl = member.profileImage,
-						placeHolder = R.drawable.ic_user_profile_placeholder
+						placeholder = R.drawable.ic_user_profile_placeholder
 					)
 					Spacer(modifier = Modifier.size(8.dp))
 					Text(

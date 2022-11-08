@@ -43,7 +43,7 @@ constructor(
 	init {
 		viewModelScope.launch {
 			_textSearch.asStateFlow().debounce(100).collectLatest { query ->
-				filterMembers(memberRepository.getMembers(query).first())
+				ioScope.launch { filterMembers(memberRepository.getMembers(query).first()) }
 			}
 		}
 	}

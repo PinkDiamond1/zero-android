@@ -3,6 +3,7 @@ package com.zero.android.database.dao
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.models.enums.DeliveryStatus
+import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
 import javax.inject.Inject
 
@@ -11,7 +12,7 @@ class MessageDao
 constructor(
 	private val messageDao: MessageDaoImpl,
 	private val memberDao: MemberDao,
-	private val directChannelDao: DirectChannelDaoImpl
+	private val channelDao: DirectChannelDaoImpl
 ) {
 
 	fun get(id: String) = messageDao.get(id)
@@ -20,17 +21,31 @@ constructor(
 
 	fun getLatestMessageByChannel(channelId: String) = messageDao.getLatestMessageByChannel(channelId)
 
-	suspend fun upsert(vararg data: MessageWithRefs, updateChannel: Boolean = true) {
-		messageDao.upsert(memberDao, *data)
+	suspend fun upsert(
+		vararg data: MessageWithRefs,
+		updateChannel: Boolean = true,
+		verifyChannel: Boolean = false
+	) {
+		val channels = data.map { it.message.channelId }.distinct()
+
+		if (verifyChannel) {
+			val channelExists = channels.map { channelDao.exists(it) }
+			data.forEach {
+				val exists = channelExists[channels.indexOf(it.message.channelId)]
+				if (exists) {
+					messageDao.upsert(memberDao, it)
+				}
+			}
+		} else {
+			messageDao.upsert(memberDao, *data)
+		}
 
 		if (updateChannel) {
-			data
-				.map { it.message.channelId }
-				.forEach { channelId ->
-					getLatestMessageByChannel(channelId)?.let {
-						directChannelDao.updateLastMessage(channelId, it.id, it.createdAt)
-					}
+			channels.forEach { channelId ->
+				getLatestMessageByChannel(channelId)?.let {
+					channelDao.updateLastMessage(channelId, it.id, it.createdAt)
 				}
+			}
 		}
 	}
 
@@ -41,6 +56,8 @@ constructor(
 
 	suspend fun updateDeliveryReceipt(channelId: String, deliveryStatus: DeliveryStatus) =
 		messageDao.updateDeliveryReceipt(channelId, deliveryStatus)
+
+	suspend fun updateStatus(id: String, status: MessageStatus) = messageDao.updateStatus(id, status)
 
 	suspend fun delete(id: String) = messageDao.delete(id)
 

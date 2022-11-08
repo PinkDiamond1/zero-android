@@ -1,19 +1,29 @@
 package com.zero.android.feature.channels.ui.components
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -25,19 +35,17 @@ import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.enums.DeliveryStatus
-import com.zero.android.ui.components.LargeCircularImage
-import com.zero.android.ui.components.NameInitialsView
+import com.zero.android.models.enums.MessageType
+import com.zero.android.models.fake.FakeModel
+import com.zero.android.ui.components.CircularInitialsImage
 import com.zero.android.ui.components.UnreadCountText
+import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.Blue300
 
 @Composable
 fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (Channel) -> Unit) {
 	val isDirectChannel = channel is DirectChannel
-	val styledMessage =
-		(channel.lastMessage?.message ?: "").messageFormatter(
-			annotationColor = AppTheme.colors.colorTextPrimary
-		)
 
 	ConstraintLayout(
 		modifier =
@@ -55,16 +63,17 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 				start.linkTo(parent.start)
 				end.linkTo(textTop.start)
 			}
-		if (isDirectChannel) {
-			LargeCircularImage(
-				modifier = imageModifier,
-				placeHolder = R.drawable.ic_user_profile_placeholder,
-				imageUrl = channel.members.firstOrNull()?.profileImage,
-				contentDescription = channel.id
-			)
-		} else {
-			NameInitialsView(modifier = imageModifier.size(64.dp), displayName = channel.name)
-		}
+
+		CircularInitialsImage(
+			modifier = imageModifier,
+			size = 64.dp,
+			name = channel.name,
+			url = channel.image,
+			placeholder =
+			if (isDirectChannel) painterResource(R.drawable.ic_user_profile_placeholder)
+			else null
+		)
+
 		Row(
 			modifier =
 			Modifier.constrainAs(textTop) {
@@ -85,20 +94,10 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 				overflow = TextOverflow.Ellipsis
 			)
 			if (!isDirectChannel) {
-				if ((channel as GroupChannel).hasTelegramChannel) {
+				(channel as GroupChannel).icon?.let { icon ->
 					Spacer(modifier = Modifier.padding(4.dp))
 					Image(
-						painter = painterResource(R.drawable.ic_chat_icon),
-						contentDescription = "",
-						modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
-						contentScale = ContentScale.Fit,
-						colorFilter = ColorFilter.tint(AppTheme.colors.colorTextPrimary)
-					)
-					Spacer(modifier = Modifier.padding(4.dp))
-				}
-				if (channel.hasDiscordChannel) {
-					Image(
-						painter = painterResource(R.drawable.ic_discord),
+						painter = painterResource(icon),
 						contentDescription = "",
 						modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 						contentScale = ContentScale.Fit,
@@ -109,7 +108,12 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 			}
 		}
 		Text(
-			text = styledMessage,
+			text =
+			getLastMessage(
+				context = LocalContext.current,
+				channel = channel,
+				annotationColor = AppTheme.colors.colorTextPrimary
+			),
 			color = AppTheme.colors.colorTextSecondary,
 			style = MaterialTheme.typography.bodyMedium,
 			modifier =
@@ -178,4 +182,27 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 			}
 		}
 	}
+}
+
+fun getLastMessage(context: Context, channel: Channel, annotationColor: Color): String {
+	return when (channel.lastMessage?.type) {
+		MessageType.AUDIO -> context.getString(R.string.voice_message)
+		MessageType.IMAGE -> context.getString(R.string.image)
+		MessageType.VIDEO -> context.getString(R.string.video)
+		else -> {
+			val styledMessage =
+				(channel.lastMessage?.message ?: "").messageFormatter(annotationColor = annotationColor)
+			val lastMessageAuthorName =
+				if (channel.memberCount > 2) {
+					channel.lastMessage?.author?.name?.let { "${it.trim()}: " } ?: ""
+				} else ""
+			"${lastMessageAuthorName}$styledMessage"
+		}
+	}
+}
+
+@Preview
+@Composable
+private fun ChannelListItemPreview() = Preview {
+	ChannelListItem(loggedInUserId = "", channel = FakeModel.GroupChannel(), onClick = {})
 }

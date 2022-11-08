@@ -7,5 +7,10 @@ plugins {
 apply from: '../feature_module.gradle'
 
 dependencies {
+	implementation project(":ui")
 	implementation project(":feature-account")
+
+	// UI
+	implementation "androidx.paging:paging-compose:${versions.pagingCompose}"
+	implementation "com.google.accompanist:accompanist-swiperefresh:${versions.swiperefresh}"
 }

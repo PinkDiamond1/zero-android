@@ -7,6 +7,8 @@ plugins {
 apply from: '../feature_module.gradle'
 
 dependencies {
+	implementation project(':plugins:waveform')
+
 	// UI
 	implementation "io.coil-kt:coil-video:${versions.coilVideo}"
 

@@ -1,15 +1,21 @@
 package com.zero.android.ui.appbar
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.zero.android.common.R.drawable
 import com.zero.android.models.Network
-import com.zero.android.ui.components.NameInitialsView
-import com.zero.android.ui.components.SmallCircularImage
+import com.zero.android.ui.components.CircularInitialsImage
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.customTextStyle
@@ -33,13 +39,12 @@ fun AppTopBar(
 		navigationIcon = {
 			IconButton(onClick = openDrawer) {
 				when {
-					!network?.logo.isNullOrEmpty() ->
-						SmallCircularImage(
-							imageUrl = network?.logo,
-							placeHolder = drawable.ic_circular_image_placeholder
+					!network?.displayName.isNullOrEmpty() || !network?.logo.isNullOrEmpty() ->
+						CircularInitialsImage(
+							size = 36.dp,
+							name = network?.displayName!!,
+							url = network.logo
 						)
-					!network?.displayName.isNullOrEmpty() ->
-						NameInitialsView(displayName = network?.displayName!!)
 					else ->
 						Icon(
 							painter = painterResource(id = drawable.ic_menu),

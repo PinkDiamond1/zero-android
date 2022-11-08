@@ -10,6 +10,7 @@ import com.zero.android.models.DraftMessage
 import com.zero.android.models.Message
 import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toParams
+import com.zero.android.network.extensions.parsed
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.service.ChatService
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +28,7 @@ internal class SendBirdChatService(
 			messages.getMessages(getChannel(channel), loadSize) { messages, e ->
 				if (e != null) {
 					logger.e(e)
-					throw e
+					close(e.parsed)
 				} else {
 					trySend(messages?.map { it.toApi() } ?: emptyList())
 				}
@@ -39,7 +40,7 @@ internal class SendBirdChatService(
 			messages.getMessages(getChannel(channel), before) { messages, e ->
 				if (e != null) {
 					logger.e(e)
-					throw e
+					close(e.parsed)
 				} else {
 					trySend(messages?.map { it.toApi() } ?: emptyList())
 				}
@@ -55,7 +56,7 @@ internal class SendBirdChatService(
 					sbChannel.sendFileMessage(params) { fileMessage, e ->
 						if (e != null) {
 							logger.e("Failed to send file message", e)
-							close(e)
+							close(e.parsed)
 						} else {
 							trySend(fileMessage.toApi())
 						}
@@ -64,7 +65,7 @@ internal class SendBirdChatService(
 					sbChannel.sendUserMessage(params as UserMessageParams) { userMessage, e ->
 						if (e != null) {
 							logger.e("Failed to send text message", e)
-							close(e)
+							close(e.parsed)
 						} else {
 							trySend(userMessage.toApi())
 						}
@@ -83,7 +84,7 @@ internal class SendBirdChatService(
 				getChannel(channel).deleteMessage(messages.getMessage(message)) {
 					if (it != null) {
 						logger.e("Failed to delete message", it)
-						coroutine.resumeWithException(it)
+						coroutine.resumeWithException(it.parsed)
 					} else {
 						coroutine.resume(Unit)
 					}

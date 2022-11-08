@@ -1,5 +1,9 @@
 package com.zero.android.models.fake
 
+import com.zero.android.models.ChannelCategory
+import com.zero.android.models.ChatMedia
+import com.zero.android.models.DirectChannel
+import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.Network
@@ -29,6 +33,26 @@ object FakeModel {
 
 	fun members() = listOf(Member("one"), Member("two"))
 
+	fun GroupChannel(
+		id: String = "id",
+		name: String = "Group Name",
+		network: String = "networkId",
+		category: ChannelCategory? = null
+	) =
+		GroupChannel(
+			id = id,
+			networkId = network,
+			category = category,
+			name = name,
+			members = members(),
+			operators = listOf(members()[0]),
+			memberCount = 2,
+			createdAt = 0L
+		)
+
+	fun DirectChannel(id: String = "id", name: String = "Group Name") =
+		DirectChannel(id = id, name = name, members = members(), memberCount = 2, createdAt = 0L)
+
 	fun Message(
 		id: String = "id",
 		channelId: String = "id",
@@ -54,5 +78,13 @@ object FakeModel {
 			updatedAt = 0,
 			status = status,
 			type = MessageType.TEXT
+		)
+
+	fun media() =
+		listOf(
+			ChatMedia("id", "", MessageType.IMAGE),
+			ChatMedia("id", "", MessageType.IMAGE),
+			ChatMedia("id", "", MessageType.AUDIO),
+			ChatMedia("id", "", MessageType.IMAGE)
 		)
 }

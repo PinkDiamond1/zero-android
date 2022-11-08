@@ -40,25 +40,12 @@ object MessagesDestination : NavDestination() {
 		"${DeepLinks.URI}/channel?channel_id=$id&is_group=$isGroupChannel"
 }
 
-object ChatMediaViewerDestination : NavDestination() {
-	const val ARG_CHANNEL_ID = "channelId"
-	const val ARG_MESSAGE_ID = "messageId"
-	private const val BASE_ROUTE = "chat_media_viewer_route"
-
-	override val route = "$BASE_ROUTE/{$ARG_CHANNEL_ID}/{$ARG_MESSAGE_ID}"
-	override val destination = "messages_destination"
-
-	override val arguments =
-		listOf(
-			navArgument(ARG_CHANNEL_ID) { type = NavType.StringType },
-			navArgument(ARG_MESSAGE_ID) { type = NavType.StringType }
-		)
-
-	fun route(channelId: String, messageId: String) = "$BASE_ROUTE/$channelId/$messageId"
-}
-
 @ExperimentalAnimationApi
-fun NavGraphBuilder.chatGraph(onBackClick: () -> Unit, onMediaClicked: (String, String) -> Unit) {
-	composable(MessagesDestination) { MessagesRoute(onBackClick, onMediaClicked) }
+fun NavGraphBuilder.chatGraph(
+	onBackClick: () -> Unit,
+	onMediaClicked: (String, String) -> Unit,
+	onChannelDetails: (String, Boolean) -> Unit
+) {
+	composable(MessagesDestination) { MessagesRoute(onBackClick, onMediaClicked, onChannelDetails) }
 	composable(ChatMediaViewerDestination) { MediaViewerRoute(onBackClick) }
 }

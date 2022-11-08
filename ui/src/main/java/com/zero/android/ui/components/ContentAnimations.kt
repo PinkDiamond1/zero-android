@@ -28,7 +28,9 @@ fun FadeExpandAnimation(
 		visible = visible,
 		enter = expandVertically() + fadeIn(),
 		exit = shrinkVertically() + fadeOut()
-	) { content() }
+	) {
+		content()
+	}
 }
 
 @Composable
@@ -42,7 +44,9 @@ fun FadeSlideAnimation(
 		visible = visible,
 		enter = slideInHorizontally() + fadeIn(),
 		exit = slideOutHorizontally() + fadeOut()
-	) { content() }
+	) {
+		content()
+	}
 }
 
 @Composable
@@ -58,7 +62,9 @@ fun InstantAnimation(
 		visibleState = MutableTransitionState(visible).apply { targetState = !visible },
 		enter = enterAnimation,
 		exit = exitAnimation
-	) { content() }
+	) {
+		content()
+	}
 }
 
 @Composable

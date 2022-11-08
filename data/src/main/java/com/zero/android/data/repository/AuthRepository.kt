@@ -21,8 +21,11 @@ interface AuthRepository {
 		name: String,
 		email: String,
 		password: String,
+		inviteCode: String?,
 		profilePic: File?
 	): Flow<AuthCredentials>
 
 	suspend fun revokeToken()
+
+	suspend fun createUser(accessToken: String, name: String, inviteCode: String?)
 }

@@ -6,13 +6,15 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.zero.android.common.extensions.channelFlowWithAwait
+import com.zero.android.common.extensions.launchSafe
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
+import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.conversion.toModel
 import com.zero.android.data.delegates.Preferences
-import com.zero.android.data.repository.chat.DirectChannelsRemoteMediator
-import com.zero.android.data.repository.chat.GroupChannelsRemoteMediator
+import com.zero.android.data.mediator.DirectChannelsRemoteMediator
+import com.zero.android.data.mediator.GroupChannelsRemoteMediator
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.ChannelEntity
@@ -35,6 +37,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
 import javax.inject.Inject
 
 internal class ChannelRepositoryImpl
@@ -43,6 +46,7 @@ constructor(
 	private val channelDao: ChannelDao,
 	private val messageDao: MessageDao,
 	private val channelService: ChannelService,
+	private val fileRepository: FileRepository,
 	private val logger: Logger,
 	preferences: Preferences
 ) : ChannelRepository {
@@ -54,7 +58,8 @@ constructor(
 	@OptIn(ExperimentalPagingApi::class)
 	override fun getDirectChannels(search: String?): Flow<PagingData<DirectChannel>> {
 		return Pager(
-			config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
+			config =
+			PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = INITIAL_LOAD_SIZE),
 			remoteMediator =
 			DirectChannelsRemoteMediator(userId, channelDao, channelService, logger),
 			pagingSourceFactory = {
@@ -62,7 +67,8 @@ constructor(
 				else channelDao.searchDirectChannels(search)
 			}
 		)
-			.flow.map { data -> data.map { it.toModel() } }
+			.flow
+			.map { data -> data.map { it.toModel() } }
 	}
 
 	@OptIn(ExperimentalPagingApi::class)
@@ -72,7 +78,8 @@ constructor(
 		search: String?
 	): Flow<PagingData<GroupChannel>> {
 		return Pager(
-			config = PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = 3),
+			config =
+			PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = INITIAL_LOAD_SIZE),
 			remoteMediator =
 			GroupChannelsRemoteMediator(
 				networkId = networkId,
@@ -86,7 +93,8 @@ constructor(
 				else channelDao.searchGroupChannels(networkId, search)
 			}
 		)
-			.flow.map { data -> data.map { it.toModel() } }
+			.flow
+			.map { data -> data.map { it.toModel() } }
 	}
 
 	override suspend fun getGroupChannel(id: String) = channelFlowWithAwait {
@@ -96,10 +104,9 @@ constructor(
 				.mapNotNull { channel -> channel?.toModel() }
 				.collect { trySend(it) }
 		}
-		launch {
+		launchSafe {
 			channelService.getChannel(id, type = ChannelType.GROUP).let {
-				it as ApiGroupChannel
-				channelDao.upsert(it.toEntity())
+				channelDao.upsert((it as ApiGroupChannel).toEntity())
 			}
 		}
 	}
@@ -111,10 +118,9 @@ constructor(
 				.mapNotNull { channel -> channel?.toModel() }
 				.collectLatest { trySend(it) }
 		}
-		launch {
+		launchSafe {
 			channelService.getChannel(id, type = ChannelType.GROUP).let {
-				it as ApiDirectChannel
-				channelDao.upsert(it.toEntity(userId))
+				channelDao.upsert((it as ApiDirectChannel).toEntity(userId))
 			}
 		}
 	}
@@ -131,11 +137,27 @@ constructor(
 		channelService.updateChannel(channel)
 	}
 
+	override suspend fun updateChannelImage(channel: Channel, image: File) {
+		val file = fileRepository.upload(image)
+		val mChannel =
+			when (channel) {
+				is DirectChannel -> channel.copy(image = file.url)
+				is GroupChannel -> channel.copy(image = file.url)
+				else -> throw IllegalStateException()
+			}
+		updateChannel(mChannel)
+	}
+
 	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) {
 		channelService.updateNotificationSettings(channel, alertType)
 	}
 
 	override suspend fun joinChannel(channel: Channel) = channelService.joinChannel(channel)
+
+	override suspend fun leaveChannel(channel: Channel) {
+		channelService.leaveChannel(channel)
+		channelDao.delete(ChannelEntity(id = channel.id, isDirectChannel = channel is DirectChannel))
+	}
 
 	override suspend fun deleteChannel(channel: Channel) {
 		channelDao.delete(ChannelEntity(id = channel.id, isDirectChannel = channel is DirectChannel))

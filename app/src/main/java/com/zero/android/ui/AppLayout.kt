@@ -1,7 +1,6 @@
 package com.zero.android.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,7 +25,7 @@ fun AppLayout(
 	ZeroTheme(randomThemePalette = dynamicThemePalette) {
 		val isLoading by viewModel.loading.collectAsState()
 
-		LoadingContainer(loading = isLoading, modifier = modifier.fillMaxSize()) {
+		LoadingContainer(loading = isLoading) {
 			AppNavHost(
 				navController = controller,
 				modifier = modifier.systemBarsPadding(),

@@ -9,6 +9,7 @@ import com.sendbird.android.SendBirdPushHelper
 import com.zero.android.common.system.Logger
 import com.zero.android.common.system.NotificationManager
 import com.zero.android.network.chat.conversion.getNetworkId
+import com.zero.android.network.extensions.parsed
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONException
 import org.json.JSONObject
@@ -17,7 +18,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class SendBirdFCMService
+internal class SendBirdFCMService
 @Inject
 constructor(private val logger: Logger, private val notificationManager: NotificationManager) :
 	SendBirdPushHandler() {
@@ -27,21 +28,43 @@ constructor(private val logger: Logger, private val notificationManager: Notific
 		pushToken.set(newToken)
 	}
 
+	@Suppress("UNNECESSARY_SAFE_CALL")
 	override fun onMessageReceived(context: Context?, remoteMessage: RemoteMessage?) {
 		logger.d("onMessageReceived")
 
 		try {
 			if (remoteMessage?.data?.containsKey("sendbird") == true) {
-				val sendbird = remoteMessage.data["sendbird"]?.let { JSONObject(it) }
-				val channel = sendbird?.get("channel") as JSONObject?
+				val sendbird = remoteMessage.data["sendbird"]?.let { JSONObject(it) } ?: return
+				val channel = sendbird.get("channel") as JSONObject?
+				val sender = sendbird.getJSONObject("sender")
 				val networkId = channel?.getString("custom_type")?.let { getNetworkId(it) }
+				val isDirectChannel = networkId == null
+				var image =
+					sendbird
+						.getJSONObject("sender")
+						?.getString("profile_url")
+						?.let { JSONObject(it) }
+						?.getString("profileImage")
+
+				val title: String?
+				val message: String?
+				if (isDirectChannel) {
+					title = sender?.getString("name")
+					message = sendbird.getString("message")
+				} else {
+					title = channel?.getString("name")
+					message =
+						(sender?.getString("name")?.let { "$it: " } ?: "") + sendbird.getString("message")
+					image = channel?.getString("coverUrl") ?: image
+				}
 
 				channel?.getString("channel_url")?.let { url ->
-					sendNotification(
-						id = url,
-						isGroupChannel = networkId != null,
-						title = remoteMessage.data["push_title"],
-						body = remoteMessage.data["message"]
+					notificationManager.createMessageNotification(
+						channelId = url,
+						isGroupChannel = !isDirectChannel,
+						title = title ?: "",
+						text = message ?: "",
+						image = image
 					)
 				}
 				SendBird.markAsDelivered(remoteMessage.data)
@@ -49,15 +72,6 @@ constructor(private val logger: Logger, private val notificationManager: Notific
 		} catch (e: JSONException) {
 			e.printStackTrace()
 		}
-	}
-
-	private fun sendNotification(id: String, isGroupChannel: Boolean, title: String?, body: String?) {
-		notificationManager.createMessageNotification(
-			id = id,
-			isGroupChannel = isGroupChannel,
-			title = title ?: "",
-			text = body ?: ""
-		)
 	}
 
 	override fun isUniquePushToken() = false
@@ -78,7 +92,7 @@ constructor(private val logger: Logger, private val notificationManager: Notific
 					pushToken.set(newToken)
 					newToken?.let { coroutine.resume(it) }
 				} else {
-					coroutine.resumeWithException(e)
+					coroutine.resumeWithException(e.parsed)
 				}
 			}
 		}

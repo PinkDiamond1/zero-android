@@ -1,15 +1,18 @@
 package com.zero.android.ui.sidebar
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,9 +21,9 @@ import com.zero.android.common.R
 import com.zero.android.models.Network
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.fake.FakeModel
+import com.zero.android.ui.components.CircularInitialsImage
 import com.zero.android.ui.components.CountBadge
-import com.zero.android.ui.components.MediumCircularImage
-import com.zero.android.ui.components.NameInitialsView
+import com.zero.android.ui.components.SmallClickableIcon
 import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 
@@ -39,15 +42,12 @@ fun NetworkDrawerItem(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
-		if (item.logo.isNullOrEmpty()) {
-			NameInitialsView(modifier = Modifier.size(42.dp), displayName = item.displayName)
-		} else {
-			MediumCircularImage(
-				placeHolder = R.drawable.ic_circular_image_placeholder,
-				imageUrl = item.logo,
-				contentDescription = item.name
-			)
-		}
+		CircularInitialsImage(
+			size = 42.dp,
+			name = item.displayName,
+			url = item.logo,
+			placeholder = painterResource(R.drawable.ic_circular_image_placeholder)
+		)
 		Spacer(modifier = Modifier.size(10.dp))
 		Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
 			Text(
@@ -66,20 +66,17 @@ fun NetworkDrawerItem(
 			CountBadge(count = item.unreadCount)
 			Spacer(modifier = Modifier.size(4.dp))
 		}
-		Image(
-			painter =
-			painterResource(
-				when (item.alerts) {
-					AlertType.DEFAULT,
-					AlertType.ALL -> R.drawable.ic_notifications
-					AlertType.MENTION_ONLY -> R.drawable.ic_notificatons_mentions
-					AlertType.OFF -> R.drawable.ic_notifications_off
-				}
-			),
+		SmallClickableIcon(
+			icon =
+			when (item.alerts) {
+				AlertType.DEFAULT,
+				AlertType.ALL -> R.drawable.ic_notifications
+				AlertType.MENTION_ONLY -> R.drawable.ic_notificatons_mentions
+				AlertType.OFF -> R.drawable.ic_notifications_off
+			},
+			onClick = onSettingsClick,
 			contentDescription = stringResource(R.string.cd_ic_settings),
-			contentScale = ContentScale.Fit,
-			colorFilter = ColorFilter.tint(AppTheme.colors.surface),
-			modifier = Modifier.wrapContentSize().clickable(onClick = onSettingsClick)
+			includePadding = false
 		)
 	}
 }

@@ -1,6 +1,7 @@
 package com.zero.android.database
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -14,6 +15,7 @@ import com.zero.android.database.dao.MessageDaoImpl
 import com.zero.android.database.dao.NetworkDao
 import com.zero.android.database.dao.ProfileDao
 import com.zero.android.database.dao.UserDao
+import com.zero.android.database.migrations.MigrationSpec3to4
 import com.zero.android.database.model.ChannelEntity
 import com.zero.android.database.model.ChannelMembersCrossRef
 import com.zero.android.database.model.ChannelOperatorsCrossRef
@@ -22,6 +24,7 @@ import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageMentionCrossRef
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.database.model.NetworkEntity
+import com.zero.android.database.model.NetworkMembersCrossRef
 import com.zero.android.database.model.ProfileEntity
 import com.zero.android.database.model.UserEntity
 
@@ -34,13 +37,18 @@ import com.zero.android.database.model.UserEntity
 		MessageEntity::class,
 		MemberEntity::class,
 		ChannelEntity::class,
+		NetworkMembersCrossRef::class,
 		MessageMentionCrossRef::class,
 		ChannelMembersCrossRef::class,
 		ChannelOperatorsCrossRef::class
 	],
 	views = [MessageWithRefs::class],
-	version = 2,
-	exportSchema = false
+	version = 4,
+	autoMigrations =
+	[
+		AutoMigration(from = 2, to = 3),
+		AutoMigration(from = 3, to = 4, spec = MigrationSpec3to4::class)
+	]
 )
 @TypeConverters(DateConverters::class, ListConverters::class)
 abstract class AppDatabase : RoomDatabase() {

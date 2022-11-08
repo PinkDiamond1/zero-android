@@ -14,13 +14,35 @@ internal fun ApiDirectChannel.toModel(loggedInUserId: String?) =
 		name = name(loggedInUserId),
 		members = members.map { it.toModel() },
 		memberCount = memberCount,
-		coverUrl = coverUrl,
+		image = image(loggedInUserId),
 		lastMessage = lastMessage?.toModel(),
 		createdAt = createdAt,
 		isTemporary = isTemporary,
 		unreadMentionCount = unreadMentionCount,
 		alerts = alerts,
 		accessCode = accessCode
+	)
+
+internal fun ApiDirectChannel.toEntity(loggedInUserId: String?) =
+	DirectChannelWithRefs(
+		channel =
+		ChannelEntity(
+			id = id,
+			name = name(loggedInUserId),
+			lastMessageId = lastMessage?.id,
+			isDirectChannel = true,
+			memberCount = memberCount,
+			image = image(loggedInUserId),
+			createdAt = createdAt,
+			lastMessageTime = lastMessage?.createdAt ?: 0,
+			isTemporary = isTemporary,
+			unreadMentionCount = unreadMentionCount,
+			unreadMessageCount = unreadMessageCount,
+			alerts = alerts,
+			accessCode = accessCode
+		),
+		members = members.map { it.toEntity() },
+		lastMessage = lastMessage?.toEntity()
 	)
 
 internal fun ApiGroupChannel.toModel() =
@@ -38,10 +60,10 @@ internal fun ApiGroupChannel.toModel() =
 		lastMessage = lastMessage?.toModel(),
 		createdAt = createdAt,
 		createdBy = createdBy?.toModel(),
-		coverUrl = coverUrl,
+		image = image,
 		isAdminOnly = properties?.isAdminOnly ?: false,
 		telegramChatId = properties?.telegramChatId,
-		discordChatId = properties?.discordChatId,
+		discordChatId = properties?.discordChatId ?: properties?.discordChannelId,
 		isTemporary = isTemporary,
 		alerts = alerts,
 		isPublic = isPublic,
@@ -53,28 +75,6 @@ internal fun ApiGroupChannel.toModel() =
 		isVideoEnabled = isVideoEnabled
 	)
 
-internal fun ApiDirectChannel.toEntity(loggedInUserId: String?) =
-	DirectChannelWithRefs(
-		channel =
-		ChannelEntity(
-			id = id,
-			name = name(loggedInUserId),
-			lastMessageId = lastMessage?.id,
-			isDirectChannel = true,
-			memberCount = memberCount,
-			coverUrl = coverUrl,
-			createdAt = createdAt,
-			lastMessageTime = lastMessage?.createdAt ?: 0,
-			isTemporary = isTemporary,
-			unreadMentionCount = unreadMentionCount,
-			unreadMessageCount = unreadMessageCount,
-			alerts = alerts,
-			accessCode = accessCode
-		),
-		members = members.map { it.toEntity() },
-		lastMessage = lastMessage?.toEntity()
-	)
-
 internal fun ApiGroupChannel.toEntity() =
 	GroupChannelWithRefs(
 		channel =
@@ -84,7 +84,7 @@ internal fun ApiGroupChannel.toEntity() =
 			authorId = createdBy?.id ?: "",
 			isDirectChannel = false,
 			memberCount = memberCount,
-			coverUrl = coverUrl,
+			image = image,
 			createdAt = createdAt,
 			lastMessageTime = lastMessage?.createdAt ?: 0,
 			isTemporary = isTemporary,
@@ -103,7 +103,7 @@ internal fun ApiGroupChannel.toEntity() =
 			type = type,
 			isAdminOnly = properties?.isAdminOnly ?: false,
 			telegramChatId = properties?.telegramChatId,
-			discordChatId = properties?.discordChatId,
+			discordChatId = properties?.discordChatId ?: properties?.discordChannelId,
 			accessType = accessType
 		),
 		members = members.map { it.toEntity() },

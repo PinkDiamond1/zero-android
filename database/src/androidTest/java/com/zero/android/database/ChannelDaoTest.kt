@@ -3,6 +3,7 @@ package com.zero.android.database
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.zero.android.database.base.BaseDatabaseTest
 import com.zero.android.database.model.fake.FakeEntity
+import com.zero.android.database.util.result
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,6 +49,75 @@ class ChannelDaoTest : BaseDatabaseTest() {
 		assertEquals(groupChannel.channel.id, data?.lastMessage?.message?.channelId)
 		assertEquals(groupChannel.members.size, data?.members?.size)
 		assertEquals(groupChannel.operators.size, data?.operators?.size)
+	}
+
+	@Test
+	fun getDirectChannels() = runTest {
+		channelDao.upsert(directChannel)
+		channelDao.upsert(FakeEntity.DirectChannelWithRefs(id = "directChannelId2", lastMessage = null))
+
+		var data = channelDao.getDirectChannels().result()
+		assertEquals("Empty channels", 1, data?.size)
+
+		messageDao.upsert(
+			FakeEntity.MessageWithRefs(
+				id = "messageId2",
+				channelId = "directChannelId2",
+				reply = false
+			),
+			updateChannel = true
+		)
+
+		data = channelDao.getDirectChannels().result()
+		assertEquals("Non empty channels", 2, data?.size)
+	}
+
+	@Test
+	fun getGroupChannels() = runTest {
+		channelDao.upsert(groupChannel)
+		channelDao.upsert(FakeEntity.GroupChannelWithRefs(id = "groupChannelId2"))
+		channelDao.upsert(
+			FakeEntity.GroupChannelWithRefs(id = "groupChannelId3", category = "category2")
+		)
+
+		var data = channelDao.getGroupChannels("networkId").result()
+		assertEquals(3, data?.size)
+
+		data = channelDao.getGroupChannels("networkId", category = "category").result()
+		assertEquals(2, data?.size)
+
+		data = channelDao.getGroupChannels("networkId", category = "category2").result()
+		assertEquals(1, data?.size)
+	}
+
+	@Test
+	fun searchDirectChannels() = runTest {
+		channelDao.upsert(directChannel)
+		channelDao.upsert(FakeEntity.DirectChannelWithRefs(id = "directChannelId2", name = "Bot, Test"))
+		channelDao.upsert(
+			FakeEntity.DirectChannelWithRefs(id = "directChannelId2", name = "Two Member")
+		)
+
+		val data = channelDao.searchDirectChannels("Member").result()
+		assertEquals(2, data?.size)
+	}
+
+	@Test
+	fun searchGroupChannels() = runTest {
+		channelDao.upsert(groupChannel)
+		channelDao.upsert(
+			FakeEntity.GroupChannelWithRefs(
+				id = "groupChannelId2",
+				networkId = "networkId",
+				name = "Test"
+			)
+		)
+		channelDao.upsert(
+			FakeEntity.GroupChannelWithRefs(id = "groupChannelId3", networkId = "networkId")
+		)
+
+		val data = channelDao.searchGroupChannels("networkId", "group").result()
+		assertEquals(2, data?.size)
 	}
 
 	@Test

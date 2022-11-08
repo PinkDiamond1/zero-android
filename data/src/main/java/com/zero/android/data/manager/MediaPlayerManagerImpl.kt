@@ -7,6 +7,11 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import linc.com.amplituda.Amplituda
+import linc.com.amplituda.Cache
+import linc.com.amplituda.callback.AmplitudaErrorListener
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
@@ -17,6 +22,8 @@ internal class MediaPlayerManagerImpl
 @Inject
 constructor(@ApplicationContext private val context: Context) : MediaPlayerManager {
 	override val baseFilePath by lazy { "${context.externalCacheDir?.absolutePath ?: ""}/Memos" }
+
+	private val amplituda: Amplituda by lazy { Amplituda(context) }
 
 	init {
 		File(baseFilePath).apply {
@@ -41,7 +48,7 @@ constructor(@ApplicationContext private val context: Context) : MediaPlayerManag
 
 	@Throws(IOException::class)
 	override fun startRecording() {
-		recorderFilePath = "$baseFilePath/Memo-${System.currentTimeMillis().div(1000)}"
+		recorderFilePath = "$baseFilePath/Memo-${System.currentTimeMillis()}"
 		recorderFilePath?.let {
 			_recorder =
 				MediaRecorder().apply {
@@ -87,4 +94,13 @@ constructor(@ApplicationContext private val context: Context) : MediaPlayerManag
 		retriever.release()
 		return time
 	}
+
+	override suspend fun getAudioAmplitudes(file: File): List<Int> =
+		withContext(Dispatchers.IO) {
+			return@withContext amplituda
+				.processAudio(file.absolutePath, Cache.withParams(Cache.REUSE))
+				.get(AmplitudaErrorListener { it.printStackTrace() })
+				.amplitudesAsList()
+				.dropWhile { it == 0 }
+		}
 }

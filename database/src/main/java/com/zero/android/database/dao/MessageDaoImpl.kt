@@ -8,11 +8,12 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.zero.android.database.model.MemberEntity
 import com.zero.android.database.model.MessageEntity
-import com.zero.android.database.model.MessageEntity.Companion.PREFIX_DRAFT_ID
 import com.zero.android.database.model.MessageMentionCrossRef
 import com.zero.android.database.model.MessageMeta
 import com.zero.android.database.model.MessageWithRefs
+import com.zero.android.models.DraftMessage.Companion.PREFIX_DRAFT_ID
 import com.zero.android.models.enums.DeliveryStatus
+import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
 import kotlinx.coroutines.flow.Flow
 
@@ -24,7 +25,13 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	abstract fun get(id: String): Flow<MessageWithRefs?>
 
 	@Transaction
-	@Query("SELECT * FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC")
+	@Query(
+		"""
+		SELECT * FROM messages 
+		WHERE channelId = :channelId 
+		ORDER BY createdAt DESC    
+		"""
+	)
 	abstract fun getByChannel(channelId: String): PagingSource<Int, MessageWithRefs>
 
 	@Transaction
@@ -67,13 +74,16 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 	}
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	protected abstract suspend fun insert(vararg refs: MessageMentionCrossRef)
+	internal abstract suspend fun insert(vararg refs: MessageMentionCrossRef)
 
 	@Query("UPDATE messages SET message = :message WHERE id = :id")
 	abstract suspend fun update(id: String, message: String?)
 
 	@Query("UPDATE messages SET deliveryStatus = :deliveryStatus WHERE id = :id")
 	abstract suspend fun markRead(id: String, deliveryStatus: DeliveryStatus)
+
+	@Query("UPDATE messages SET status = :status WHERE id = :id")
+	abstract suspend fun updateStatus(id: String, status: MessageStatus)
 
 	@Query("UPDATE messages SET deliveryStatus = :deliveryStatus WHERE channelId = :channelId")
 	abstract suspend fun updateDeliveryReceipt(channelId: String, deliveryStatus: DeliveryStatus)

@@ -41,6 +41,9 @@ internal val GroupChannel.networkId
 private val GroupChannel.isDirectChannel
 	get() = networkId == null
 
+private val BaseChannel.image
+	get() = if (coverUrl.contains("static.sendbird.com/sample")) null else coverUrl
+
 internal fun Channel.isGroupChannel() =
 	this is DirectChannel ||
 		(this is com.zero.android.models.GroupChannel && type == ChannelType.GROUP)
@@ -57,7 +60,7 @@ internal fun OpenChannel.toApi() =
 		memberCount = participantCount,
 		operators = operators.map { it.toApi() },
 		createdAt = createdAt,
-		coverUrl = coverUrl,
+		image = image,
 		properties = Json.decodeFromString<ApiChannelProperties>(data),
 		isTemporary = isEphemeral
 	)
@@ -73,7 +76,6 @@ internal fun GroupChannel.toDirectApi(): ApiDirectChannel {
 		unreadMessageCount = unreadMessageCount,
 		lastMessage = lastMessage?.toApi(),
 		createdAt = createdAt,
-		coverUrl = coverUrl,
 		isTemporary = isEphemeral,
 		alerts = myPushTriggerOption.toType()
 	)
@@ -95,7 +97,7 @@ internal fun GroupChannel.toGroupApi(): ApiGroupChannel {
 		unreadMessageCount = unreadMessageCount,
 		lastMessage = lastMessage?.toApi(),
 		createdAt = createdAt,
-		coverUrl = coverUrl,
+		image = image,
 		properties = properties,
 		isTemporary = isEphemeral,
 		createdBy = creator?.toApi(),
@@ -111,7 +113,7 @@ internal fun DirectChannel.toParams() =
 	GroupChannelParams().apply {
 		setName(members.joinToString { it.name ?: "" }.trim())
 		if (id.isNotEmpty()) setChannelUrl(id)
-		setCoverUrl(coverUrl)
+		setCoverUrl(image)
 		setData(null)
 		setCustomType(null)
 
@@ -130,7 +132,7 @@ internal fun com.zero.android.models.GroupChannel.toOpenParams() =
 	OpenChannelParams().apply {
 		setName(name)
 		if (id.isNotEmpty()) setChannelUrl(id)
-		setCoverUrl(coverUrl)
+		setCoverUrl(image)
 		setData(Json.encodeToString(toProperties()))
 		setCustomType(networkId.encodeToNetworkId())
 	}
@@ -139,7 +141,7 @@ internal fun com.zero.android.models.GroupChannel.toParams() =
 	GroupChannelParams().apply {
 		setName(name)
 		if (id.isNotEmpty()) setChannelUrl(id)
-		setCoverUrl(coverUrl)
+		setCoverUrl(image)
 		setData(Json.encodeToString(toProperties()))
 		setCustomType(networkId.encodeToNetworkId())
 
@@ -152,6 +154,18 @@ internal fun com.zero.android.models.GroupChannel.toParams() =
 		setMessageSurvivalSeconds(messageLifeSeconds)
 
 		addUserIds(members.map { it.id })
+	}
+
+internal fun com.zero.android.models.GroupChannel.toUpdateParams() =
+	GroupChannelParams().apply {
+		setName(name)
+		setCoverUrl(image)
+
+		setSuper(isSuper)
+		setPublic(isPublic)
+		setDiscoverable(isDiscoverable)
+		setEphemeral(isTemporary)
+		setAccessCode(accessCode)
 	}
 
 private fun com.zero.android.models.GroupChannel.toProperties() =

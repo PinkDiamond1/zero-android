@@ -24,7 +24,7 @@ import androidx.room.Index
 		)
 	]
 )
-data class ChannelMembersCrossRef(val channelId: String, val memberId: String)
+internal data class ChannelMembersCrossRef(val channelId: String, val memberId: String)
 
 @Entity(
 	tableName = "channel_operators_relation",
@@ -46,4 +46,4 @@ data class ChannelMembersCrossRef(val channelId: String, val memberId: String)
 		)
 	]
 )
-data class ChannelOperatorsCrossRef(val channelId: String, val memberId: String)
+internal data class ChannelOperatorsCrossRef(val channelId: String, val memberId: String)

@@ -11,17 +11,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.extensions.initials
 import com.zero.android.ui.theme.AppTheme
 
-private val DEFAULT_MODIFIER = Modifier.size(36.dp)
-
 @Composable
-fun NameInitialsView(modifier: Modifier = DEFAULT_MODIFIER, displayName: String) {
+fun NameInitialsCircle(modifier: Modifier, size: Dp = 36.dp, displayName: String) {
 	Box(
 		modifier =
 		modifier
+			.size(size)
 			.background(color = AppTheme.colors.surfaceInverse, shape = CircleShape)
 			.border(BorderStroke(1.dp, AppTheme.colors.colorTextSecondaryVariant), CircleShape)
 	) {
@@ -32,4 +33,16 @@ fun NameInitialsView(modifier: Modifier = DEFAULT_MODIFIER, displayName: String)
 			style = MaterialTheme.typography.displayLarge
 		)
 	}
+}
+
+@Composable
+fun CircularInitialsImage(
+	modifier: Modifier = Modifier,
+	size: Dp = 36.dp,
+	name: String,
+	url: String?,
+	placeholder: Painter? = null
+) {
+	if (url.isNullOrEmpty()) NameInitialsCircle(modifier = modifier, size = size, displayName = name)
+	else CircularImage(modifier = modifier, size = size, url = url, placeholder = placeholder)
 }

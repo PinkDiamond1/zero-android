@@ -2,7 +2,12 @@ package com.zero.android.ui.sidebar
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,7 +31,11 @@ fun AppDrawerFooter(modifier: Modifier = Modifier, onCreateWorldClick: () -> Uni
 		horizontalAlignment = Alignment.Start,
 		verticalArrangement = Arrangement.SpaceBetween
 	) {
-		Divider(color = AppTheme.colors.divider, modifier = modifier.fillMaxWidth(), thickness = 0.5.dp)
+		Divider(
+			color = AppTheme.colors.divider,
+			modifier = modifier.fillMaxWidth(),
+			thickness = 0.5.dp
+		)
 		Row(
 			modifier =
 			modifier

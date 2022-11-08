@@ -23,6 +23,8 @@ import com.zero.android.network.chat.conversion.toGroupApi
 import com.zero.android.network.chat.conversion.toOpenParams
 import com.zero.android.network.chat.conversion.toOption
 import com.zero.android.network.chat.conversion.toParams
+import com.zero.android.network.chat.conversion.toUpdateParams
+import com.zero.android.network.extensions.parsed
 import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiMember
 import com.zero.android.network.service.ChannelCategoryService
@@ -81,7 +83,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			openQuery!!.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get open channels", e)
-					coroutine.resumeWithException(e)
+					coroutine.resumeWithException(e.parsed)
 				} else {
 					coroutine.resume(channels.map { it.toApi() })
 				}
@@ -104,7 +106,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			groupQuery!!.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get group channels", e)
-					coroutine.resumeWithException(e)
+					coroutine.resumeWithException(e.parsed)
 				} else {
 					coroutine.resume(channels.map { it.toGroupApi() })
 				}
@@ -133,7 +135,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		directQuery!!.next { channels, e ->
 			if (e != null) {
 				logger.e("Failed to get direct channels", e)
-				coroutine.resumeWithException(e)
+				coroutine.resumeWithException(e.parsed)
 			} else {
 				coroutine.resume(channels.filter { it.networkId.isNullOrEmpty() }.map { it.toDirectApi() })
 			}
@@ -154,7 +156,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			publicChannelQuery.next { channels, e ->
 				if (e != null) {
 					logger.e("Failed to get group channels", e)
-					coroutine.resumeWithException(e)
+					coroutine.resumeWithException(e.parsed)
 				} else {
 					coroutine.resume(channels.map { it.toGroupApi() })
 				}
@@ -171,7 +173,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			GroupChannel.createChannel(params) { groupChannel, e ->
 				if (e != null) {
 					logger.e("Failed to create channel", e)
-					it.resumeWithException(e)
+					it.resumeWithException(e.parsed)
 				} else {
 					it.resume(groupChannel.toGroupApi())
 				}
@@ -180,7 +182,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			OpenChannel.createChannel(channel.toOpenParams()) { openChannel, e ->
 				if (e != null) {
 					logger.e("Failed to create channel", e)
-					it.resumeWithException(e)
+					it.resumeWithException(e.parsed)
 				} else {
 					it.resume(openChannel.toApi())
 				}
@@ -192,7 +194,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		GroupChannel.createChannelWithUserIds(members.map { it.id }, true) { directChannel, e ->
 			if (e != null) {
 				logger.e("Failed to create channel", e)
-				it.resumeWithException(e)
+				it.resumeWithException(e.parsed)
 			} else {
 				it.resume(directChannel.toDirectApi())
 			}
@@ -205,7 +207,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 				OpenChannel.getChannel(url) { openChannel, e ->
 					if (e != null) {
 						logger.e("Failed to get channel", e)
-						it.resumeWithException(e)
+						it.resumeWithException(e.parsed)
 					} else {
 						it.resume(openChannel.toApi())
 					}
@@ -214,7 +216,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 				GroupChannel.getChannel(url) { groupChannel, e ->
 					if (e != null) {
 						logger.e("Failed to get channel", e)
-						it.resumeWithException(e)
+						it.resumeWithException(e.parsed)
 					} else {
 						it.resume(groupChannel.toApi())
 					}
@@ -225,15 +227,15 @@ internal class SendBirdChannelService(private val logger: Logger) :
 	override suspend fun updateChannel(channel: Channel) = suspendCoroutine { coroutine ->
 		val params =
 			when (channel) {
-				is DirectChannel -> channel.toParams()
-				is com.zero.android.models.GroupChannel -> channel.toParams()
+				is com.zero.android.models.GroupChannel -> channel.toUpdateParams()
 				else -> throw IllegalStateException()
 			}
 
 		withSameScope {
 			(getChannel(channel) as GroupChannel).let {
 				it.updateChannel(params) { channel, e ->
-					if (e == null) coroutine.resume(channel.toApi()) else coroutine.resumeWithException(e)
+					if (e == null) coroutine.resume(channel.toApi())
+					else coroutine.resumeWithException(e.parsed)
 				}
 			}
 		}
@@ -265,7 +267,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
 				groupChannel(channel.id).setMyPushTriggerOption(alertType.toOption()) {
-					if (it != null) coroutine.resumeWithException(it) else coroutine.resume(Unit)
+					if (it != null) coroutine.resumeWithException(it.parsed) else coroutine.resume(Unit)
 				}
 			}
 		}
@@ -284,7 +286,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 						coroutine.resume(Unit)
 					} else {
 						logger.e("Failed to join channel", it)
-						coroutine.resumeWithException(it)
+						coroutine.resumeWithException(it.parsed)
 					}
 				}
 			} else if (channel.isOpenChannel()) {
@@ -292,8 +294,32 @@ internal class SendBirdChannelService(private val logger: Logger) :
 					if (it == null) {
 						coroutine.resume(Unit)
 					} else {
-						logger.e("Failed to join channel", it)
-						coroutine.resumeWithException(it)
+						logger.e("Failed to join open channel", it)
+						coroutine.resumeWithException(it.parsed)
+					}
+				}
+			}
+		}
+	}
+
+	override suspend fun leaveChannel(channel: Channel) = suspendCancellableCoroutine { coroutine ->
+		withSameScope {
+			if (channel.isGroupChannel()) {
+				groupChannel(channel.id).leave {
+					if (it == null) {
+						coroutine.resume(Unit)
+					} else {
+						logger.e("Failed to leave channel", it)
+						coroutine.resumeWithException(it.parsed)
+					}
+				}
+			} else if (channel.isOpenChannel()) {
+				openChannel(channel.id).exit {
+					if (it == null) {
+						coroutine.resume(Unit)
+					} else {
+						logger.e("Failed to leave open channel", it)
+						coroutine.resumeWithException(it.parsed)
 					}
 				}
 			}
@@ -308,7 +334,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 						coroutine.resume(Unit)
 					} else {
 						logger.e("Failed to join channel", it)
-						coroutine.resumeWithException(it)
+						coroutine.resumeWithException(it.parsed)
 					}
 				}
 			} else if (channel.isOpenChannel()) {
@@ -317,7 +343,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 						coroutine.resume(Unit)
 					} else {
 						logger.e("Failed to join channel", it)
-						coroutine.resumeWithException(it)
+						coroutine.resumeWithException(it.parsed)
 					}
 				}
 			}
@@ -333,16 +359,16 @@ internal class SendBirdChannelService(private val logger: Logger) :
 							coroutine.resume(Unit)
 						} else {
 							logger.e("Failed to mark channel read", it)
-							coroutine.resumeWithException(it)
+							coroutine.resumeWithException(it.parsed)
 						}
 					}
 				} else {
-					val ex = IllegalStateException("Cannot mark open channel read")
-					coroutine.resumeWithException(ex)
+					coroutine.resumeWithException(IllegalStateException("Cannot mark open channel read"))
 				}
 			}
 		}
 
+	@Suppress("RemoveExplicitTypeArguments")
 	override suspend fun getReadMembers(id: String) = suspendCancellableCoroutine { coroutine ->
 		withSameScope {
 			val baseChannel = groupChannel(id)

@@ -3,7 +3,7 @@ buildscript {
 		"id"         : "com.zero.android",
 
 		"version"    : 1,
-		"versionName": "1.4",
+		"versionName": "1.7",
 
 		"minSdk"     : 21,
 		"compileSdk" : 33,
@@ -36,11 +36,13 @@ buildscript {
 		"lifecycle"       : "2.6.0-alpha01",
 		"splashscreen"    : "1.0.0",
 		"constraintlayout": "1.1.0-alpha03",
-		"coil"            : '2.1.0',
-		"coilVideo"      : '2.2.1',
 		"pager"           : "0.24.12-rc",
+		"swiperefresh"    : "0.25.0",
+		"coil"            : '2.1.0',
+		"coilVideo"       : '2.2.1',
 		"imagePicker"     : "2.1",
 		"videoPlayer"     : "0.1.0-alpha",
+		"amplituda"   	  : "2.2.2",
 
 		// Data
 		"retrofit"        : "2.9.0",
@@ -81,10 +83,10 @@ buildscript {
 }
 
 plugins {
-	id 'com.android.application' version '7.3.0' apply false
-	id 'com.android.library' version '7.3.0' apply false
+	id 'com.android.application' version '7.3.1' apply false
+	id 'com.android.library' version '7.3.1' apply false
 	id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
-	id 'com.diffplug.spotless' version '6.6.1'
+	id 'com.diffplug.spotless' version '6.11.0'
 	id 'org.jetbrains.kotlin.jvm' version '1.6.21' apply false
 }
 

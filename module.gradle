@@ -37,4 +37,4 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-datetime:${versions.datetime}"
 }
 
-apply from: "../test_dependencies.gradle"
+apply from: rootProject.projectDir.absolutePath + "/test_dependencies.gradle"

@@ -9,6 +9,7 @@ import com.zero.android.models.Message
 import com.zero.android.models.enums.AlertType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.File
 
 interface ChannelRepository {
 
@@ -32,9 +33,13 @@ interface ChannelRepository {
 
 	suspend fun updateChannel(channel: Channel)
 
+	suspend fun updateChannelImage(channel: Channel, image: File)
+
 	suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType)
 
 	suspend fun joinChannel(channel: Channel)
+
+	suspend fun leaveChannel(channel: Channel)
 
 	suspend fun deleteChannel(channel: Channel)
 

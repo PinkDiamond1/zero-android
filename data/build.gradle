@@ -22,4 +22,5 @@ dependencies {
 	// Data
 	implementation "androidx.paging:paging-compose:${versions.pagingCompose}"
 	implementation "io.coil-kt:coil-compose:${versions.coil}"
+	implementation "com.github.lincollincol:amplituda:${versions.amplituda}"
 }

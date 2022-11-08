@@ -1,10 +1,12 @@
 package com.zero.android.network.service
 
-import kotlinx.serialization.json.JsonObject
-import retrofit2.http.GET
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 
 interface AccountService {
 
-	@GET(value = "accounts/sync")
-	suspend fun sync(): JsonObject
+	@FormUrlEncoded
+	@POST(value = "accounts/sync")
+	suspend fun syncAccount(@Field("idToken") token: String, @Field("inviteCode") inviteCode: String)
 }

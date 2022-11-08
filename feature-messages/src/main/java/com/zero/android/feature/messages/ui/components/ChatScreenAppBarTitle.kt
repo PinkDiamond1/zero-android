@@ -14,26 +14,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
+import com.zero.android.models.fake.FakeModel
 import com.zero.android.models.isGroupChannel
-import com.zero.android.ui.components.NameInitialsView
-import com.zero.android.ui.components.SmallCircularImage
+import com.zero.android.ui.components.CircularInitialsImage
+import com.zero.android.ui.extensions.Preview
 
 @Composable
 fun ChatScreenAppBarTitle(channel: Channel) {
 	Row {
 		IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = {}) {
-			if (channel.isGroupChannel) {
-				NameInitialsView(displayName = channel.name)
-			} else {
-				SmallCircularImage(
-					imageUrl = channel.members.firstOrNull()?.profileImage,
-					placeHolder = R.drawable.ic_user_profile_placeholder
-				)
-			}
+			CircularInitialsImage(
+				size = 36.dp,
+				name = channel.name,
+				url = channel.image,
+				placeholder =
+				if (channel.isGroupChannel) null
+				else painterResource(R.drawable.ic_user_profile_placeholder)
+			)
 		}
 		Text(
 			channel.name.lowercase(),
@@ -44,23 +46,21 @@ fun ChatScreenAppBarTitle(channel: Channel) {
 		)
 		Spacer(modifier = Modifier.padding(6.dp))
 		if (channel.isGroupChannel) {
-			if ((channel as GroupChannel).hasTelegramChannel) {
+			(channel as GroupChannel).icon?.let { icon ->
 				Image(
-					painter = painterResource(R.drawable.ic_chat_icon),
+					painter = painterResource(icon),
 					contentDescription = "",
 					modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 					contentScale = ContentScale.Fit
 				)
 				Spacer(modifier = Modifier.padding(6.dp))
 			}
-			if (channel.hasDiscordChannel) {
-				Image(
-					painter = painterResource(R.drawable.ic_discord),
-					contentDescription = "",
-					modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
-					contentScale = ContentScale.Fit
-				)
-			}
 		}
 	}
+}
+
+@Preview
+@Composable
+private fun ChatScreenAppBarTitlePreview() = Preview {
+	ChatScreenAppBarTitle(channel = FakeModel.GroupChannel())
 }

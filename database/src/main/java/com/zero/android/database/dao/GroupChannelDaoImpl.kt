@@ -19,7 +19,7 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 		SELECT * FROM channels 
 		WHERE isDirectChannel = 0 
 		AND networkId = :networkId 
-		ORDER BY lastMessageTime DESC    
+		ORDER BY lastMessageTime DESC
 		"""
 	)
 	abstract fun getByNetwork(networkId: String): PagingSource<Int, GroupChannelWithRefs>
@@ -31,7 +31,7 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 		WHERE isDirectChannel = 0 
 		AND networkId = :networkId 
 		AND category = :category 
-		ORDER BY lastMessageTime DESC    
+		ORDER BY lastMessageTime DESC
 		"""
 	)
 	abstract fun getByNetworkAndCategory(
@@ -43,7 +43,7 @@ abstract class GroupChannelDaoImpl : BaseChannelDao() {
 	@Query(
 		"""
 		SELECT * FROM channels 
-		WHERE isDirectChannel = 0
+		WHERE isDirectChannel = 0 
 		AND networkId = :networkId 
 		AND name LIKE '%'||:name||'%'
 		"""

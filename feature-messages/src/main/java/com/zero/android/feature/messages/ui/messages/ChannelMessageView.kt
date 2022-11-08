@@ -61,7 +61,7 @@ fun ChannelMessage(
 	) {
 		SmallCircularImage(
 			imageUrl = msg.author?.profileImage,
-			placeHolder = R.drawable.ic_user_profile_placeholder
+			placeholder = R.drawable.ic_user_profile_placeholder
 		)
 		CMAuthorAndTextMessage(
 			modifier = Modifier.padding(end = 16.dp).weight(1f),

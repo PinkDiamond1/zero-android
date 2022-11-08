@@ -5,7 +5,12 @@ enum class MessageType(val serializedName: String) {
 	IMAGE("image"),
 	AUDIO("audio"),
 	VIDEO("video"),
-	UNKNOWN("")
+	UNKNOWN("");
+
+	companion object {
+		val mediaMessageTypes
+			get() = values().filterNot { it == TEXT }
+	}
 }
 
 fun String?.toMessageType() =

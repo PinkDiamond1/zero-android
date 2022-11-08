@@ -24,4 +24,4 @@ import androidx.room.Index
 		)
 	]
 )
-data class MessageMentionCrossRef(val messageId: String, val memberId: String)
+internal data class MessageMentionCrossRef(val messageId: String, val memberId: String)

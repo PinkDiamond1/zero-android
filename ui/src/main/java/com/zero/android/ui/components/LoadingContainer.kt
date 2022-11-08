@@ -1,6 +1,12 @@
 package com.zero.android.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,10 +25,12 @@ fun LoadingContainer(
 ) {
 	if (loading) {
 		Column(
-			modifier = modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp),
+			modifier = modifier.fillMaxSize().fillMaxWidth().defaultMinSize(minHeight = 100.dp),
 			verticalArrangement = Arrangement.Center,
 			horizontalAlignment = Alignment.CenterHorizontally
-		) { CircularProgress(size = size) }
+		) {
+			CircularProgress(size = size)
+		}
 	} else {
 		content()
 	}
@@ -39,10 +47,12 @@ fun OverlappingLoadingContainer(
 		content()
 		if (loading) {
 			Column(
-				modifier = modifier.fillMaxWidth().defaultMinSize(minHeight = 100.dp),
+				modifier = modifier.fillMaxWidth().clickable {}.defaultMinSize(minHeight = 100.dp),
 				verticalArrangement = Arrangement.Center,
 				horizontalAlignment = Alignment.CenterHorizontally
-			) { CircularProgress(size = size) }
+			) {
+				CircularProgress(size = size)
+			}
 		}
 	}
 }

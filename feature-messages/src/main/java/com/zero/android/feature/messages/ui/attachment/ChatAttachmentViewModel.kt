@@ -15,8 +15,6 @@ class ChatAttachmentViewModel
 @Inject
 constructor(private val mediaPlayerManager: MediaPlayerManager) : BaseViewModel() {
 
-	val currentPosition
-		get() = mediaPlayerManager.mediaPlayer.currentPosition
 	private val voiceMemoMediaSources = mutableMapOf<String, ChatAttachmentProvider>()
 	private var lastMediaId: String? = null
 
@@ -26,11 +24,16 @@ constructor(private val mediaPlayerManager: MediaPlayerManager) : BaseViewModel(
 				.filter { it.type == MessageType.AUDIO }
 				.map {
 					if (!voiceMemoMediaSources.containsKey(it.id)) {
-						val mediaSource = ChatAttachmentProvider(it.fileName, mediaPlayerManager)
+						val fileName = getMediaFileName(it)
+						val mediaSource = ChatAttachmentProvider(fileName, mediaPlayerManager)
 						voiceMemoMediaSources[it.id] = mediaSource
 					}
 				}
 		}
+	}
+
+	private fun getMediaFileName(msg: Message): String {
+		return msg.fileName ?: "Memo-${System.currentTimeMillis()}"
 	}
 
 	fun getMediaSource(message: Message) =
@@ -65,5 +68,14 @@ constructor(private val mediaPlayerManager: MediaPlayerManager) : BaseViewModel(
 
 	fun seekMediaTo(message: Message, value: Float) {
 		getMediaSource(message).seekTo(value)
+	}
+
+	fun getMemoAmplitudes(message: Message, onResult: (List<Int>) -> Unit) {
+		ioScope.launch {
+			getMediaSource(message).apply {
+				val amps = mediaPlayerManager.getAudioAmplitudes(currentFile)
+				onResult.invoke(amps)
+			}
+		}
 	}
 }

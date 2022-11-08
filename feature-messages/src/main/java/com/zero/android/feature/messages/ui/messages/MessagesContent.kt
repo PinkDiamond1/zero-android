@@ -14,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -27,14 +29,18 @@ import androidx.paging.compose.items
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.isSameDay
 import com.zero.android.common.extensions.toDate
+import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.feature.messages.ui.attachment.ChatAttachmentViewModel
 import com.zero.android.models.Channel
 import com.zero.android.models.Message
+import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.components.JumpToBottom
 import com.zero.android.ui.components.StrikeLabel
 import com.zero.android.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+private const val SCROLL_OFFSET = -500
 
 @Composable
 fun MessagesContent(
@@ -43,10 +49,37 @@ fun MessagesContent(
 	loggedInUser: String,
 	latestMessage: Message?,
 	channel: Channel,
-	onMediaClick: (String) -> Unit
+	resetScroll: Boolean = false,
+	onMediaClick: (String) -> Unit,
+	onRetryMessage: (message: Message) -> Unit
 ) {
 	val scrollState = rememberLazyListState()
 	val scope = rememberCoroutineScope()
+
+	var checkScrollState by remember { mutableStateOf(false) }
+	var replyMessageRef: Message? by remember { mutableStateOf(null) }
+
+	val resetScrollState: (Int, Int, Boolean) -> Unit = { position, offset, smoothScroll ->
+		scope.launch {
+			if (smoothScroll) {
+				scrollState.animateScrollToItem(position, offset)
+			} else {
+				scrollState.scrollToItem(position, offset)
+			}
+		}
+	}
+
+	val scrollTillTarget: () -> Unit = {
+		checkScrollState = true
+		resetScrollState(messages.itemSnapshotList.items.size, 0, true)
+	}
+
+	val onTargetFound: (Message, Int) -> Unit = { refMessage, index ->
+		checkScrollState = false
+		replyMessageRef = null
+		MessageActionStateHandler.setMessageToHighLight(refMessage)
+		resetScrollState(index, SCROLL_OFFSET, false)
+	}
 
 	Surface(modifier = modifier) {
 		Box(modifier = Modifier.fillMaxSize()) {
@@ -59,8 +92,38 @@ fun MessagesContent(
 					channel = channel,
 					scrollState = scrollState,
 					coroutineScope = scope,
-					onMediaClick = onMediaClick
+					onMessageClicked = { message ->
+						when (message.type) {
+							MessageType.IMAGE,
+							MessageType.VIDEO -> onMediaClick(message.id)
+							else -> {
+								message.parentMessage?.let { refMessage ->
+									val parentMessagePos = messages.itemSnapshotList.indexOf(refMessage)
+									if (parentMessagePos >= 0) {
+										onTargetFound(refMessage, parentMessagePos)
+									} else {
+										replyMessageRef = refMessage
+										scrollTillTarget()
+									}
+								}
+							}
+						}
+					},
+					onRetryMessage = onRetryMessage
 				)
+			}
+		}
+	}
+	if (resetScroll) {
+		resetScrollState(0, 0, false)
+	}
+	if (checkScrollState) {
+		replyMessageRef?.let {
+			val parentMessagePos = messages.itemSnapshotList.indexOf(it)
+			if (parentMessagePos >= 0) {
+				onTargetFound(it, parentMessagePos)
+			} else {
+				scrollTillTarget()
 			}
 		}
 	}
@@ -76,7 +139,8 @@ fun Messages(
 	scrollState: LazyListState,
 	coroutineScope: CoroutineScope,
 	chatAttachmentViewModel: ChatAttachmentViewModel = hiltViewModel(),
-	onMediaClick: (String) -> Unit
+	onMessageClicked: (Message) -> Unit,
+	onRetryMessage: (Message) -> Unit
 ) {
 	DisposableEffect(Unit) { onDispose { chatAttachmentViewModel.dispose() } }
 	Box {
@@ -129,13 +193,15 @@ fun Messages(
 					showDeliveryStatus = showDeliveryStatus,
 					chatAttachmentViewModel = chatAttachmentViewModel,
 					onAuthorClick = {},
-					onMediaClick = onMediaClick
+					onMessageClicked = onMessageClicked,
+					onRetryMessage = onRetryMessage
 				)
 
 				if (!isSameDay) {
 					StrikeLabel(messageDate.format("MMMM dd, yyyy"))
 				}
 			}
+			item { Spacer(modifier = Modifier.size(80.dp)) }
 		}
 
 		val jumpThreshold = with(LocalDensity.current) { JumpToBottomThreshold.toPx() }
@@ -148,7 +214,7 @@ fun Messages(
 		JumpToBottom(
 			// Only show if the scroller is not at the bottom
 			enabled = jumpToBottomButtonEnabled,
-			onClicked = { coroutineScope.launch { scrollState.animateScrollToItem(0) } },
+			onClicked = { coroutineScope.launch { scrollState.scrollToItem(0) } },
 			modifier = Modifier.align(Alignment.BottomCenter)
 		)
 	}

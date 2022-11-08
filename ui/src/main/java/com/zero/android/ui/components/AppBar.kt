@@ -1,7 +1,7 @@
 package com.zero.android.ui.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -18,21 +18,33 @@ fun AppBar(
 	color: Color? = null,
 	navIcon: @Composable () -> Unit,
 	title: @Composable () -> Unit,
-	actions: @Composable RowScope.() -> Unit = {}
+	actions: @Composable RowScope.() -> Unit = {},
+	centered: Boolean = false
 ) {
-	Box(modifier = Modifier) {
+	val colors =
+		if (color != null) {
+			TopAppBarDefaults.smallTopAppBarColors(containerColor = color)
+		} else {
+			TopAppBarDefaults.smallTopAppBarColors()
+		}
+
+	if (centered) {
+		CenterAlignedTopAppBar(
+			modifier = modifier,
+			actions = actions,
+			title = title,
+			scrollBehavior = scrollBehavior,
+			navigationIcon = navIcon,
+			colors = colors
+		)
+	} else {
 		TopAppBar(
 			modifier = modifier,
 			actions = actions,
 			title = title,
 			scrollBehavior = scrollBehavior,
 			navigationIcon = navIcon,
-			colors =
-			if (color != null) {
-				TopAppBarDefaults.smallTopAppBarColors(containerColor = color)
-			} else {
-				TopAppBarDefaults.smallTopAppBarColors()
-			}
+			colors = colors
 		)
 	}
 }

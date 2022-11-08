@@ -77,7 +77,9 @@ fun PasswordStrengthMeter(modifier: Modifier, password: String = "") {
 			Spacer(modifier = Modifier.size(8.dp))
 			Box(
 				modifier =
-				Modifier.weight(1f).height(4.dp).background(thirdBarColor, RoundedCornerShape(12.dp))
+				Modifier.weight(1f)
+					.height(4.dp)
+					.background(thirdBarColor, RoundedCornerShape(12.dp))
 			)
 		}
 		Text(

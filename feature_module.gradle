@@ -1,4 +1,4 @@
-apply from: "../module.gradle"
+apply from: rootProject.projectDir.absolutePath + "/module.gradle"
 
 android {
 	buildFeatures {

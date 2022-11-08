@@ -2,30 +2,21 @@ package com.zero.android.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
-import androidx.compose.ui.res.stringResource
-import com.zero.android.common.R
+import androidx.compose.runtime.Composable
 
 @Composable
-fun AppAlertDialog(error: String, onDismiss: () -> Unit = {}) {
-	var showDialog by remember { mutableStateOf(true) }
-	if (showDialog) {
-		AlertDialog(
-			onDismissRequest = {
-				showDialog = false
-				onDismiss()
-			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						showDialog = false
-						onDismiss()
-					}
-				) { Text(text = stringResource(R.string.ok)) }
-			},
-			title = { Text(text = stringResource(R.string.error)) },
-			text = { Text(text = error) }
-		)
-	}
+fun AppAlertDialog(
+	title: String = "Zero-Tech",
+	message: String,
+	onDismiss: () -> Unit = {},
+	confirmButton: @Composable (() -> Unit),
+	dismissButton: @Composable (() -> Unit)? = null
+) {
+	AlertDialog(
+		onDismissRequest = { onDismiss() },
+		confirmButton = confirmButton,
+		dismissButton = dismissButton,
+		title = { Text(title) },
+		text = { Text(text = message) }
+	)
 }

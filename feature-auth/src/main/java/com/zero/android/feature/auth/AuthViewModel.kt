@@ -1,13 +1,18 @@
 package com.zero.android.feature.auth
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import com.zero.android.common.ui.Result
 import com.zero.android.common.ui.asResult
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.manager.SessionManager
 import com.zero.android.data.repository.AuthRepository
+import com.zero.android.data.repository.InviteRepository
+import com.zero.android.feature.auth.navigation.AuthDestination
 import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.models.AuthCredentials
+import com.zero.android.models.Invite
+import com.zero.android.models.InviteDetail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -18,8 +23,10 @@ import javax.inject.Inject
 class AuthViewModel
 @Inject
 constructor(
+	savedStateHandle: SavedStateHandle,
 	private val sessionManager: SessionManager,
 	private val authRepository: AuthRepository,
+	private val inviteRepository: InviteRepository,
 	private val authValidator: AuthValidator
 ) : BaseViewModel() {
 
@@ -27,6 +34,12 @@ constructor(
 		LOGIN,
 		AUTH_REQUIRED
 	}
+
+	val inviteCode: String? = savedStateHandle[AuthDestination.ARG_INVITE_CODE]
+	val inviteDetails = MutableStateFlow<InviteDetail?>(null)
+	private val _inviteInfo = MutableStateFlow<Invite?>(null)
+	val inviteId: String
+		get() = _inviteInfo.value?.id ?: ""
 
 	val uiState = MutableStateFlow(AuthScreenUIState.AUTH_REQUIRED)
 	val loading = MutableStateFlow(false)
@@ -125,18 +138,44 @@ constructor(
 			val formValidator = authValidator.validateRegistration(name, email, password, confirmPassword)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
-				authRepository.register(name!!, email!!, password!!, profilePic).asResult().collect {
-					when (it) {
-						is Result.Success -> onAuth(it.data)
-						is Result.Error -> {
-							loading.emit(false)
-							error.emit((it as? Result.Error)?.exception?.message)
+				authRepository
+					.register(name!!, email!!, password!!, inviteCode, profilePic)
+					.asResult()
+					.collect {
+						when (it) {
+							is Result.Success -> loginAndCreateUser(email, password, name, inviteCode)
+							is Result.Error -> {
+								loading.emit(false)
+								error.emit((it as? Result.Error)?.exception?.message)
+							}
+							else -> {}
 						}
-						else -> {}
 					}
-				}
 			} else {
 				registerValidator.emit(formValidator)
+			}
+		}
+	}
+
+	private fun loginAndCreateUser(
+		email: String,
+		password: String,
+		name: String,
+		inviteCode: String?
+	) {
+		ioScope.launch {
+			authRepository.login(email, password).asResult().collect {
+				when (it) {
+					is Result.Success -> {
+						authRepository.createUser(it.data.accessToken, name, inviteCode)
+						onAuth(it.data)
+					}
+					is Result.Error -> {
+						loading.emit(false)
+						error.emit((it as? Result.Error)?.exception?.message)
+					}
+					else -> {}
+				}
 			}
 		}
 	}
@@ -156,6 +195,27 @@ constructor(
 				loginValidator.emit(AuthValidator.LoginValidator())
 				forgotPasswordValidator.emit(AuthValidator.ResetPasswordValidator())
 				registerValidator.emit(AuthValidator.RegistrationValidator())
+			}
+		}
+	}
+
+	fun checkInviteCode() {
+		inviteCode?.let { invite ->
+			ioScope.launch {
+				loading.tryEmit(true)
+				inviteRepository.resolveInvite(invite).asResult().collect { inviteInfo ->
+					if (inviteInfo is Result.Success) {
+						this@AuthViewModel._inviteInfo.emit(inviteInfo.data)
+						inviteRepository.getInviteDetails(inviteInfo.data.id).asResult().collect { detail ->
+							if (detail is Result.Success) {
+								inviteDetails.emit(detail.data)
+							}
+							loading.emit(false)
+						}
+					} else {
+						loading.emit(false)
+					}
+				}
 			}
 		}
 	}

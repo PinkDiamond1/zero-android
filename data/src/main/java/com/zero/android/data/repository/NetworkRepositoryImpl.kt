@@ -1,6 +1,7 @@
 package com.zero.android.data.repository
 
 import com.zero.android.common.extensions.channelFlowWithAwait
+import com.zero.android.common.extensions.launchSafe
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.database.dao.NetworkDao
 import com.zero.android.database.model.toModel
@@ -34,7 +35,7 @@ constructor(
 				trySend(networks.map { it.toModel() })
 			}
 		}
-		launch {
+		launchSafe {
 			networkService.getNetworks(preferences.userId()).let { networks ->
 				val alertTypes = mutableMapOf<String, AlertType>()
 				for (network in networks) {
@@ -48,7 +49,9 @@ constructor(
 
 	override suspend fun getCategories(id: String): Flow<List<ChannelCategory>> = flow {
 		networkDao.getCategories(id).firstOrNull()?.let { emit(it) }
-		emit(categoryService.getCategories(id)) // TODO: remove this after data loading after login
+		runCatching {
+			emit(categoryService.getCategories(id))
+		} // TODO: remove this after data loading after login
 	}
 
 	override suspend fun updateNotificationSettings(id: String, alertType: AlertType) {

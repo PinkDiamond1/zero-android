@@ -1,6 +1,8 @@
 package com.zero.android.ui.splash
 
 import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,8 +26,11 @@ fun SplashScreen(onNavigateAway: () -> Unit) {
 	val context = LocalContext.current
 	val mediaUri = "android.resource://${context.packageName}/${R.raw.zero}"
 
-	VideoPlayer(modifier = Modifier.fillMaxSize(), playerState = playerState) {
-		VideoPlayerControl(state = playerState, title = "")
+	Box {
+		VideoPlayer(modifier = Modifier.fillMaxSize(), playerState = playerState) {
+			VideoPlayerControl(state = playerState, title = "")
+		}
+		Box(modifier = Modifier.fillMaxSize().clickable {})
 	}
 	LaunchedEffect(Unit) {
 		playerState.player.setMediaItem(MediaItem.fromUri(Uri.parse(mediaUri)))

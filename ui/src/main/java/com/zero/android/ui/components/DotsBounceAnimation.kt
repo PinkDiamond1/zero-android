@@ -69,7 +69,12 @@ fun DotsBounceAnimation(
 		horizontalArrangement = Arrangement.Center
 	) {
 		dys.forEachIndexed { _, dy ->
-			Box(Modifier.size(size).scale(dy).alpha(dy).background(color = color, shape = CircleShape))
+			Box(
+				Modifier.size(size)
+					.scale(dy)
+					.alpha(dy)
+					.background(color = color, shape = CircleShape)
+			)
 		}
 	}
 }

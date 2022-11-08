@@ -10,9 +10,12 @@ import com.zero.android.feature.auth.navigation.AuthDestination
 import com.zero.android.feature.auth.navigation.ForgotPasswordDestination
 import com.zero.android.feature.auth.navigation.RegisterDestination
 import com.zero.android.feature.auth.navigation.authGraph
+import com.zero.android.feature.channels.navigation.ChannelDetailsDestination
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
 import com.zero.android.feature.channels.navigation.DirectChannelsDestination
+import com.zero.android.feature.channels.navigation.EditChannelDestination
+import com.zero.android.feature.channels.navigation.channelGraph
 import com.zero.android.feature.channels.ui.channels.ChannelsRoute
 import com.zero.android.feature.channels.ui.createdirectchannel.CreateDirectChannelRoute
 import com.zero.android.feature.channels.ui.directchannels.DirectChannelsRoute
@@ -33,20 +36,35 @@ import com.zero.android.navigation.extensions.navigate
 internal fun NavGraphBuilder.appGraph(controller: NavController) {
 	navigation(startDestination = AuthDestination.route, route = AppGraph.AUTH) {
 		authGraph(
-			onLogin = { controller.navigate(HomeDestination) { asRoot() } },
+			onLogin = { inviteCode ->
+				controller.navigate(HomeDestination.route(inviteCode)) { asRoot() }
+			},
 			onForgotPassword = { controller.navigate(ForgotPasswordDestination) },
-			onRegister = { controller.navigate(RegisterDestination) },
+			onRegister = { inviteCode -> controller.navigate(RegisterDestination.route(inviteCode)) },
 			onBackPress = { controller.navigateUp() }
 		)
 	}
 	navigation(startDestination = HomeDestination.route, route = AppGraph.MAIN) {
+		channelGraph(
+			onEditClick = { id, isGroupChannel ->
+				controller.navigate(EditChannelDestination.route(id, isGroupChannel))
+			},
+			onMediaClick = { channel, media ->
+				controller.navigate(ChatMediaViewerDestination.route(channel, media.messageId))
+			},
+			onAllMediaClick = {},
+			onLeaveChannel = { controller.navigate(ChannelsDestination) { asRoot() } },
+			onBackClick = { controller.navigateUp() }
+		)
 		chatGraph(
 			onBackClick = { controller.navigateUp() },
 			onMediaClicked = { channel, message ->
 				controller.navigate(ChatMediaViewerDestination.route(channel, message))
+			},
+			onChannelDetails = { id, isGroupChannel ->
+				controller.navigate(ChannelDetailsDestination.route(id, isGroupChannel))
 			}
 		)
-		composable(MembersDestination) { MembersRoute() }
 		composable(FeedDestination) { FeedRoute() }
 		composable(NotificationsDestination) { NotificationsRoute() }
 		composable(CreateDirectChannelDestination) {
@@ -62,7 +80,9 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 		homeGraph(
 			navController = controller,
 			onNavigateToRootDestination = { controller.navigate(it) },
-			onLogout = { controller.navigate(AppGraph.AUTH) { asRoot() } }
+			onLogout = { inviteCode ->
+				controller.navigate(AuthDestination.route(inviteCode)) { asRoot() }
+			}
 		)
 	}
 }
@@ -73,5 +93,8 @@ internal fun NavGraphBuilder.homeBottomNavGraph(controller: NavController, netwo
 	}
 	composableSimple(DirectChannelsDestination) {
 		DirectChannelsRoute { controller.navigate(MessagesDestination.route(it.id, false)) }
+	}
+	composableSimple(MembersDestination) {
+		MembersRoute(network = network) { controller.navigate(MessagesDestination.route(it.id, false)) }
 	}
 }

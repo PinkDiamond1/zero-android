@@ -13,5 +13,7 @@ fun Background(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
 		color = MaterialTheme.colorScheme.background,
 		tonalElevation = 0.dp,
 		modifier = modifier.fillMaxSize()
-	) { content() }
+	) {
+		content()
+	}
 }

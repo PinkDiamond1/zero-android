@@ -1,17 +1,6 @@
 package com.zero.android.data.di
 
-import com.zero.android.data.repository.AuthRepository
-import com.zero.android.data.repository.AuthRepositoryImpl
-import com.zero.android.data.repository.ChannelRepository
-import com.zero.android.data.repository.ChannelRepositoryImpl
-import com.zero.android.data.repository.ChatRepository
-import com.zero.android.data.repository.ChatRepositoryImpl
-import com.zero.android.data.repository.MemberRepository
-import com.zero.android.data.repository.MemberRepositoryImpl
-import com.zero.android.data.repository.NetworkRepository
-import com.zero.android.data.repository.NetworkRepositoryImpl
-import com.zero.android.data.repository.UserRepository
-import com.zero.android.data.repository.UserRepositoryImpl
+import com.zero.android.data.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -32,4 +21,11 @@ internal interface RepositoryModule {
 	@Binds fun bindChannelRepository(channelRepository: ChannelRepositoryImpl): ChannelRepository
 
 	@Binds fun bindChatRepository(chatRepository: ChatRepositoryImpl): ChatRepository
+
+	@Binds
+	fun bindChatMediaRepository(chatMediaRepository: ChatMediaRepositoryImpl): ChatMediaRepository
+
+	@Binds fun bindInviteRepository(inviteRepository: InviteRepositoryImpl): InviteRepository
+
+	@Binds fun bindFileRepository(fileRepository: FileRepositoryImpl): FileRepository
 }

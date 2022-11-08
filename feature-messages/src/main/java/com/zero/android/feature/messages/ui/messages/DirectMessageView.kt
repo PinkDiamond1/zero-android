@@ -4,18 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zero.android.common.R
@@ -42,6 +32,8 @@ import com.zero.android.feature.messages.ui.components.VideoMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
+import com.zero.android.ui.components.FlashAnimationComposable
+import com.zero.android.ui.components.InstantAnimation
 import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.theme.AppTheme
 
@@ -57,74 +49,90 @@ fun DirectMessage(
 	showDeliveryStatus: Boolean,
 	chatAttachmentViewModel: ChatAttachmentViewModel,
 	onAuthorClick: (Member) -> Unit,
-	onMediaClick: (String) -> Unit
+	onMessageClicked: (Message) -> Unit,
+	onRetryMessage: (Message) -> Unit
 ) {
 	val focusManager = LocalFocusManager.current
 	val currentSelectedMessage: Message? by MessageActionStateHandler.selectedMessage.collectAsState()
+	val flashMessage: Message? by MessageActionStateHandler.flashMessage.collectAsState()
 	val mModifier = if (isLastMessageByAuthor) modifier.padding(top = 8.dp) else modifier
-	Column(
-		modifier =
-		mModifier
-			.fillMaxWidth()
-			.combinedClickable(
-				onClick = {
-					focusManager.clearFocus(true)
-					if (msg.type == MessageType.IMAGE || msg.type == MessageType.VIDEO) {
-						onMediaClick(msg.id)
-					}
-				},
-				onLongClick = {
-					focusManager.clearFocus(true)
-					MessageActionStateHandler.setSelectedMessage(msg)
-				}
-			)
+
+	var startAnimation = flashMessage?.id == msg.id
+	FlashAnimationComposable(
+		startAnimation = startAnimation,
+		onEndAnimation = {
+			MessageActionStateHandler.resetHighLightMessage()
+			startAnimation = false
+		}
 	) {
-		Row(
+		Column(
 			modifier =
-			if (currentSelectedMessage?.id == msg.id) {
-				Modifier.fillMaxWidth()
-					.background(AppTheme.colors.surface.copy(0.1f))
-					.padding(horizontal = 12.dp)
-			} else Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-			horizontalArrangement = if (isUserMe) Arrangement.End else Arrangement.Start
-		) {
-			if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
-				SmallCircularImage(
-					modifier = Modifier.align(Alignment.Bottom).padding(bottom = 4.dp),
-					imageUrl = msg.author?.profileImage,
-					placeHolder = R.drawable.ic_user_profile_placeholder
+			mModifier
+				.fillMaxWidth()
+				.combinedClickable(
+					onClick = {
+						focusManager.clearFocus(true)
+						if (!msg.isDraft) onMessageClicked(msg) else onRetryMessage(msg)
+					},
+					onLongClick = {
+						focusManager.clearFocus(true)
+						MessageActionStateHandler.setSelectedMessage(msg)
+					}
 				)
-			} else {
-				Spacer(modifier = Modifier.width(36.dp))
-			}
-			when (msg.type) {
-				MessageType.IMAGE -> msg.fileUrl?.let { ImageMessage(it, msg.createdAt) }
-				MessageType.VIDEO -> {
-					msg.fileUrl?.let { VideoMessage(it, msg.createdAt) }
-				}
-				else ->
-					DMAuthorAndTextMessage(
-						modifier = Modifier.padding(end = 16.dp).weight(1f),
-						message = msg,
-						isUserMe = isUserMe,
-						isSameDay = isSameDay,
-						isLastMessageByAuthor = isLastMessageByAuthor,
-						authorClicked = onAuthorClick,
-						chatAttachmentViewModel = chatAttachmentViewModel
-					)
-			}
-		}
-		AnimatedVisibility(
-			visible = showDeliveryStatus,
-			modifier = Modifier.align(Alignment.End).padding(end = 16.dp)
 		) {
-			Text(
-				style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-				text = msg.deliveryStatus.name.lowercase().replaceFirstChar { it.uppercase() },
-				color = AppTheme.colors.colorTextSecondaryVariant
-			)
+			Row(
+				modifier =
+				if (currentSelectedMessage?.id == msg.id) {
+					Modifier.fillMaxWidth()
+						.background(AppTheme.colors.surface.copy(0.1f))
+						.padding(horizontal = 12.dp)
+				} else Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+				horizontalArrangement = if (isUserMe) Arrangement.End else Arrangement.Start
+			) {
+				if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
+					SmallCircularImage(
+						modifier = Modifier.align(Alignment.Bottom).padding(bottom = 4.dp),
+						imageUrl = msg.author?.profileImage,
+						placeholder = R.drawable.ic_user_profile_placeholder
+					)
+				} else {
+					Spacer(modifier = Modifier.width(36.dp))
+				}
+				when (msg.type) {
+					MessageType.IMAGE -> msg.fileUrl?.let { ImageMessage(it, msg.createdAt) }
+					MessageType.VIDEO -> {
+						msg.fileUrl?.let { VideoMessage(it, msg.createdAt) }
+					}
+					else ->
+						DMAuthorAndTextMessage(
+							modifier = Modifier.padding(end = 16.dp).weight(1f),
+							message = msg,
+							isUserMe = isUserMe,
+							isSameDay = isSameDay,
+							isLastMessageByAuthor = isLastMessageByAuthor,
+							authorClicked = onAuthorClick,
+							chatAttachmentViewModel = chatAttachmentViewModel
+						)
+				}
+			}
+			if (!msg.isDraft) {
+				AnimatedVisibility(
+					visible = showDeliveryStatus,
+					modifier = Modifier.align(Alignment.End).padding(end = 16.dp)
+				) {
+					Text(
+						style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+						text =
+						msg.deliveryStatus.name.lowercase().replaceFirstChar {
+							it.uppercase()
+						},
+						color = AppTheme.colors.colorTextSecondaryVariant
+					)
+				}
+			}
+
+			ChatBubbleSpacing(isFirstMessageByAuthor)
 		}
-		ChatBubbleSpacing(isFirstMessageByAuthor)
 	}
 }
 
@@ -162,11 +170,13 @@ fun DMAuthorAndTextMessage(
 		) {
 			Column(modifier = Modifier.padding(4.dp)) {
 				message.parentMessage?.let {
-					ReplyMessage(
-						modifier = Modifier.wrapContentWidth(),
-						message = it,
-						showCloseButton = false
-					)
+					InstantAnimation {
+						ReplyMessage(
+							modifier = Modifier.wrapContentWidth(),
+							message = it,
+							showCloseButton = false
+						)
+					}
 				}
 				if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
 					Text(
@@ -193,6 +203,14 @@ fun DMAuthorAndTextMessage(
 					Modifier.align(Alignment.End).padding(start = 4.dp, end = 4.dp, bottom = 2.dp),
 					color = if (isUserMe) Color.White else AppTheme.colors.colorTextSecondary
 				)
+
+				if (message.isDraft) {
+					Text(
+						style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+						text = stringResource(id = R.string.message_retry),
+						color = AppTheme.colors.error
+					)
+				}
 			}
 		}
 	}

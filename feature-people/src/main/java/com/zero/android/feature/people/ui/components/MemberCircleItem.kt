@@ -33,7 +33,7 @@ fun MemberCircleItem(
 	Box(modifier = Modifier.padding((iconSize / 2))) {
 		MediumCircularImage(
 			modifier = Modifier.clickable { onClick?.invoke() },
-			placeHolder = R.drawable.ic_user_profile_placeholder,
+			placeholder = R.drawable.ic_user_profile_placeholder,
 			imageUrl = member.profileImage,
 			contentDescription = member.id
 		)

@@ -17,6 +17,8 @@ object MessageActionStateHandler {
 	val selectedMessage: StateFlow<Message?> = _selectedMessage
 	private val _replyToMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
 	val replyToMessage: StateFlow<Message?> = _replyToMessage
+	private val _flashMessage: MutableStateFlow<Message?> = MutableStateFlow(null)
+	val flashMessage: StateFlow<Message?> = _flashMessage
 
 	private val _mentionUser: MutableStateFlow<Boolean> = MutableStateFlow(false)
 	val mentionUser: StateFlow<Boolean> = _mentionUser
@@ -96,6 +98,7 @@ object MessageActionStateHandler {
 				val indexOfLastMention = lastMessage.indexOfLast { it == '@' }
 				append(lastMessage.substring(0, indexOfLastMention + 1))
 				append("${member.name?.trim()?.replace(" ","_")}")
+				append(" ")
 			}
 			messageUpdatedText.emit(newMessageText)
 			_mentionUser.emit(false)
@@ -104,5 +107,13 @@ object MessageActionStateHandler {
 
 	fun getMentionQuery(text: String): String {
 		return text.split("@").lastOrNull()?.split(" ")?.firstOrNull()?.trim() ?: ""
+	}
+
+	fun setMessageToHighLight(message: Message) {
+		ioScope.launch { _flashMessage.emit(message) }
+	}
+
+	fun resetHighLightMessage() {
+		ioScope.launch { _flashMessage.emit(null) }
 	}
 }

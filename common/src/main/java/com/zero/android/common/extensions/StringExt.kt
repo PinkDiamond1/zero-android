@@ -20,6 +20,8 @@ fun String?.initials(): String {
 	}
 }
 
+fun String.plural(count: Int) = if (count <= 1) this else "${this}s"
+
 val String.isValidUrl
 	get() = Patterns.WEB_URL.matcher(this).matches()
 

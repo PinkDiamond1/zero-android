@@ -55,11 +55,11 @@ fun MemberSectionList(
 					Spacer(modifier = Modifier.size(8.dp))
 					if (nested) {
 						Column(modifier = Modifier.fillMaxWidth()) {
-							sectionMembers.forEach { MemberSearchItem(it, onMemberSelected) }
+							sectionMembers.forEach { MemberListItem(it, onClick = onMemberSelected) }
 						}
 					} else {
 						LazyColumn(modifier = Modifier.fillMaxWidth()) {
-							items(sectionMembers) { MemberSearchItem(it, onMemberSelected) }
+							items(sectionMembers) { MemberListItem(it, onClick = onMemberSelected) }
 						}
 					}
 				}

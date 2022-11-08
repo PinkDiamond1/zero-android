@@ -28,12 +28,14 @@ object FakeEntity {
 
 	fun DirectChannelWithRefs(
 		id: String = "directChannelId",
+		name: String = "Member One, Member Two",
 		lastMessage: MessageWithRefs? = MessageWithRefs(id = "directLastMessageId", channelId = id)
 	) =
 		DirectChannelWithRefs(
 			channel =
 			ChannelEntity(
 				id = id,
+				name = name,
 				lastMessageId = lastMessage?.message?.id,
 				isDirectChannel = true,
 				memberCount = 2
@@ -46,6 +48,7 @@ object FakeEntity {
 		id: String = "groupChannelId",
 		networkId: String = "networkId",
 		category: ChannelCategory = "category",
+		name: String = "Group Channel",
 		lastMessage: MessageWithRefs? = MessageWithRefs(id = "groupLastMessageId", channelId = id)
 	) =
 		GroupChannelWithRefs(
@@ -53,6 +56,7 @@ object FakeEntity {
 			channel =
 			ChannelEntity(
 				id = id,
+				name = name,
 				networkId = networkId,
 				lastMessageId = lastMessage?.message?.id,
 				isDirectChannel = false,
@@ -68,7 +72,8 @@ object FakeEntity {
 		id: String = "messageId",
 		channelId: String = "channelId",
 		authorId: String = "memberOne",
-		requestId: String? = null
+		requestId: String? = null,
+		reply: Boolean = true
 	) =
 		MessageWithRefs(
 			message =
@@ -76,8 +81,8 @@ object FakeEntity {
 				id = id,
 				requestId = requestId,
 				authorId = authorId,
-				parentMessageId = "parentMessageId",
-				parentMessageAuthorId = "memberThree",
+				parentMessageId = if (reply) "parentMessageId" else null,
+				parentMessageAuthorId = if (reply) "memberThree" else null,
 				channelId = channelId,
 				type = MessageType.TEXT,
 				status = MessageStatus.PENDING,
@@ -85,15 +90,17 @@ object FakeEntity {
 			),
 			author = MemberEntity(id = authorId),
 			parentMessage =
-			MessageEntity(
-				id = "parentMessageId",
-				authorId = "memberThree",
-				channelId = channelId,
-				type = MessageType.TEXT,
-				status = MessageStatus.PENDING,
-				deliveryStatus = DeliveryStatus.SENT
-			),
-			parentMessageAuthor = MemberEntity(id = "memberThree"),
+			if (reply) {
+				MessageEntity(
+					id = "parentMessageId",
+					authorId = "memberThree",
+					channelId = channelId,
+					type = MessageType.TEXT,
+					status = MessageStatus.PENDING,
+					deliveryStatus = DeliveryStatus.SENT
+				)
+			} else null,
+			parentMessageAuthor = if (reply) MemberEntity(id = "memberThree") else null,
 			mentions = listOf(MemberEntity(id = "memberOne"), MemberEntity(id = "memberTwo"))
 		)
 }

@@ -19,6 +19,7 @@ import com.zero.android.models.Channel
 import com.zero.android.models.ChannelCategory
 import com.zero.android.models.GroupChannel
 import com.zero.android.ui.components.InstantAnimation
+import com.zero.android.ui.extensions.OnConnectionChanged
 import com.zero.android.ui.extensions.OnLifecycleEvent
 import kotlinx.coroutines.flow.Flow
 
@@ -31,7 +32,8 @@ fun ChannelPager(
 	onClick: (Channel) -> Unit
 ) {
 	InstantAnimation {
-		HorizontalPager(state = pagerState, count = categories.size) { index ->
+		HorizontalPager(state = pagerState, count = categories.size, userScrollEnabled = false) { index
+			->
 			Column(modifier = Modifier.fillMaxSize()) {
 				pagers[categories[index]]?.let { PagedChannels(pagedData = it, onClick = onClick) }
 			}
@@ -50,6 +52,8 @@ private fun PagedChannels(pagedData: Flow<PagingData<GroupChannel>>, onClick: (C
 		}
 		initialLoad.value = true
 	}
+
+	OnConnectionChanged { if (it) items.refresh() }
 
 	LazyColumn {
 		items(items) { channel ->

@@ -46,7 +46,7 @@ fun NetworkDrawerContent(
 	onNetworkSettingsClick: (Network) -> Unit,
 	onNavigateToRootDestination: (NavDestination) -> Unit
 ) {
-	LoadingContainer(modifier = modifier.fillMaxSize(), loading = networks is Result.Loading) {
+	LoadingContainer(loading = networks is Result.Loading) {
 		ConstraintLayout(
 			modifier =
 			modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background)
@@ -94,14 +94,14 @@ fun NetworkDrawerContent(
 				}
 			}
 
-      /*AppDrawerFooter(
-      	modifier =
-      	modifier.constrainAs(footer) {
-      		bottom.linkTo(parent.bottom)
-      		start.linkTo(parent.start)
-      	},
-      	onCreateWorldClick = { coroutineScope.launch { drawerState.close() } }
-      )*/
+          /*AppDrawerFooter(
+          	modifier =
+          	modifier.constrainAs(footer) {
+          		bottom.linkTo(parent.bottom)
+          		start.linkTo(parent.start)
+          	},
+          	onCreateWorldClick = { coroutineScope.launch { drawerState.close() } }
+          )*/
 		}
 	}
 }

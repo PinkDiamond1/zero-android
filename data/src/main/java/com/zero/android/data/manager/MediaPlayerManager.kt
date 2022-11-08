@@ -22,4 +22,6 @@ interface MediaPlayerManager {
 	fun prepareMediaPlayer(uri: Uri, onPlayBackComplete: () -> Unit)
 
 	fun getFileDuration(file: File): String?
+
+	suspend fun getAudioAmplitudes(file: File): List<Int>
 }

@@ -21,11 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
-import com.zero.android.common.R
 import com.zero.android.models.GroupChannel
-import com.zero.android.ui.components.NameInitialsView
+import com.zero.android.models.fake.FakeModel
+import com.zero.android.ui.components.CircularInitialsImage
+import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
@@ -77,7 +79,7 @@ fun ChannelSearchItem(
 						verticalAlignment = Alignment.CenterVertically,
 						modifier = Modifier.fillMaxWidth().clickable { onClick(channel) }
 					) {
-						NameInitialsView(modifier = Modifier.size(32.dp), displayName = channel.name)
+						CircularInitialsImage(size = 32.dp, name = channel.name, url = channel.image)
 						Spacer(modifier = Modifier.size(8.dp))
 						Text(
 							text = channel.name,
@@ -86,23 +88,16 @@ fun ChannelSearchItem(
 							maxLines = 1,
 							overflow = TextOverflow.Ellipsis
 						)
-						if (channel.hasTelegramChannel) {
+
+						channel.icon?.let { icon ->
 							Spacer(modifier = Modifier.padding(8.dp))
 							Image(
-								painter = painterResource(R.drawable.ic_chat_icon),
+								painter = painterResource(icon),
 								contentDescription = "",
 								modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
 								contentScale = ContentScale.Fit
 							)
-						}
-						if (channel.hasDiscordChannel) {
-							Spacer(modifier = Modifier.padding(8.dp))
-							Image(
-								painter = painterResource(R.drawable.ic_discord),
-								contentDescription = "",
-								modifier = Modifier.wrapContentSize().align(Alignment.CenterVertically),
-								contentScale = ContentScale.Fit
-							)
+							Spacer(modifier = Modifier.padding(4.dp))
 						}
 					}
 					Spacer(modifier = Modifier.size(6.dp))
@@ -110,4 +105,14 @@ fun ChannelSearchItem(
 			)
 		}
 	}
+}
+
+@Preview
+@Composable
+private fun ChannelSearchItemPreview() = Preview {
+	ChannelSearchItem(
+		header = "Search",
+		channels = listOf(FakeModel.GroupChannel(), FakeModel.GroupChannel()),
+		onClick = {}
+	)
 }

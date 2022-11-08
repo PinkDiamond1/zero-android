@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.zero.android.models.DraftMessage.Companion.PREFIX_DRAFT_ID
 import com.zero.android.models.FileThumbnail
 import com.zero.android.models.Member
 import com.zero.android.models.Message
@@ -69,8 +70,6 @@ data class MessageEntity(
 ) : BaseEntity {
 
 	companion object {
-		internal const val PREFIX_DRAFT_ID = "draft_"
-
 		fun generateDraftId(str: String?) = "${PREFIX_DRAFT_ID}${str ?: UUID.randomUUID().toString()}"
 	}
 }

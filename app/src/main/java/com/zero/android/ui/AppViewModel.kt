@@ -1,7 +1,6 @@
 package com.zero.android.ui
 
 import com.zero.android.common.extensions.emitInScope
-import com.zero.android.common.extensions.withScope
 import com.zero.android.common.ui.base.BaseViewModel
 import com.zero.android.data.manager.ConnectionManager
 import com.zero.android.data.manager.SessionManager
@@ -13,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -38,13 +38,13 @@ constructor(
 	private fun checkAuthOnLaunch() {
 		val authCredentials = runBlocking(Dispatchers.IO) { preferences.authCredentials() }
 		val isLoggedIn = authCredentials != null
-		startDestination = if (isLoggedIn) AppGraph.MAIN else AppGraph.AUTH
+		startDestination = AppGraph.MAIN
 
 		if (isLoggedIn) onLoggedIn(authCredentials!!) else loading.emitInScope(false)
 	}
 
 	private fun onLoggedIn(authCredentials: AuthCredentials) =
-		withScope(Dispatchers.IO) {
+		ioScope.launch {
 			sessionManager.onLogin(authCredentials)
 			loading.emit(false)
 		}
