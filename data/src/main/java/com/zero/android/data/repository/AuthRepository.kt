@@ -2,20 +2,19 @@ package com.zero.android.data.repository
 
 import android.content.Context
 import com.zero.android.models.AuthCredentials
-import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface AuthRepository {
 
 	suspend fun refreshChatAccessToken(accessToken: String)
 
-	suspend fun login(email: String, password: String): Flow<AuthCredentials>
+	suspend fun login(email: String, password: String): AuthCredentials
 
-	suspend fun loginWithApple(context: Context): Flow<AuthCredentials>
+	suspend fun loginWithApple(context: Context): AuthCredentials
 
-	suspend fun loginWithGoogle(context: Context): Flow<AuthCredentials>
+	suspend fun loginWithGoogle(context: Context): AuthCredentials
 
-	suspend fun forgotPassword(email: String): Flow<Unit>
+	suspend fun forgotPassword(email: String)
 
 	suspend fun register(
 		name: String,
@@ -23,9 +22,7 @@ interface AuthRepository {
 		password: String,
 		inviteCode: String?,
 		profilePic: File?
-	): Flow<AuthCredentials>
+	): AuthCredentials
 
 	suspend fun revokeToken()
-
-	suspend fun createUser(accessToken: String, name: String, inviteCode: String?)
 }

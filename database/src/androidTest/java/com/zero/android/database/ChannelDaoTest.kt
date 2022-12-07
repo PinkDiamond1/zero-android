@@ -4,8 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.zero.android.database.base.BaseDatabaseTest
 import com.zero.android.database.model.fake.FakeEntity
 import com.zero.android.database.util.result
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNull
+import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -30,10 +29,10 @@ class ChannelDaoTest : BaseDatabaseTest() {
 		channelDao.upsert(directChannel)
 		channelDao.upsert(directChannel) // Checking 2nd insert
 
-		val data = channelDao.getDirectChannel(directChannel.channel.id).first()
+		val data = channelDao.getChannel(directChannel.channel.id).first()
 		assertEquals(directChannel.channel.id, data?.channel?.id)
-		assertEquals(directChannel.lastMessage?.message?.id, data?.lastMessage?.message?.id)
-		assertEquals(directChannel.channel.id, data?.lastMessage?.message?.channelId)
+		assertEquals(directChannel.channel.lastMessage?.id, data?.channel?.lastMessage?.id)
+		assertEquals(directChannel.channel.id, data?.channel?.lastMessage?.channelId)
 		assertEquals(directChannel.members.size, data?.members?.size)
 	}
 
@@ -42,11 +41,14 @@ class ChannelDaoTest : BaseDatabaseTest() {
 		channelDao.upsert(groupChannel)
 		channelDao.upsert(groupChannel) // Checking 2nd insert
 
-		val data = channelDao.getGroupChannel(groupChannel.channel.id).first()
+		val data = channelDao.getChannel(groupChannel.channel.id).first()
 		assertEquals(groupChannel.channel.id, data?.channel?.id)
-		assertEquals(groupChannel.lastMessage?.message?.id, data?.lastMessage?.message?.id)
-		assertEquals(groupChannel.lastMessage?.author?.id, data?.lastMessage?.author?.id)
-		assertEquals(groupChannel.channel.id, data?.lastMessage?.message?.channelId)
+		assertEquals(groupChannel.channel.lastMessage?.id, data?.channel?.lastMessage?.id)
+		assertEquals(
+			groupChannel.channel.lastMessage?.author?.id,
+			data?.channel?.lastMessage?.author?.id
+		)
+		assertEquals(groupChannel.channel.id, data?.channel?.lastMessage?.channelId)
 		assertEquals(groupChannel.members.size, data?.members?.size)
 		assertEquals(groupChannel.operators.size, data?.operators?.size)
 	}
@@ -138,18 +140,18 @@ class ChannelDaoTest : BaseDatabaseTest() {
 	@Test
 	fun deleteDirectChannel() = runTest {
 		channelDao.upsert(directChannel)
-		channelDao.delete(directChannel.channel)
+		channelDao.delete(directChannel.channel.id)
 
-		assertNull(channelDao.getDirectChannel(directChannel.channel.id).firstOrNull())
-		assertNull(messageDao.get(directChannel.lastMessage?.message?.id!!).firstOrNull())
+		assertNull(channelDao.getChannel(directChannel.channel.id).firstOrNull())
+		assertTrue(messageDao.getByChannel(directChannel.channel.id).result()?.size == 0)
 	}
 
 	@Test
 	fun deleteGroupChannel() = runTest {
 		channelDao.upsert(groupChannel)
-		channelDao.delete(groupChannel.channel)
+		channelDao.delete(groupChannel.channel.id)
 
-		assertNull(channelDao.getDirectChannel(groupChannel.channel.id).firstOrNull())
-		assertNull(messageDao.get(groupChannel.lastMessage?.message?.id!!).firstOrNull())
+		assertNull(channelDao.getChannel(groupChannel.channel.id).firstOrNull())
+		assertTrue(messageDao.getByChannel(groupChannel.channel.id).result()?.size == 0)
 	}
 }

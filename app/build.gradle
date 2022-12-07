@@ -66,10 +66,11 @@ dependencies {
 	implementation project(":navigation")
 	implementation project(":common")
 	implementation project(":models")
-	implementation project(":data")
+	implementation project(":sync")
 	implementation project(":network")
-	implementation project(":datastore")
 	implementation project(":database")
+	implementation project(":datastore")
+	implementation project(":data")
 	implementation project(":feature-auth")
 	implementation project(":feature-account")
 	implementation project(":feature-channels")
@@ -79,6 +80,7 @@ dependencies {
 
 	implementation "androidx.core:core-ktx:${versions.coreKtx}"
 	implementation "com.google.dagger:hilt-android:${versions.hilt}"
+	implementation "androidx.hilt:hilt-work:${versions.hiltWorkManager}"
 	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
 
 	implementation platform("com.google.firebase:firebase-bom:${versions.firebase}")

@@ -26,12 +26,17 @@ abstract class BaseDatabaseTest {
 		db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
 		messageDao = MessageDao(db.messageDao(), db.memberDao(), db.directChannelDao())
-		channelDao = ChannelDao(db.directChannelDao(), db.groupChannelDao(), db.memberDao(), messageDao)
+		channelDao =
+			ChannelDao(
+				db.groupChannelDao(),
+				db.directChannelDao(),
+				db.groupChannelDao(),
+				db.memberDao(),
+				messageDao
+			)
 	}
 
 	@After
 	@Throws(IOException::class)
-	open fun onCloseDB() {
-		db.close()
-	}
+	open fun onCloseDB() = db.close()
 }

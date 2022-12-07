@@ -23,10 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.zero.android.common.R
 import com.zero.android.common.util.messageFormatter
 import com.zero.android.models.Message
-import com.zero.android.ui.components.ExtraSmallCircularImage
+import com.zero.android.ui.components.Avatar
 import com.zero.android.ui.theme.AppTheme
 
 @Composable
@@ -48,10 +47,7 @@ fun ReplyMessage(
 				.padding(horizontal = 6.dp, vertical = 6.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			ExtraSmallCircularImage(
-				imageUrl = message.author?.profileImage,
-				placeholder = R.drawable.ic_user_profile_placeholder
-			)
+			Avatar(size = 24.dp, user = message.author)
 			Spacer(modifier = Modifier.size(8.dp))
 			Column(modifier = Modifier.weight(1f)) {
 				message.author?.name?.let {

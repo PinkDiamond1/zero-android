@@ -24,9 +24,9 @@ import com.zero.android.models.Network
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.components.LoadingContainer
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.BODY_PADDING_HORIZONTAL
+import com.zero.android.ui.util.Preview
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

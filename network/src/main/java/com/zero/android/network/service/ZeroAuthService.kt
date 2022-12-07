@@ -1,6 +1,6 @@
 package com.zero.android.network.service
 
-import com.zero.android.network.model.request.CreateUser
+import com.zero.android.network.model.request.CreateUserRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -12,6 +12,6 @@ interface ZeroAuthService {
 	@POST(value = "accounts/create")
 	suspend fun createUser(
 		@Header("Authorization") accessToken: String,
-		@Body payload: CreateUser
+		@Body payload: CreateUserRequest
 	): Response<ResponseBody>
 }

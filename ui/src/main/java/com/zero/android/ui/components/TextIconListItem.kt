@@ -19,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.zero.android.common.R
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun TextIconListItem(

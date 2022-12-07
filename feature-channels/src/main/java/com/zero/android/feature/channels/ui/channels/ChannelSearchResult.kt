@@ -27,8 +27,8 @@ import androidx.paging.compose.LazyPagingItems
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.CircularInitialsImage
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun ChannelSearchResult(

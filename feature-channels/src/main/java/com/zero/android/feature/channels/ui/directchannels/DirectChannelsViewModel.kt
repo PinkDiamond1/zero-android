@@ -36,8 +36,8 @@ constructor(
 	val loggedInUserId
 		get() = runBlocking(Dispatchers.IO) { preferences.userId() }
 
-	private val _uiState = MutableStateFlow(DirectChannelScreenUiState(DirectChannelUiState.Loading))
-	val uiState: StateFlow<DirectChannelScreenUiState> = _uiState
+	private val _uiState = MutableStateFlow(DirectChannelScreenUIState(DirectChannelUIState.Loading))
+	val uiState: StateFlow<DirectChannelScreenUIState> = _uiState
 	val showSearchBar: StateFlow<Boolean> = searchTriggerUseCase.showSearchBar
 
 	private var channelsJob: Job? = null
@@ -75,14 +75,14 @@ constructor(
 							is Result.Success -> {
 								channels.emit(it.data)
 								_uiState.emit(
-									DirectChannelScreenUiState(
-										DirectChannelUiState.Success(isSearchResult = !search.isNullOrEmpty())
+									DirectChannelScreenUIState(
+										DirectChannelUIState.Success(isSearchResult = !search.isNullOrEmpty())
 									)
 								)
 							}
 							is Result.Loading ->
-								_uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Loading))
-							else -> _uiState.emit(DirectChannelScreenUiState(DirectChannelUiState.Error))
+								_uiState.emit(DirectChannelScreenUIState(DirectChannelUIState.Loading))
+							else -> _uiState.emit(DirectChannelScreenUIState(DirectChannelUIState.Error))
 						}
 					}
 			}

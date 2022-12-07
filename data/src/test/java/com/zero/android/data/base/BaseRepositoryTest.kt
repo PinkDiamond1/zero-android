@@ -6,7 +6,6 @@ import com.zero.android.database.dao.GroupChannelDaoImpl
 import com.zero.android.database.dao.MemberDao
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.dao.MessageDaoImpl
-import com.zero.android.network.service.ChannelService
 import org.mockito.Mockito
 
 abstract class BaseRepositoryTest {
@@ -16,13 +15,17 @@ abstract class BaseRepositoryTest {
 	protected val mockMemberDao = Mockito.mock(MemberDao::class.java)
 	protected val mockMessageDaoImpl = Mockito.mock(MessageDaoImpl::class.java)
 	protected val mockMessageDao =
-		MessageDao(messageDao = mockMessageDaoImpl, memberDao = mockMemberDao)
+		MessageDao(
+			messageDao = mockMessageDaoImpl,
+			memberDao = mockMemberDao,
+			channelDao = mockDirectChannelDao
+		)
 	protected val mockChannelDao =
 		ChannelDao(
+			channelDao = mockGroupChannelDao,
 			directChannelDao = mockDirectChannelDao,
 			groupChannelDao = mockGroupChannelDao,
 			memberDao = mockMemberDao,
 			messageDao = mockMessageDao
 		)
-	protected val mockChannelService = Mockito.mock(ChannelService::class.java)
 }

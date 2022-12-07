@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -42,6 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +55,7 @@ import com.zero.android.feature.channels.ui.components.ChannelNotificationSettin
 import com.zero.android.feature.people.ui.components.MemberListItem
 import com.zero.android.models.Channel
 import com.zero.android.models.ChatMedia
+import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
 import com.zero.android.models.enums.AlertType
@@ -64,20 +67,20 @@ import com.zero.android.ui.components.CircularInitialsImage
 import com.zero.android.ui.components.LoadingContainer
 import com.zero.android.ui.components.RoundedImage
 import com.zero.android.ui.components.TextIconListItem
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.extensions.bodyPaddings
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.BODY_PADDING_HORIZONTAL
 import com.zero.android.ui.theme.Gray
 import com.zero.android.ui.util.BackHandler
+import com.zero.android.ui.util.Preview
 import kotlinx.coroutines.launch
 
 @Composable
 fun ChannelDetailsRoute(
 	viewModel: ChannelDetailsViewModel = hiltViewModel(),
 	onBackClick: () -> Unit,
-	onEditClick: (String, Boolean) -> Unit,
-	onAllMediaClick: (String) -> Unit,
+	onEditClick: (String) -> Unit,
+	onAddMember: (String) -> Unit,
 	onLeaveChannel: () -> Unit,
 	onMediaClick: (String, ChatMedia) -> Unit
 ) {
@@ -92,9 +95,9 @@ fun ChannelDetailsRoute(
 		channelResult = channel,
 		chatMedia = chatMedia,
 		onBackClick = onBackClick,
-		onEditClick = { onEditClick(viewModel.channelId, viewModel.isGroupChannel) },
-		onAllMediaClick = { onAllMediaClick(viewModel.channelId) },
+		onEditClick = { onEditClick(viewModel.channelId) },
 		onMediaClick = { onMediaClick(viewModel.channelId, it) },
+		onAddMember = { onAddMember(viewModel.channelId) },
 		updateAlerts = { viewModel.updateAlerts(it) },
 		leaveChannel = { viewModel.leaveChannel() }
 	)
@@ -106,10 +109,10 @@ fun ChannelDetailsScreen(
 	channelResult: Result<Channel>,
 	chatMedia: List<ChatMedia>,
 	onEditClick: () -> Unit,
-	onAllMediaClick: () -> Unit,
 	onMediaClick: (ChatMedia) -> Unit,
 	onBackClick: () -> Unit,
 	onMemberClick: (Member) -> Unit = {},
+	onAddMember: () -> Unit,
 	updateAlerts: (AlertType) -> Unit,
 	leaveChannel: () -> Unit
 ) {
@@ -123,6 +126,8 @@ fun ChannelDetailsScreen(
 	BackHandler {
 		if (bottomState.isVisible) coroutineScope.launch { bottomState.hide() } else onBackClick()
 	}
+
+	val isOneToOne = channel is DirectChannel && channel.isOneToOne
 
 	val topBar: @Composable () -> Unit = {
 		AppBar(
@@ -143,7 +148,7 @@ fun ChannelDetailsScreen(
 				)
 			},
 			actions = {
-				if (channel is GroupChannel) {
+				if (!isOneToOne) {
 					TextButton(
 						colors = ButtonDefaults.textButtonColors(contentColor = AppTheme.colors.glow),
 						onClick = onEditClick
@@ -185,6 +190,17 @@ fun ChannelDetailsScreen(
 					}
 				}
 			}
+			channel?.description?.let {
+				Text(
+					modifier = Modifier.padding(horizontal = 16.dp),
+					text = channel.description ?: "",
+					color = AppTheme.colors.colorTextSecondary,
+					style = MaterialTheme.typography.bodyMedium,
+					fontWeight = FontWeight.Medium,
+					overflow = TextOverflow.Ellipsis,
+					textAlign = TextAlign.Center
+				)
+			}
 		}
 	}
 
@@ -199,7 +215,7 @@ fun ChannelDetailsScreen(
 			if (chatMedia.isNotEmpty()) {
 				LazyRow(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
 					items(chatMedia) { media ->
-						if (media.type == MessageType.IMAGE) {
+						if (media.type == MessageType.IMAGE || media.type == MessageType.VIDEO) {
 							RoundedImage(
 								modifier =
 								Modifier.padding(
@@ -219,7 +235,12 @@ fun ChannelDetailsScreen(
 					}
 				}
 				Text(
-					modifier = Modifier.bodyPaddings(vertical = 0f).clickable { onAllMediaClick() },
+					modifier =
+					Modifier.bodyPaddings(vertical = 0f).clickable {
+						chatMedia
+							.find { it.type == MessageType.IMAGE || it.type == MessageType.VIDEO }
+							?.let { onMediaClick(it) }
+					},
 					text = stringResource(R.string.media_see_all),
 					style = MaterialTheme.typography.displayMedium
 				)
@@ -243,6 +264,32 @@ fun ChannelDetailsScreen(
 			)
 
 			Column(modifier = Modifier.padding(top = 8.dp)) {
+				Row(
+					modifier =
+					Modifier.clickable { onAddMember() }
+						.padding(horizontal = BODY_PADDING_HORIZONTAL.dp, vertical = 8.dp)
+						.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					if (!isOneToOne) {
+						Box(modifier = Modifier.padding(start = 4.dp, end = 4.dp)) {
+							Icon(
+								modifier = Modifier.size(26.dp),
+								painter = painterResource(R.drawable.ic_add_circle),
+								contentDescription = "ic_add",
+								tint = AppTheme.colors.glow
+							)
+						}
+						Text(
+							modifier = Modifier.padding(start = 8.dp),
+							text = stringResource(R.string.add_member),
+							color = AppTheme.colors.glow,
+							style = MaterialTheme.typography.bodyMedium,
+							overflow = TextOverflow.Ellipsis
+						)
+					}
+				}
+
 				channel?.members?.forEach { member ->
 					MemberListItem(
 						member = member,
@@ -299,7 +346,7 @@ fun ChannelDetailsScreen(
 						channelMembers()
 						Divider(modifier = Modifier.padding(top = 24.dp, bottom = 10.dp))
 
-						if (channel is GroupChannel) {
+						if (!isOneToOne && channel !is GroupChannel) {
 							TextIconListItem(
 								icon = R.drawable.ic_exit,
 								text = stringResource(R.string.leave_channel),
@@ -323,8 +370,8 @@ private fun ChannelDetailsScreenPreview() = Preview {
 		updateAlerts = {},
 		leaveChannel = {},
 		onEditClick = {},
+		onAddMember = {},
 		onMediaClick = {},
-		onAllMediaClick = {},
 		onBackClick = {}
 	)
 }

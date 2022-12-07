@@ -39,9 +39,10 @@ import com.zero.android.models.enums.MessageType
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.CircularInitialsImage
 import com.zero.android.ui.components.UnreadCountText
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.Blue300
+import com.zero.android.ui.util.LIST_IMAGE_LARGE
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (Channel) -> Unit) {
@@ -66,9 +67,9 @@ fun ChannelListItem(loggedInUserId: String? = null, channel: Channel, onClick: (
 
 		CircularInitialsImage(
 			modifier = imageModifier,
-			size = 64.dp,
+			size = LIST_IMAGE_LARGE.dp,
 			name = channel.name,
-			url = channel.image,
+			url = if (isDirectChannel) channel.image else null,
 			placeholder =
 			if (isDirectChannel) painterResource(R.drawable.ic_user_profile_placeholder)
 			else null

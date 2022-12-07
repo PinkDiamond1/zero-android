@@ -1,78 +1,59 @@
 package com.zero.android.database.converter
 
 import androidx.room.TypeConverter
+import com.zero.android.database.converter.AppJson.decodeJson
+import com.zero.android.database.converter.AppJson.toJson
 import com.zero.android.models.Education
 import com.zero.android.models.Experience
 import com.zero.android.models.FileThumbnail
 import com.zero.android.models.Investment
 import com.zero.android.models.MessageReaction
 import com.zero.android.models.Valuable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class ListConverters {
 
 	@TypeConverter
-	fun stringToValuableList(value: String?): List<Valuable>? =
-		value?.let { Json.decodeFromString<List<Valuable>>(value) }
+	fun stringToValuableList(value: String?): List<Valuable>? = value?.decodeJson<List<Valuable>>()
+
+	@TypeConverter fun valuableListToString(value: List<Valuable>?) = value?.toJson()
 
 	@TypeConverter
-	fun valuableListToString(value: List<Valuable>?): String? =
-		value?.let { Json.encodeToString(value) }
+	fun stringToEducationList(value: String?): List<Education>? = value?.decodeJson<List<Education>>()
 
-	@TypeConverter
-	fun stringToEducationList(value: String?): List<Education>? =
-		value?.let { Json.decodeFromString<List<Education>>(value) }
-
-	@TypeConverter
-	fun educationListToString(value: List<Education>?): String? =
-		value?.let { Json.encodeToString(value) }
+	@TypeConverter fun educationListToString(value: List<Education>?) = value?.toJson()
 
 	@TypeConverter
 	fun stringToInvestmentList(value: String?): List<Investment>? =
-		value?.let { Json.decodeFromString<List<Investment>>(value) }
+		value?.decodeJson<List<Investment>>()
 
-	@TypeConverter
-	fun investmentListToString(value: List<Investment>?): String? =
-		value?.let { Json.encodeToString(value) }
+	@TypeConverter fun investmentListToString(value: List<Investment>?) = value?.toJson()
 
 	@TypeConverter
 	fun stringToExperienceList(value: String?): List<Experience>? =
-		value?.let { Json.decodeFromString<List<Experience>>(value) }
+		value?.decodeJson<List<Experience>>()
+
+	@TypeConverter fun experienceListToString(value: List<Experience>?) = value?.toJson()
 
 	@TypeConverter
-	fun experienceListToString(value: List<Experience>?): String? =
-		value?.let { Json.encodeToString(value) }
+	fun stringToStringList(value: String?): List<String>? = value?.decodeJson<List<String>>()
 
-	@TypeConverter
-	fun stringToStringList(value: String?): List<String>? =
-		value?.let { Json.decodeFromString<List<String>>(value) }
-
-	@TypeConverter
-	fun stringListToString(value: List<String>?): String? = value?.let { Json.encodeToString(value) }
+	@TypeConverter fun stringListToString(value: List<String>?): String? = value?.toJson()
 
 	@TypeConverter
 	fun stringToStringMap(value: String?): Map<String, String?>? =
-		value?.let { Json.decodeFromString<Map<String, String?>>(value) }
+		value?.decodeJson<Map<String, String?>>()
 
-	@TypeConverter
-	fun stringMapToString(value: Map<String, String?>?): String? =
-		value?.let { Json.encodeToString(value) }
+	@TypeConverter fun stringMapToString(value: Map<String, String?>?) = value?.toJson()
 
 	@TypeConverter
 	fun stringToMessageReactionList(value: String?): List<MessageReaction>? =
-		value?.let { Json.decodeFromString<List<MessageReaction>>(value) }
+		value?.decodeJson<List<MessageReaction>>()
 
-	@TypeConverter
-	fun messageReactionListToString(value: List<MessageReaction>?): String? =
-		value?.let { Json.encodeToString(value) }
+	@TypeConverter fun messageReactionListToString(value: List<MessageReaction>?) = value?.toJson()
 
 	@TypeConverter
 	fun stringToFileThumbnailList(value: String?): List<FileThumbnail>? =
-		value?.let { Json.decodeFromString<List<FileThumbnail>>(value) }
+		value?.decodeJson<List<FileThumbnail>>()
 
-	@TypeConverter
-	fun fileThumbnailListToString(value: List<FileThumbnail>?): String? =
-		value?.let { Json.encodeToString(value) }
+	@TypeConverter fun fileThumbnailListToString(value: List<FileThumbnail>?) = value?.toJson()
 }

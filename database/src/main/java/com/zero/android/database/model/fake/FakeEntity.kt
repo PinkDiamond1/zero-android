@@ -1,13 +1,14 @@
 package com.zero.android.database.model.fake
 
 import com.zero.android.database.model.ChannelEntity
-import com.zero.android.database.model.DirectChannelWithRefs
-import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.database.model.ChannelWithRefs
 import com.zero.android.database.model.MemberEntity
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.database.model.NetworkEntity
+import com.zero.android.database.model.toModel
 import com.zero.android.models.ChannelCategory
+import com.zero.android.models.conversions.toMeta
 import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.InviteMode
 import com.zero.android.models.enums.MessageStatus
@@ -31,17 +32,17 @@ object FakeEntity {
 		name: String = "Member One, Member Two",
 		lastMessage: MessageWithRefs? = MessageWithRefs(id = "directLastMessageId", channelId = id)
 	) =
-		DirectChannelWithRefs(
+		ChannelWithRefs(
 			channel =
 			ChannelEntity(
 				id = id,
 				name = name,
-				lastMessageId = lastMessage?.message?.id,
+				lastMessage = lastMessage?.toModel()?.toMeta(),
 				isDirectChannel = true,
 				memberCount = 2
 			),
 			members = listOf(MemberEntity(id = "memberOne"), MemberEntity(id = "memberTwo")),
-			lastMessage = lastMessage
+			operators = listOf(MemberEntity(id = "memberOne"))
 		)
 
 	fun GroupChannelWithRefs(
@@ -51,21 +52,20 @@ object FakeEntity {
 		name: String = "Group Channel",
 		lastMessage: MessageWithRefs? = MessageWithRefs(id = "groupLastMessageId", channelId = id)
 	) =
-		GroupChannelWithRefs(
+		ChannelWithRefs(
 			createdBy = MemberEntity(id = "memberFive"),
 			channel =
 			ChannelEntity(
 				id = id,
 				name = name,
 				networkId = networkId,
-				lastMessageId = lastMessage?.message?.id,
+				lastMessage = lastMessage?.toModel()?.toMeta(),
 				isDirectChannel = false,
 				memberCount = 2,
 				category = category
 			),
 			members = listOf(MemberEntity(id = "memberFive"), MemberEntity(id = "memberFour")),
-			operators = listOf(MemberEntity(id = "memberFive")),
-			lastMessage = lastMessage
+			operators = listOf(MemberEntity(id = "memberFive"))
 		)
 
 	fun MessageWithRefs(

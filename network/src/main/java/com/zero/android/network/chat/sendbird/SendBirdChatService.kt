@@ -23,9 +23,9 @@ internal class SendBirdChatService(
 	private val messages: SendBirdMessages = SendBirdMessages(logger)
 ) : SendBirdBaseService(), ChatService {
 
-	override suspend fun getMessages(channel: Channel, loadSize: Int) =
+	override suspend fun getMessages(channel: Channel, limit: Int) =
 		callbackFlowWithAwait<List<ApiMessage>> {
-			messages.getMessages(getChannel(channel), loadSize) { messages, e ->
+			messages.getMessages(getChannel(channel), limit) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					close(e.parsed)
@@ -35,9 +35,9 @@ internal class SendBirdChatService(
 			}
 		}
 
-	override suspend fun getMessages(channel: Channel, before: String) =
+	override suspend fun getMessages(channel: Channel, limit: Int, before: String) =
 		callbackFlowWithAwait<List<ApiMessage>> {
-			messages.getMessages(getChannel(channel), before) { messages, e ->
+			messages.getMessages(getChannel(channel), limit, before) { messages, e ->
 				if (e != null) {
 					logger.e(e)
 					close(e.parsed)

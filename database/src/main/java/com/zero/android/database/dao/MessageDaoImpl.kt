@@ -9,7 +9,6 @@ import androidx.room.Transaction
 import com.zero.android.database.model.MemberEntity
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageMentionCrossRef
-import com.zero.android.database.model.MessageMeta
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.models.DraftMessage.Companion.PREFIX_DRAFT_ID
 import com.zero.android.models.enums.DeliveryStatus
@@ -45,9 +44,14 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 
 	@Transaction
 	@Query(
-		"SELECT id, createdAt FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC LIMIT 1"
+		"""
+		SELECT *
+		FROM messages 
+		WHERE channelId = :channelId 
+		ORDER BY createdAt DESC LIMIT 1
+		"""
 	)
-	abstract fun getLatestMessageByChannel(channelId: String): MessageMeta?
+	internal abstract fun getLatestMessageByChannel(channelId: String): MessageWithRefs?
 
 	@Transaction
 	@Query("SELECT * FROM messages WHERE channelId = :channelId ORDER BY createdAt DESC LIMIT 1")
@@ -78,9 +82,6 @@ abstract class MessageDaoImpl : BaseDao<MessageEntity>() {
 
 	@Query("UPDATE messages SET message = :message WHERE id = :id")
 	abstract suspend fun update(id: String, message: String?)
-
-	@Query("UPDATE messages SET deliveryStatus = :deliveryStatus WHERE id = :id")
-	abstract suspend fun markRead(id: String, deliveryStatus: DeliveryStatus)
 
 	@Query("UPDATE messages SET status = :status WHERE id = :id")
 	abstract suspend fun updateStatus(id: String, status: MessageStatus)

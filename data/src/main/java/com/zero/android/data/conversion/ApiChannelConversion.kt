@@ -1,21 +1,29 @@
 package com.zero.android.data.conversion
 
 import com.zero.android.database.model.ChannelEntity
-import com.zero.android.database.model.DirectChannelWithRefs
-import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.database.model.ChannelWithRefs
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
+import com.zero.android.models.conversions.toMeta
+import com.zero.android.network.model.ApiChannel
 import com.zero.android.network.model.ApiDirectChannel
 import com.zero.android.network.model.ApiGroupChannel
+
+internal fun ApiChannel.toEntity(loggedInUserId: String?): ChannelWithRefs {
+	return if (this is ApiDirectChannel) toEntity(loggedInUserId)
+	else (this as ApiGroupChannel).toEntity()
+}
 
 internal fun ApiDirectChannel.toModel(loggedInUserId: String?) =
 	DirectChannel(
 		id = id,
 		name = name(loggedInUserId),
+		description = description,
+		operators = operators.map { it.toModel() },
 		members = members.map { it.toModel() },
 		memberCount = memberCount,
 		image = image(loggedInUserId),
-		lastMessage = lastMessage?.toModel(),
+		lastMessage = lastMessage?.toModel()?.toMeta(),
 		createdAt = createdAt,
 		isTemporary = isTemporary,
 		unreadMentionCount = unreadMentionCount,
@@ -24,40 +32,42 @@ internal fun ApiDirectChannel.toModel(loggedInUserId: String?) =
 	)
 
 internal fun ApiDirectChannel.toEntity(loggedInUserId: String?) =
-	DirectChannelWithRefs(
+	ChannelWithRefs(
 		channel =
 		ChannelEntity(
 			id = id,
 			name = name(loggedInUserId),
-			lastMessageId = lastMessage?.id,
+			description = description,
+			lastMessage = lastMessage?.toModel()?.toMeta(),
+			lastMessageTime = lastMessage?.createdAt ?: 0L,
 			isDirectChannel = true,
 			memberCount = memberCount,
 			image = image(loggedInUserId),
 			createdAt = createdAt,
-			lastMessageTime = lastMessage?.createdAt ?: 0,
 			isTemporary = isTemporary,
 			unreadMentionCount = unreadMentionCount,
 			unreadMessageCount = unreadMessageCount,
 			alerts = alerts,
 			accessCode = accessCode
 		),
-		members = members.map { it.toEntity() },
-		lastMessage = lastMessage?.toEntity()
+		operators = operators.map { it.toEntity() },
+		members = members.map { it.toEntity() }
 	)
 
-internal fun ApiGroupChannel.toModel() =
+fun ApiGroupChannel.toModel() =
 	GroupChannel(
 		id = id,
 		networkId = networkId,
 		category = category,
 		name = name,
+		description = description,
 		isSuper = isSuper,
 		operators = operators.map { it.toModel() },
 		members = members.map { it.toModel() },
 		memberCount = memberCount,
 		unreadMentionCount = unreadMentionCount,
 		unreadMessageCount = unreadMessageCount,
-		lastMessage = lastMessage?.toModel(),
+		lastMessage = lastMessage?.toModel()?.toMeta(),
 		createdAt = createdAt,
 		createdBy = createdBy?.toModel(),
 		image = image,
@@ -76,17 +86,17 @@ internal fun ApiGroupChannel.toModel() =
 	)
 
 internal fun ApiGroupChannel.toEntity() =
-	GroupChannelWithRefs(
+	ChannelWithRefs(
 		channel =
 		ChannelEntity(
 			id = id,
-			lastMessageId = lastMessage?.id,
-			authorId = createdBy?.id ?: "",
+			lastMessage = lastMessage?.toModel()?.toMeta(),
+			lastMessageTime = lastMessage?.createdAt ?: 0L,
+			authorId = createdBy?.id,
 			isDirectChannel = false,
 			memberCount = memberCount,
 			image = image,
 			createdAt = createdAt,
-			lastMessageTime = lastMessage?.createdAt ?: 0,
 			isTemporary = isTemporary,
 			unreadMentionCount = unreadMentionCount,
 			unreadMessageCount = unreadMessageCount,
@@ -96,6 +106,7 @@ internal fun ApiGroupChannel.toEntity() =
 			networkId = networkId,
 			category = category,
 			name = name,
+			description = description,
 			isSuper = isSuper,
 			isPublic = isPublic,
 			isDiscoverable = isDiscoverable,
@@ -108,6 +119,5 @@ internal fun ApiGroupChannel.toEntity() =
 		),
 		members = members.map { it.toEntity() },
 		operators = operators.map { it.toEntity() },
-		lastMessage = lastMessage?.toEntity(),
 		createdBy = createdBy?.toEntity()
 	)

@@ -42,3 +42,6 @@ val Rhythm = Color(0xFF796E97)
 val Argent = Color(0xFFF0F0F0)
 val Platinum = Color(0xFFE7E7E7)
 val TaupeGray = Color(0xFF888888)
+
+val PinkF7 = Color(0xFFF763B0)
+val Purple76 = Color(0xFF7614E7)

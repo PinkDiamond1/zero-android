@@ -19,6 +19,7 @@ import com.zero.android.network.chat.conversion.isOpenChannel
 import com.zero.android.network.chat.conversion.networkId
 import com.zero.android.network.chat.conversion.toApi
 import com.zero.android.network.chat.conversion.toDirectApi
+import com.zero.android.network.chat.conversion.toDirectParams
 import com.zero.android.network.chat.conversion.toGroupApi
 import com.zero.android.network.chat.conversion.toOpenParams
 import com.zero.android.network.chat.conversion.toOption
@@ -63,7 +64,6 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		networkId: String,
 		type: ChannelType,
 		before: String?,
-		loadSize: Int,
 		limit: Int,
 		searchName: String?,
 		refresh: Boolean
@@ -93,7 +93,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 			if (groupNetworkId != networkId || groupQuery != null) {
 				groupQuery =
 					GroupChannel.createMyGroupChannelListQuery().apply {
-						this.limit = limit
+						this.limit = limit.coerceAtLeast(100)
 						isIncludeEmpty = false
 						order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 						customTypeStartsWithFilter = networkId.encodeToNetworkId()
@@ -116,7 +116,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 
 	override suspend fun getDirectChannels(
 		before: String?,
-		loadSize: Int,
+		limit: Int,
 		searchName: String?,
 		refresh: Boolean
 	) = suspendCancellableCoroutine { coroutine ->
@@ -124,8 +124,8 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		if (directQuery == null) {
 			directQuery =
 				GroupChannel.createMyGroupChannelListQuery().apply {
+					this.limit = limit.coerceAtLeast(100)
 					isIncludeEmpty = false
-					limit = 100
 					memberStateFilter = GroupChannelListQuery.MemberStateFilter.ALL
 					order = GroupChannelListQuery.Order.LATEST_LAST_MESSAGE
 
@@ -191,7 +191,7 @@ internal class SendBirdChannelService(private val logger: Logger) :
 	}
 
 	override suspend fun createDirectChannel(members: List<Member>) = suspendCancellableCoroutine {
-		GroupChannel.createChannelWithUserIds(members.map { it.id }, true) { directChannel, e ->
+		GroupChannel.createChannel(toDirectParams(members)) { directChannel, e ->
 			if (e != null) {
 				logger.e("Failed to create channel", e)
 				it.resumeWithException(e.parsed)
@@ -228,49 +228,67 @@ internal class SendBirdChannelService(private val logger: Logger) :
 		val params =
 			when (channel) {
 				is com.zero.android.models.GroupChannel -> channel.toUpdateParams()
+				is DirectChannel -> channel.toUpdateParams()
 				else -> throw IllegalStateException()
 			}
 
 		withSameScope {
-			(getChannel(channel) as GroupChannel).let {
-				it.updateChannel(params) { channel, e ->
-					if (e == null) coroutine.resume(channel.toApi())
-					else coroutine.resumeWithException(e.parsed)
-				}
+			groupChannel(channel.id).updateChannel(params) { channel, e ->
+				if (e == null) coroutine.resume(channel.toApi())
+				else coroutine.resumeWithException(e.parsed)
 			}
 		}
 	}
 
-	override suspend fun getNetworkNotificationSettings(networkId: String): AlertType =
+	override suspend fun addMembers(id: String, memberIds: List<String>) =
 		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
-				val channels = getGroupChannels(networkId, limit = 1, loadSize = 1)
+				groupChannel(id).inviteWithUserIds(memberIds) {
+					if (it != null) coroutine.resumeWithException(it.parsed) else coroutine.resume(Unit)
+				}
+			}
+		}
+
+	override suspend fun getNotificationSettings(id: String) =
+		suspendCancellableCoroutine { coroutine ->
+			withSameScope {
+				val channel = groupChannel(id)
+				coroutine.resume(channel.toApi().alerts)
+			}
+		}
+
+	override suspend fun getNotificationSettingsByNetwork(networkId: String): AlertType =
+		suspendCancellableCoroutine { coroutine ->
+			withSameScope {
+				val channels = getGroupChannels(networkId, limit = 1)
 				if (channels.isNotEmpty()) coroutine.resume(channels[0].alerts)
 				else coroutine.resume(AlertType.DEFAULT)
 			}
 		}
 
-	override suspend fun updateNotificationSettings(networkId: String, alertType: AlertType) =
+	override suspend fun updateNotificationSettings(id: String, alertType: AlertType) =
 		suspendCancellableCoroutine { coroutine ->
 			withSameScope {
-				getGroupChannels(networkId).forEach {
-					groupChannel(it.id).setMyPushTriggerOption(alertType.toOption()) { e ->
-						if (e != null) logger.e(e)
-					}
-				}
-
-				coroutine.resume(Unit)
-			}
-		}
-
-	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) =
-		suspendCancellableCoroutine { coroutine ->
-			withSameScope {
-				groupChannel(channel.id).setMyPushTriggerOption(alertType.toOption()) {
+				groupChannel(id).setMyPushTriggerOption(alertType.toOption()) {
 					if (it != null) coroutine.resumeWithException(it.parsed) else coroutine.resume(Unit)
 				}
 			}
 		}
+
+	override suspend fun updateNotificationSettingsByNetwork(
+		networkId: String,
+		alertType: AlertType
+	) = suspendCancellableCoroutine { coroutine ->
+		withSameScope {
+			getGroupChannels(networkId).forEach {
+				groupChannel(it.id).setMyPushTriggerOption(alertType.toOption()) { e ->
+					if (e != null) logger.e(e)
+				}
+			}
+
+			coroutine.resume(Unit)
+		}
+	}
 
 	override suspend fun joinChannel(channel: Channel) = suspendCancellableCoroutine { coroutine ->
 		withSameScope {

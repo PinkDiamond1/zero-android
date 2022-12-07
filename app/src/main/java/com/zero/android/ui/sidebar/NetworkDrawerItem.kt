@@ -24,8 +24,8 @@ import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.CircularInitialsImage
 import com.zero.android.ui.components.CountBadge
 import com.zero.android.ui.components.SmallClickableIcon
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun NetworkDrawerItem(

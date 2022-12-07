@@ -10,6 +10,7 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.zero.android.datastore.AppPreferences
 import com.zero.android.datastore.ChatPreferences
 import com.zero.android.datastore.DatastoreCleaner
+import com.zero.android.datastore.migrations.DatastoreMigration1
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,14 +23,14 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatastoreModule {
+internal object DatastoreModule {
 
 	@Provides
 	@Singleton
 	fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
 		return PreferenceDataStoreFactory.create(
 			corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { emptyPreferences() }),
-			migrations = listOf(),
+			migrations = listOf(DatastoreMigration1()),
 			scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
 			produceFile = { context.preferencesDataStoreFile("app_preferences") }
 		)

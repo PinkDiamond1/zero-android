@@ -22,10 +22,14 @@ import com.zero.android.navigation.HomeDestination
 import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.manager.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,11 +70,9 @@ constructor(
 	}
 
 	private fun checkAuthOnLaunch() {
-		val authCredentials = runBlocking(Dispatchers.IO) { preferences.userCredentials() }
+		val authCredentials = runBlocking(Dispatchers.IO) { preferences.credentials() }
 		val isLoggedIn = authCredentials != null
-		if (isLoggedIn) {
-			checkInvite()
-		}
+		if (isLoggedIn) checkInvite()
 		isUserLoggedIn.emitInScope(isLoggedIn)
 	}
 

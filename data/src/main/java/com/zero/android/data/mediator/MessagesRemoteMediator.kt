@@ -5,9 +5,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.zero.android.common.system.Logger
-import com.zero.android.common.util.INITIAL_LOAD_SIZE
-import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.extensions.initialPageSize
 import com.zero.android.database.dao.MessageDao
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.models.Channel
@@ -46,10 +45,12 @@ internal class MessagesRemoteMediator(
 
 			val response =
 				lastMessageId?.let {
-					chatService.getMessages(channel = channel, before = it).firstOrNull()
+					chatService
+						.getMessages(channel = channel, limit = state.config.pageSize, before = it)
+						.firstOrNull()
 				}
 					?: chatService
-						.getMessages(channel = channel, loadSize = INITIAL_LOAD_SIZE)
+						.getMessages(channel = channel, limit = state.config.initialPageSize)
 						.firstOrNull()
 
 			response?.map { it.toEntity() }?.let { messageDao.upsert(*it.toTypedArray()) }
@@ -57,7 +58,8 @@ internal class MessagesRemoteMediator(
 			logger.d("Loading Messages: $loadType - $lastMessageId: ${response?.size ?: 0}")
 
 			MediatorResult.Success(
-				endOfPaginationReached = response.isNullOrEmpty() || response.size < MESSAGES_PAGE_LIMIT
+				endOfPaginationReached =
+				response.isNullOrEmpty() || response.size < state.config.pageSize
 			)
 		} catch (e: UnknownHostException) {
 			MediatorResult.Error(e)

@@ -1,13 +1,16 @@
 package com.zero.android.common.system
 
+import android.app.Notification
+
 interface NotificationManager {
 	fun createMessageNotification(
 		channelId: String,
-		isGroupChannel: Boolean,
 		title: String,
 		text: String,
 		image: String? = null
 	)
 
 	fun removeMessageNotifications(channelId: String)
+
+	fun createSyncNotification(notificationId: Int): Notification
 }

@@ -10,7 +10,7 @@ import java.util.*
 
 internal interface BaseMessage {
 	val channelId: String
-	val author: Member?
+	val author: BaseMember?
 	val type: MessageType
 	val mentionType: MessageMentionType
 	val message: String?
@@ -83,6 +83,25 @@ data class DraftMessage(
 		const val PREFIX_DRAFT_ID = "draft_"
 	}
 }
+
+@Serializable
+data class MessageMeta(
+	val id: String,
+	override val channelId: String,
+	override val author: MemberMeta?,
+	override val type: MessageType,
+	override val mentionType: MessageMentionType,
+	override val message: String?,
+	override val createdAt: Long,
+	override val updatedAt: Long,
+	override val status: MessageStatus,
+	override val deliveryStatus: DeliveryStatus,
+	override val data: String? = null,
+	override val isMuted: Boolean = false,
+	override val fileName: String? = null,
+	override val fileThumbnails: List<FileThumbnail>? = null,
+	override val fileMimeType: String? = null
+) : BaseMessage
 
 @Serializable
 data class FileThumbnail(

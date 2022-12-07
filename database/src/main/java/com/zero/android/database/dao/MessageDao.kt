@@ -2,6 +2,8 @@ package com.zero.android.database.dao
 
 import com.zero.android.database.model.MessageEntity
 import com.zero.android.database.model.MessageWithRefs
+import com.zero.android.database.model.toModel
+import com.zero.android.models.conversions.toMeta
 import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
@@ -32,9 +34,7 @@ constructor(
 			val channelExists = channels.map { channelDao.exists(it) }
 			data.forEach {
 				val exists = channelExists[channels.indexOf(it.message.channelId)]
-				if (exists) {
-					messageDao.upsert(memberDao, it)
-				}
+				if (exists) messageDao.upsert(memberDao, it)
 			}
 		} else {
 			messageDao.upsert(memberDao, *data)
@@ -43,16 +43,13 @@ constructor(
 		if (updateChannel) {
 			channels.forEach { channelId ->
 				getLatestMessageByChannel(channelId)?.let {
-					channelDao.updateLastMessage(channelId, it.id, it.createdAt)
+					channelDao.updateLastMessage(channelId, it.toModel().toMeta())
 				}
 			}
 		}
 	}
 
 	suspend fun update(id: String, text: String) = messageDao.update(id, text)
-
-	suspend fun markRead(id: String, deliveryStatus: DeliveryStatus = DeliveryStatus.READ) =
-		messageDao.markRead(id, deliveryStatus)
 
 	suspend fun updateDeliveryReceipt(channelId: String, deliveryStatus: DeliveryStatus) =
 		messageDao.updateDeliveryReceipt(channelId, deliveryStatus)

@@ -18,18 +18,17 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
 import com.zero.android.models.Channel
+import com.zero.android.models.DirectChannel
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.components.SmallClickableIcon
 import com.zero.android.ui.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatAppBar(
 	modifier: Modifier,
 	channel: Channel,
 	loggedInUser: String,
-	scrollBehavior: TopAppBarScrollBehavior? = null,
 	onBackClick: () -> Unit,
 	onDeleteMessage: (Message) -> Unit,
 	onCopyMedia: (Message) -> Unit,
@@ -71,14 +70,15 @@ fun ChatAppBar(
 				modifier = Modifier.align(Alignment.CenterEnd),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				// 			if (actionMessage == null) {
-				// 				SmallClickableIcon(
-				// 					icon = R.drawable.ic_more_vertical,
-				// 					contentDescription = "Channel Info",
-				// 					onClick = onChannelDetailsClick
-				// 				)
-				// 			} else {
-				if (actionMessage != null) {
+				if (actionMessage == null) {
+					if (channel is DirectChannel) {
+						SmallClickableIcon(
+							icon = R.drawable.ic_more_vertical,
+							contentDescription = "Channel Info",
+							onClick = onChannelDetailsClick
+						)
+					}
+				} else {
 					val message = actionMessage!!
 					if ((message.type == MessageType.IMAGE) ||
 						(message.type == MessageType.TEXT && !message.message.isNullOrEmpty())

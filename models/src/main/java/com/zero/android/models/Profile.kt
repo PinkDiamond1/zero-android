@@ -1,5 +1,6 @@
 package com.zero.android.models
 
+import com.zero.android.models.enums.ProfileType
 import kotlinx.datetime.Instant
 
 data class Profile(
@@ -7,8 +8,11 @@ data class Profile(
 	val firstName: String? = null,
 	val lastName: String? = null,
 	val profileImage: String? = null,
+	val handle: String? = null,
+	val type: ProfileType? = null,
 	val gender: String? = null,
 	val guild: String? = null,
+	val guildId: String? = null,
 	val summary: String? = null,
 	val skills: List<Valuable>? = null,
 	val values: List<Valuable>? = null,

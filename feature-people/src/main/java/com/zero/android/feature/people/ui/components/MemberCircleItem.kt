@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
 import com.zero.android.models.Member
 import com.zero.android.models.fake.FakeModel
-import com.zero.android.ui.components.MediumCircularImage
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.components.Avatar
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun MemberCircleItem(
@@ -31,12 +31,7 @@ fun MemberCircleItem(
 	val iconSize = 20.dp
 
 	Box(modifier = Modifier.padding((iconSize / 2))) {
-		MediumCircularImage(
-			modifier = Modifier.clickable { onClick?.invoke() },
-			placeholder = R.drawable.ic_user_profile_placeholder,
-			imageUrl = member.profileImage,
-			contentDescription = member.id
-		)
+		Avatar(modifier = Modifier.clickable { onClick?.invoke() }, size = 42.dp, user = member)
 
 		if (topIcon != null) {
 			val offsetInPx = LocalDensity.current.run { (iconSize / 2f).roundToPx() }

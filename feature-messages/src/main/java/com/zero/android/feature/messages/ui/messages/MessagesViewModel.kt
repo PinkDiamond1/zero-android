@@ -58,11 +58,9 @@ constructor(
 ) : BaseViewModel() {
 
 	val channelId: String = checkNotNull(savedStateHandle[MessagesDestination.ARG_CHANNEL_ID])
-	val isGroupChannel: Boolean =
-		checkNotNull(savedStateHandle[MessagesDestination.ARG_IS_GROUP_CHANNEL])
 
 	val loggedInUserId = runBlocking(Dispatchers.IO) { preferences.userId() }
-	val lastMessage = channelRepository.lastMessage
+	val lastMessage = MutableStateFlow<Message?>(null)
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 
@@ -112,14 +110,7 @@ constructor(
 
 	fun loadChannel() {
 		ioScope.launch {
-			val request =
-				if (isGroupChannel) {
-					channelRepository.getGroupChannel(channelId)
-				} else {
-					channelRepository.getDirectChannel(channelId)
-				}
-
-			request.firstOrNull()?.let { channel ->
+			channelRepository.getChannel(channelId).firstOrNull()?.let { channel ->
 				_channel.emit(Result.Success(channel))
 				markChannelRead()
 				chatRepository.getMessages(channel)
@@ -144,7 +135,6 @@ constructor(
 						val chatMembers = channel.members.filter { it.id != loggedInUserId }.map { it.id }
 						val readMembers = channelRepository.getReadMembers(channel.id).map { it.id }
 						if (readMembers.containsAll(chatMembers)) {
-							// chatRepository.markRead(message)
 							chatRepository.markMessagesRead(channel.id)
 						}
 					}
@@ -196,7 +186,7 @@ constructor(
 
 	private fun updateMessage() {
 		ioScope.launch {
-			channelRepository.getLastMessage(channelId)
+			channelRepository.getLastMessage(channelId).collectLatest { lastMessage.emit(it) }
 			getLastMessageStatus()
 		}
 	}

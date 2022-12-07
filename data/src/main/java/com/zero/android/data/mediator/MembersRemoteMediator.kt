@@ -5,8 +5,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.zero.android.common.system.Logger
-import com.zero.android.common.util.MEMBERS_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.extensions.initialPageSize
 import com.zero.android.database.dao.MemberDao
 import com.zero.android.database.model.MemberEntity
 import com.zero.android.network.model.request.GetMembersFilter
@@ -41,7 +41,12 @@ internal class MembersRemoteMediator(
 			val response =
 				memberService.getByNetwork(
 					networkId,
-					GetMembersFilter(limit = MEMBERS_PAGE_LIMIT, offset = offset).toString()
+					GetMembersFilter(
+						limit =
+						if (offset == 0) state.config.initialPageSize else state.config.pageSize,
+						offset = state.config.pageSize * offset
+					)
+						.toString()
 				)
 
 			response?.map { it.toEntity() }?.let { memberDao.upsert(networkId, it) }
@@ -49,13 +54,17 @@ internal class MembersRemoteMediator(
 			logger.d("Loading Network Members: $loadType - $offset: ${response?.size ?: 0}")
 
 			MediatorResult.Success(
-				endOfPaginationReached = response.isNullOrEmpty() || response.size < MEMBERS_PAGE_LIMIT
+				endOfPaginationReached =
+				response.isNullOrEmpty() || response.size < state.config.pageSize
 			)
 		} catch (e: UnknownHostException) {
+			offset -= 1
 			MediatorResult.Error(e)
 		} catch (e: IOException) {
+			offset -= 1
 			MediatorResult.Error(e)
 		} catch (e: Exception) {
+			offset -= 1
 			logger.e(e)
 			MediatorResult.Error(e)
 		}

@@ -17,6 +17,7 @@ interface ImageLoader {
 
 	companion object {
 
+		/** WorkAround for creating Global ImageLoader. Only use this function inside ZeroApp */
 		fun getImageLoader(context: Context, diskCaching: Boolean = true): ImageLoader {
 			var builder =
 				ImageLoader.Builder(context).memoryCache {

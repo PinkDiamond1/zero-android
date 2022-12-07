@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.zero.android.common.R
 import com.zero.android.common.extensions.format
 import com.zero.android.common.extensions.toDate
 import com.zero.android.feature.messages.helper.MessageActionStateHandler
@@ -34,7 +33,7 @@ import com.zero.android.feature.messages.ui.components.MessageContent
 import com.zero.android.feature.messages.ui.components.ReplyMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
-import com.zero.android.ui.components.SmallCircularImage
+import com.zero.android.ui.components.Avatar
 import com.zero.android.ui.theme.AppTheme
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -59,10 +58,7 @@ fun ChannelMessage(
 			modifier.background(Color.White.copy(0.1f))
 		} else modifier
 	) {
-		SmallCircularImage(
-			imageUrl = msg.author?.profileImage,
-			placeholder = R.drawable.ic_user_profile_placeholder
-		)
+		Avatar(size = 36.dp, user = msg.author)
 		CMAuthorAndTextMessage(
 			modifier = Modifier.padding(end = 16.dp).weight(1f),
 			message = msg,

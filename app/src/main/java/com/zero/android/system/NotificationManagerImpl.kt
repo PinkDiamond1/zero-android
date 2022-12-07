@@ -12,8 +12,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.zero.android.MainActivity
-import com.zero.android.R
+import com.zero.android.common.R
 import com.zero.android.common.R.string
+import com.zero.android.common.extensions.notificationManager
 import com.zero.android.common.extensions.runOnMainThread
 import com.zero.android.common.extensions.withScope
 import com.zero.android.common.system.NotificationManager
@@ -35,6 +36,7 @@ constructor(
 
 	private companion object {
 		const val MESSAGES_CHANNEL_ID = "Messages"
+		const val SYNC_CHANNEL_ID = "Sync"
 	}
 
 	private data class Notification(
@@ -47,7 +49,7 @@ constructor(
 
 	private val notificationsMap: ArrayMap<String, MutableList<Notification>> by lazy { ArrayMap() }
 
-	private fun createNotificationChannel(
+	private fun createChannel(
 		id: String,
 		name: String,
 		description: String,
@@ -56,19 +58,17 @@ constructor(
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			val channel =
 				NotificationChannel(id, name, importance).apply { this.description = description }
-			(context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager)
-				.let { it.createNotificationChannel(channel) }
+			context.notificationManager?.createNotificationChannel(channel)
 		}
 	}
 
 	override fun createMessageNotification(
 		channelId: String,
-		isGroupChannel: Boolean,
 		title: String,
 		text: String,
 		image: String?
 	) {
-		createNotificationChannel(
+		createChannel(
 			id = MESSAGES_CHANNEL_ID,
 			name = context.getString(string.notification_channel_messages),
 			description = context.getString(string.notification_channel_messages_description)
@@ -77,7 +77,7 @@ constructor(
 		val intent =
 			Intent(context, MainActivity::class.java).apply {
 				flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-				data = Uri.parse(MessagesDestination.deeplink(channelId, isGroupChannel))
+				data = Uri.parse(MessagesDestination.deeplink(channelId))
 			}
 		val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
@@ -106,12 +106,28 @@ constructor(
 
 	override fun removeMessageNotifications(channelId: String) = removeNotifications(tag = channelId)
 
+	override fun createSyncNotification(notificationId: Int): android.app.Notification {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			createChannel(
+				SYNC_CHANNEL_ID,
+				context.getString(string.sync_notification_channel_name),
+				context.getString(string.sync_notification_channel_description)
+			)
+		}
+
+		return NotificationCompat.Builder(context, notificationId.toString())
+			.setSmallIcon(R.mipmap.ic_launcher_foreground)
+			.setContentTitle(context.getString(string.app_name))
+			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+			.build()
+	}
+
 	private fun NotificationCompat.Builder.createNotificationsByTag(
 		tag: String,
 		notification: Notification,
 		pendingIntent: PendingIntent
 	) {
-		setSmallIcon(R.drawable.ic_launcher_foreground)
+		setSmallIcon(R.mipmap.ic_launcher_foreground)
 		setLargeIcon(notification.image)
 		setContentTitle(notification.title)
 		setContentText(notification.message)
@@ -141,18 +157,17 @@ constructor(
 
 	private fun getActiveNotifications(tag: String): List<Notification> {
 		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			(context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager?)
-				?.run {
-					activeNotifications.map {
-						Notification(
-							id = it.id,
-							tag = it.tag,
-							title = it.notification.extras.getString("android.title", ""),
-							message = it.notification.extras.getString("android.text", ""),
-							image = it.notification.getLargeIcon()?.loadDrawable(context)?.toBitmap()
-						)
-					}
+			context.notificationManager?.run {
+				activeNotifications.map {
+					Notification(
+						id = it.id,
+						tag = it.tag,
+						title = it.notification.extras.getString("android.title", ""),
+						message = it.notification.extras.getString("android.text", ""),
+						image = it.notification.getLargeIcon()?.loadDrawable(context)?.toBitmap()
+					)
 				}
+			}
 		} else {
 			notificationsMap[tag]
 		}

@@ -7,12 +7,12 @@ import androidx.paging.PagingData
 import androidx.paging.filter
 import androidx.paging.map
 import com.zero.android.common.extensions.channelFlowWithAwait
-import com.zero.android.common.extensions.launchSafe
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.common.util.MEMBERS_PAGE_LIMIT
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.delegates.Preferences
+import com.zero.android.data.extensions.launchSafeApi
 import com.zero.android.data.mediator.MembersRemoteMediator
 import com.zero.android.database.dao.MemberDao
 import com.zero.android.database.model.toModel
@@ -50,8 +50,8 @@ constructor(
 				.mapNotNull { it?.map { member -> member.toModel() } }
 				.collect { trySend(it) }
 		}
-		launchSafe {
-			val networkUsers = memberService.getMembers(GetMembersFilter(filter = filterName).toString())
+		launchSafeApi {
+			val networkUsers = memberService.getMembers(GetMembersFilter(name = filterName).toString())
 			memberDao.upsert(
 				networkUsers?.filter { it.id != userId }?.map { it.toEntity() } ?: emptyList()
 			)
@@ -62,7 +62,10 @@ constructor(
 	override suspend fun getByNetwork(id: String): Flow<PagingData<Member>> {
 		return Pager(
 			config =
-			PagingConfig(pageSize = MEMBERS_PAGE_LIMIT, prefetchDistance = INITIAL_LOAD_SIZE),
+			PagingConfig(
+				pageSize = MEMBERS_PAGE_LIMIT,
+				initialLoadSize = MEMBERS_PAGE_LIMIT * INITIAL_LOAD_SIZE
+			),
 			remoteMediator = MembersRemoteMediator(id, memberService, memberDao, logger),
 			pagingSourceFactory = { memberDao.getByNetwork(id) }
 		)

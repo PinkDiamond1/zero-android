@@ -23,7 +23,7 @@ import javax.inject.Inject
 class MembersViewModel
 @Inject
 constructor(
-	private val membersRepository: MemberRepository,
+	private val memberRepository: MemberRepository,
 	private val channelRepository: ChannelRepository,
 	private val logger: Logger
 ) : BaseViewModel() {
@@ -45,13 +45,13 @@ constructor(
 		loadMembers()
 	}
 
-	fun loadMembers() {
+	private fun loadMembers() {
 		_loading.value = true
 
 		membersJob?.cancel()
 		membersJob =
 			ioScope.launch {
-				membersRepository
+				memberRepository
 					.getByNetwork(network.id)
 					.cachedIn(viewModelScope)
 					.onEach { _loading.emit(false) }

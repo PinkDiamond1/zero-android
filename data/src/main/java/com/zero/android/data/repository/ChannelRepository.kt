@@ -8,12 +8,9 @@ import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.AlertType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 
 interface ChannelRepository {
-
-	val lastMessage: StateFlow<Message?>
 
 	fun getDirectChannels(search: String? = null): Flow<PagingData<DirectChannel>>
 
@@ -23,9 +20,7 @@ interface ChannelRepository {
 		search: String? = null
 	): Flow<PagingData<GroupChannel>>
 
-	suspend fun getGroupChannel(id: String): Flow<GroupChannel>
-
-	suspend fun getDirectChannel(id: String): Flow<DirectChannel>
+	suspend fun getChannel(id: String): Flow<Channel>
 
 	suspend fun createGroupChannel(networkId: String, channel: GroupChannel): GroupChannel
 
@@ -35,7 +30,11 @@ interface ChannelRepository {
 
 	suspend fun updateChannelImage(channel: Channel, image: File)
 
+	suspend fun addMembers(id: String, members: List<Member>)
+
 	suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType)
+
+	suspend fun joinPublicChannels(networkId: String)
 
 	suspend fun joinChannel(channel: Channel)
 
@@ -49,5 +48,5 @@ interface ChannelRepository {
 
 	suspend fun getReadMembers(id: String): List<Member>
 
-	suspend fun getLastMessage(channelId: String)
+	suspend fun getLastMessage(channelId: String): Flow<Message>
 }

@@ -14,7 +14,7 @@ fun Modifier.bodyPaddings(vertical: Float = 1f, horizontal: Float = 1f) =
 	)
 
 @Suppress("FunctionName")
-fun BodyPaddingValues(vertical: Float = 1f, horizontal: Float = 1f) =
+fun BodyPadding(vertical: Float = 1f, horizontal: Float = 1f) =
 	PaddingValues(
 		vertical = (BODY_PADDING_VERTICAL * vertical).dp,
 		horizontal = (BODY_PADDING_HORIZONTAL * horizontal).dp

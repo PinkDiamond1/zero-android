@@ -10,6 +10,7 @@ import com.zero.android.feature.auth.navigation.AuthDestination
 import com.zero.android.feature.auth.navigation.ForgotPasswordDestination
 import com.zero.android.feature.auth.navigation.RegisterDestination
 import com.zero.android.feature.auth.navigation.authGraph
+import com.zero.android.feature.channels.navigation.AddMembersDestination
 import com.zero.android.feature.channels.navigation.ChannelDetailsDestination
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.CreateDirectChannelDestination
@@ -46,14 +47,12 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 	}
 	navigation(startDestination = HomeDestination.route, route = AppGraph.MAIN) {
 		channelGraph(
-			onEditClick = { id, isGroupChannel ->
-				controller.navigate(EditChannelDestination.route(id, isGroupChannel))
-			},
+			onEditClick = { id -> controller.navigate(EditChannelDestination.route(id)) },
+			onAddMember = { id -> controller.navigate(AddMembersDestination.route(id)) },
 			onMediaClick = { channel, media ->
 				controller.navigate(ChatMediaViewerDestination.route(channel, media.messageId))
 			},
-			onAllMediaClick = {},
-			onLeaveChannel = { controller.navigate(ChannelsDestination) { asRoot() } },
+			onLeaveChannel = { controller.navigate(HomeDestination) { asRoot() } },
 			onBackClick = { controller.navigateUp() }
 		)
 		chatGraph(
@@ -61,17 +60,14 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 			onMediaClicked = { channel, message ->
 				controller.navigate(ChatMediaViewerDestination.route(channel, message))
 			},
-			onChannelDetails = { id, isGroupChannel ->
-				controller.navigate(ChannelDetailsDestination.route(id, isGroupChannel))
-			}
+			onChannelDetails = { id -> controller.navigate(ChannelDetailsDestination.route(id)) }
 		)
 		composable(FeedDestination) { FeedRoute() }
-		composable(NotificationsDestination) { NotificationsRoute() }
 		composable(CreateDirectChannelDestination) {
 			CreateDirectChannelRoute(
 				onChannelCreated = {
 					controller.navigateUp()
-					controller.navigate(MessagesDestination.route(it.id, false))
+					controller.navigate(MessagesDestination.route(it.id))
 				},
 				onBackClick = { controller.navigateUp() }
 			)
@@ -89,12 +85,15 @@ internal fun NavGraphBuilder.appGraph(controller: NavController) {
 
 internal fun NavGraphBuilder.homeBottomNavGraph(controller: NavController, network: Network?) {
 	composableSimple(ChannelsDestination) {
-		ChannelsRoute(network = network) { controller.navigate(MessagesDestination.route(it.id, true)) }
+		ChannelsRoute(network = network) { controller.navigate(MessagesDestination.route(it.id)) }
 	}
 	composableSimple(DirectChannelsDestination) {
-		DirectChannelsRoute { controller.navigate(MessagesDestination.route(it.id, false)) }
+		DirectChannelsRoute { controller.navigate(MessagesDestination.route(it.id)) }
 	}
 	composableSimple(MembersDestination) {
-		MembersRoute(network = network) { controller.navigate(MessagesDestination.route(it.id, false)) }
+		MembersRoute(network = network) { controller.navigate(MessagesDestination.route(it.id)) }
+	}
+	composableSimple(NotificationsDestination) {
+		NotificationsRoute(onOpenChannel = { controller.navigate(MessagesDestination.route(it)) })
 	}
 }

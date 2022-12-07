@@ -3,7 +3,8 @@ package com.zero.android.data.repository
 import android.content.Context
 import com.zero.android.data.delegates.Preferences
 import com.zero.android.datastore.ChatPreferences
-import com.zero.android.network.model.request.CreateUser
+import com.zero.android.models.AuthCredentials
+import com.zero.android.network.model.request.CreateUserRequest
 import com.zero.android.network.service.AccessService
 import com.zero.android.network.service.AuthService
 import com.zero.android.network.service.ZeroAuthService
@@ -40,15 +41,20 @@ constructor(
 		password: String,
 		inviteCode: String?,
 		profilePic: File?
-	) = authService.register(name, email, password, inviteCode ?: "", profilePic)
-
-	override suspend fun revokeToken() {
-		preferences.userCredentials()?.refreshToken?.let { authService.revokeToken(it) }
+	): AuthCredentials {
+		authService.register(name, email, password, inviteCode ?: "", profilePic)
+		val credentials = login(email, password)
+		createUser(credentials, name, inviteCode)
+		return credentials
 	}
 
-	override suspend fun createUser(accessToken: String, name: String, inviteCode: String?) {
-		val token = "Bearer $accessToken"
-		val payload = CreateUser(inviteCode ?: "", CreateUser.UserInfo(name, name, ""))
+	override suspend fun revokeToken() {
+		preferences.credentials()?.refreshToken?.let { authService.revokeToken(it) }
+	}
+
+	private suspend fun createUser(credentials: AuthCredentials, name: String, inviteCode: String?) {
+		val token = "Bearer ${credentials.accessToken}"
+		val payload = CreateUserRequest(inviteCode ?: "", CreateUserRequest.UserInfo(name, name, ""))
 		zeroAuthService.createUser(token, payload)
 	}
 }

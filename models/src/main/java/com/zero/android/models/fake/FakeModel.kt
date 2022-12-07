@@ -7,10 +7,14 @@ import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.Network
+import com.zero.android.models.Notification
 import com.zero.android.models.enums.ConnectionStatus
 import com.zero.android.models.enums.DeliveryStatus
 import com.zero.android.models.enums.MessageStatus
 import com.zero.android.models.enums.MessageType
+import com.zero.android.models.enums.NotificationType
+import com.zero.android.models.enums.toNotificationCategory
+import kotlinx.datetime.Instant
 
 object FakeModel {
 
@@ -44,14 +48,22 @@ object FakeModel {
 			networkId = network,
 			category = category,
 			name = name,
+			description = "Group description",
 			members = members(),
-			operators = listOf(members()[0]),
+			operators = listOf(Member("one")),
 			memberCount = 2,
 			createdAt = 0L
 		)
 
 	fun DirectChannel(id: String = "id", name: String = "Group Name") =
-		DirectChannel(id = id, name = name, members = members(), memberCount = 2, createdAt = 0L)
+		DirectChannel(
+			id = id,
+			name = name,
+			members = members(),
+			operators = listOf(Member("one")),
+			memberCount = 2,
+			createdAt = 0L
+		)
 
 	fun Message(
 		id: String = "id",
@@ -86,5 +98,24 @@ object FakeModel {
 			ChatMedia("id", "", MessageType.IMAGE),
 			ChatMedia("id", "", MessageType.AUDIO),
 			ChatMedia("id", "", MessageType.IMAGE)
+		)
+
+	fun Notification(
+		id: String = "id",
+		title: String = "Notification Title",
+		description: String = "New reply in direct message conversation",
+		type: NotificationType = NotificationType.DM_REPLY
+	) =
+		Notification(
+			id = id,
+			title = title,
+			description = description,
+			type = type,
+			category = type.toNotificationCategory(),
+			isRead = true,
+			userId = "userId",
+			originUserId = "originUserId",
+			channelId = "channelId",
+			createdAt = Instant.DISTANT_FUTURE
 		)
 }

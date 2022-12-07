@@ -28,4 +28,9 @@ internal interface RepositoryModule {
 	@Binds fun bindInviteRepository(inviteRepository: InviteRepositoryImpl): InviteRepository
 
 	@Binds fun bindFileRepository(fileRepository: FileRepositoryImpl): FileRepository
+
+	@Binds
+	fun bindNotificationRepository(
+		notificationRepository: NotificationRepositoryImpl
+	): NotificationRepository
 }

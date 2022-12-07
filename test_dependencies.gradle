@@ -1,4 +1,4 @@
-dependencies {
+	dependencies {
 	testImplementation "junit:junit:${versions.junit}"
 	testImplementation "org.mockito:mockito-core:${versions.mockito}"
 	testImplementation "org.mockito.kotlin:mockito-kotlin:${versions.mockitoKotlin}"

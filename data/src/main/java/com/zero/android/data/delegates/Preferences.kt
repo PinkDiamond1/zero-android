@@ -8,5 +8,5 @@ interface Preferences {
 
 	suspend fun userImage(): String
 
-	suspend fun userCredentials(): AuthCredentials?
+	suspend fun credentials(): AuthCredentials?
 }

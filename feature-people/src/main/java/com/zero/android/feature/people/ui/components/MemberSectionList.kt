@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import com.zero.android.models.Member
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.ui.components.InstantAnimation
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun MemberSectionList(

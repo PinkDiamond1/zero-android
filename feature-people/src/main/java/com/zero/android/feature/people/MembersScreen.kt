@@ -1,10 +1,12 @@
 package com.zero.android.feature.people
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.PagingData
@@ -20,7 +22,7 @@ import com.zero.android.models.Member
 import com.zero.android.models.Network
 import com.zero.android.models.fake.FakeModel
 import com.zero.android.navigation.util.NavigationState
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.util.Preview
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
@@ -46,7 +48,6 @@ fun MembersRoute(
 	MembersScreen(
 		members = pagedMembers,
 		isRefreshing = loading,
-		onRefresh = { viewModel.loadMembers() },
 		onMemberSelected = { viewModel.onMembersSelected(it) }
 	)
 }
@@ -55,11 +56,10 @@ fun MembersRoute(
 fun MembersScreen(
 	members: LazyPagingItems<Member>,
 	isRefreshing: Boolean = false,
-	onRefresh: () -> Unit,
 	onMemberSelected: (Member) -> Unit
 ) {
-	SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing), onRefresh = onRefresh) {
-		LazyColumn {
+	SwipeRefresh(state = rememberSwipeRefreshState(isRefreshing), onRefresh = { members.refresh() }) {
+		LazyColumn(Modifier.fillMaxSize()) {
 			items(members) { member ->
 				member ?: return@items
 				MemberListItem(member, showStatus = true) { onMemberSelected(it) }
@@ -73,7 +73,6 @@ fun MembersScreen(
 private fun MembersScreenPreview() = Preview {
 	MembersScreen(
 		members = flowOf(PagingData.from(FakeModel.members())).collectAsLazyPagingItems(),
-		onRefresh = {},
 		onMemberSelected = {}
 	)
 }

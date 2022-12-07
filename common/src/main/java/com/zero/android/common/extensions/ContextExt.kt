@@ -4,8 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.widget.Toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+
+val Context.notificationManager
+	get() = (getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager?)
 
 fun Context.getActivity(): Activity? =
 	when (this) {
@@ -13,8 +14,6 @@ fun Context.getActivity(): Activity? =
 		is ContextWrapper -> baseContext.getActivity()
 		else -> null
 	}
-
-fun CoroutineScope.launchSafe(block: suspend () -> Unit) = launch { runCatching { block() } }
 
 fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 	Toast.makeText(this, message, duration).show()

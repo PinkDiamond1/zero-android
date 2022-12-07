@@ -1,14 +1,13 @@
 package com.zero.android.database.dao
 
-import com.zero.android.database.model.ChannelEntity
-import com.zero.android.database.model.DirectChannelWithRefs
-import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.database.model.ChannelWithRefs
 import com.zero.android.models.ChannelCategory
 import javax.inject.Inject
 
 class ChannelDao
 @Inject
 constructor(
+	private val channelDao: GroupChannelDaoImpl,
 	private val directChannelDao: DirectChannelDaoImpl,
 	private val groupChannelDao: GroupChannelDaoImpl,
 	private val memberDao: MemberDao,
@@ -26,25 +25,11 @@ constructor(
 
 	fun searchDirectChannels(name: String) = directChannelDao.search(name)
 
-	fun getGroupChannel(id: String) = groupChannelDao.get(id)
-
-	fun getDirectChannel(id: String) = directChannelDao.get(id)
+	fun getChannel(id: String) = channelDao.get(id)
 
 	fun getUnreadDirectMessagesCount() = directChannelDao.getUnreadCount()
 
-	suspend fun upsert(vararg data: DirectChannelWithRefs) =
-		directChannelDao.upsert(messageDao, memberDao, *data)
+	suspend fun upsert(vararg data: ChannelWithRefs) = channelDao.upsert(messageDao, memberDao, *data)
 
-	suspend fun upsert(vararg data: GroupChannelWithRefs) =
-		groupChannelDao.upsert(messageDao, memberDao, *data)
-
-	internal suspend fun updateLatestMessage(id: String) {
-		messageDao.getLatestMessageByChannel(id)?.let { meta ->
-			directChannelDao.updateLastMessage(id, meta.id, meta.createdAt)
-		}
-	}
-
-	suspend fun delete(entity: ChannelEntity) = groupChannelDao.delete(entity)
-
-	suspend fun delete(id: String) = groupChannelDao.delete(id)
+	suspend fun delete(id: String) = channelDao.delete(id)
 }

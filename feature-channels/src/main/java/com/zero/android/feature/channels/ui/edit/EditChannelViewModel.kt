@@ -26,15 +26,17 @@ constructor(savedStateHandle: SavedStateHandle, private val channelRepository: C
 
 	internal data class EditChannelForm(
 		val name: String = "",
+		val description: String = "",
 		val image: String? = null,
 		val updated: Boolean = false,
-		val nameError: Int? = null
+		val nameError: Int? = null,
+		val descriptionError: Int? = null
 	) {
 		val isValid
-			get() = nameError == null
+			get() = nameError == null && descriptionError == null
 
 		fun isChanged(channel: Channel): Boolean {
-			return channel.name != name
+			return channel.name != name || channel.description != description
 		}
 
 		fun validate(): EditChannelForm {
@@ -42,17 +44,19 @@ constructor(savedStateHandle: SavedStateHandle, private val channelRepository: C
 			if (name.isEmpty()) form = form.copy(nameError = R.string.name_required)
 			return form
 		}
+
+		fun map(channel: Channel) =
+			copy(name = channel.name, description = channel.description ?: "", image = channel.image)
 	}
 
 	private val channelId: String =
 		checkNotNull(savedStateHandle[EditChannelDestination.ARG_CHANNEL_ID])
-	private val isGroupChannel: Boolean =
-		checkNotNull(savedStateHandle[EditChannelDestination.ARG_IS_GROUP_CHANNEL])
 
 	private val _channel = MutableStateFlow<Channel?>(null)
 	val channel = _channel.asStateFlow()
 
 	internal val form = MutableStateFlow(EditChannelForm())
+	internal val uploadingImage = MutableStateFlow(false)
 
 	init {
 		loadChannel()
@@ -60,22 +64,13 @@ constructor(savedStateHandle: SavedStateHandle, private val channelRepository: C
 
 	private fun loadChannel() {
 		ioScope.launch {
-			val request =
-				if (isGroupChannel) {
-					channelRepository.getGroupChannel(channelId)
-				} else {
-					channelRepository.getDirectChannel(channelId)
-				}
-
-			request.asResult().collect {
+			channelRepository.getChannel(channelId).asResult().collect {
 				if (it is Result.Success) {
 					if (form.value.updated) {
-						form.emit(form.value.copy(name = it.data.name, image = it.data.image, updated = false))
-
+						form.emit(form.value.map(it.data).copy(updated = false))
 						_channel.emit(it.data)
 					} else if (channel.value == null) {
-						form.emit(form.value.copy(name = it.data.name, image = it.data.image))
-
+						form.emit(form.value.map(it.data))
 						_channel.emit(it.data)
 					}
 				}
@@ -89,8 +84,10 @@ constructor(savedStateHandle: SavedStateHandle, private val channelRepository: C
 			form.emit(form.value.copy(updated = true))
 			val mChannel =
 				when (val channel = channel.value!!) {
-					is DirectChannel -> channel.copy(name = form.value.name)
-					is GroupChannel -> channel.copy(name = form.value.name)
+					is DirectChannel ->
+						channel.copy(name = form.value.name, description = form.value.description)
+					is GroupChannel ->
+						channel.copy(name = form.value.name, description = form.value.description)
 					else -> throw IllegalStateException()
 				}
 
@@ -100,7 +97,11 @@ constructor(savedStateHandle: SavedStateHandle, private val channelRepository: C
 
 	fun onImagePicked(image: File) {
 		viewModelScope.launch { form.emit(form.value.copy(image = image.path)) }
-		ioScope.launch { channelRepository.updateChannelImage(channel.value!!, image) }
+		ioScope.launch {
+			uploadingImage.emit(true)
+			channelRepository.updateChannelImage(channel.value!!, image)
+			uploadingImage.emit(false)
+		}
 	}
 
 	internal fun updateForm(updated: EditChannelForm) {

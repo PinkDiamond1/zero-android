@@ -12,6 +12,8 @@ import kotlinx.serialization.Serializable
 
 interface ApiChannel {
 	val id: String
+	val description: String?
+	val operators: List<ApiMember>
 	val members: List<ApiMember>
 	val memberCount: Int
 	val createdAt: Long
@@ -26,6 +28,10 @@ interface ApiChannel {
 @Serializable
 data class ApiDirectChannel(
 	override val id: String,
+	private val name: String? = null,
+	override val description: String? = null,
+	private val image: String? = null,
+	override val operators: List<ApiMember>,
 	override val members: List<ApiMember>,
 	override val memberCount: Int,
 	override val lastMessage: ApiMessage? = null,
@@ -37,10 +43,16 @@ data class ApiDirectChannel(
 	override val accessCode: String? = null
 ) : ApiChannel {
 
-	fun name(loggedInUserId: String?) =
-		members.filter { it.id != loggedInUserId }.joinToString { it.nickname?.trim() ?: "" }.trim()
+	fun name(loggedInUserId: String?): String {
+		return if (name.isNullOrEmpty() || name == "Group Channel" || name == "Chat") {
+			members.filter { it.id != loggedInUserId }.joinToString { it.nickname?.trim() ?: "" }.trim()
+		} else name
+	}
 
-	fun image(loggedInUserId: String?) = members.firstOrNull { it.id != loggedInUserId }?.profileImage
+	fun image(loggedInUserId: String?) =
+		image
+			?: lastMessage?.author?.profileImage
+			?: members.lastOrNull { it.id != loggedInUserId }?.profileImage
 }
 
 @Serializable
@@ -49,7 +61,8 @@ data class ApiGroupChannel(
 	val networkId: String,
 	val category: ChannelCategory? = null,
 	val name: String,
-	val operators: List<ApiMember>,
+	override val description: String? = null,
+	override val operators: List<ApiMember>,
 	override val members: List<ApiMember>,
 	override val memberCount: Int,
 	val image: String? = null,
@@ -80,5 +93,6 @@ data class ApiChannelProperties(
 	val isVideoEnabled: Boolean = true,
 	val telegramChatId: String? = null,
 	val discordChatId: String? = null,
-	val discordChannelId: String? = null
+	val discordChannelId: String? = null,
+	val description: String? = null
 )

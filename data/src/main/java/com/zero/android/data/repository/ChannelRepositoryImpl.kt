@@ -6,33 +6,28 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.zero.android.common.extensions.channelFlowWithAwait
-import com.zero.android.common.extensions.launchSafe
 import com.zero.android.common.system.Logger
 import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
 import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.data.conversion.toEntity
 import com.zero.android.data.conversion.toModel
 import com.zero.android.data.delegates.Preferences
+import com.zero.android.data.extensions.launchSafeApi
 import com.zero.android.data.mediator.DirectChannelsRemoteMediator
 import com.zero.android.data.mediator.GroupChannelsRemoteMediator
 import com.zero.android.database.dao.ChannelDao
 import com.zero.android.database.dao.MessageDao
-import com.zero.android.database.model.ChannelEntity
+import com.zero.android.database.model.toDirectModel
+import com.zero.android.database.model.toGroupModel
 import com.zero.android.database.model.toModel
 import com.zero.android.models.Channel
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
-import com.zero.android.models.Message
 import com.zero.android.models.enums.AlertType
-import com.zero.android.models.enums.ChannelType
-import com.zero.android.network.model.ApiDirectChannel
-import com.zero.android.network.model.ApiGroupChannel
 import com.zero.android.network.service.ChannelService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -53,13 +48,14 @@ constructor(
 
 	private val userId = runBlocking { preferences.userId() }
 
-	override val lastMessage = MutableStateFlow<Message?>(null)
-
 	@OptIn(ExperimentalPagingApi::class)
 	override fun getDirectChannels(search: String?): Flow<PagingData<DirectChannel>> {
 		return Pager(
 			config =
-			PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = INITIAL_LOAD_SIZE),
+			PagingConfig(
+				pageSize = CHANNELS_PAGE_LIMIT,
+				initialLoadSize = CHANNELS_PAGE_LIMIT * INITIAL_LOAD_SIZE
+			),
 			remoteMediator =
 			DirectChannelsRemoteMediator(userId, channelDao, channelService, logger),
 			pagingSourceFactory = {
@@ -68,7 +64,7 @@ constructor(
 			}
 		)
 			.flow
-			.map { data -> data.map { it.toModel() } }
+			.map { data -> data.map { it.toDirectModel() } }
 	}
 
 	@OptIn(ExperimentalPagingApi::class)
@@ -79,7 +75,10 @@ constructor(
 	): Flow<PagingData<GroupChannel>> {
 		return Pager(
 			config =
-			PagingConfig(pageSize = CHANNELS_PAGE_LIMIT, prefetchDistance = INITIAL_LOAD_SIZE),
+			PagingConfig(
+				pageSize = CHANNELS_PAGE_LIMIT,
+				initialLoadSize = CHANNELS_PAGE_LIMIT * INITIAL_LOAD_SIZE
+			),
 			remoteMediator =
 			GroupChannelsRemoteMediator(
 				networkId = networkId,
@@ -94,35 +93,20 @@ constructor(
 			}
 		)
 			.flow
-			.map { data -> data.map { it.toModel() } }
+			.map { data -> data.map { it.toGroupModel() } }
 	}
 
-	override suspend fun getGroupChannel(id: String) = channelFlowWithAwait {
+	override suspend fun getChannel(id: String) = channelFlowWithAwait {
 		launch(Dispatchers.Unconfined) {
 			channelDao
-				.getGroupChannel(id)
-				.mapNotNull { channel -> channel?.toModel() }
+				.getChannel(id)
+				.mapNotNull { channel ->
+					if (channel?.channel?.isDirectChannel == true) channel.toDirectModel()
+					else channel?.toGroupModel()
+				}
 				.collect { trySend(it) }
 		}
-		launchSafe {
-			channelService.getChannel(id, type = ChannelType.GROUP).let {
-				channelDao.upsert((it as ApiGroupChannel).toEntity())
-			}
-		}
-	}
-
-	override suspend fun getDirectChannel(id: String) = channelFlowWithAwait {
-		launch(Dispatchers.Unconfined) {
-			channelDao
-				.getDirectChannel(id)
-				.mapNotNull { channel -> channel?.toModel() }
-				.collectLatest { trySend(it) }
-		}
-		launchSafe {
-			channelService.getChannel(id, type = ChannelType.GROUP).let {
-				channelDao.upsert((it as ApiDirectChannel).toEntity(userId))
-			}
-		}
+		launchSafeApi { channelService.getChannel(id).let { channelDao.upsert(it.toEntity(userId)) } }
 	}
 
 	override suspend fun createGroupChannel(networkId: String, channel: GroupChannel): GroupChannel {
@@ -148,19 +132,32 @@ constructor(
 		updateChannel(mChannel)
 	}
 
+	override suspend fun addMembers(id: String, members: List<Member>) {
+		channelService.addMembers(id, members.map { it.id })
+	}
+
 	override suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType) {
-		channelService.updateNotificationSettings(channel, alertType)
+		channelService.updateNotificationSettings(channel.id, alertType)
+	}
+
+	override suspend fun joinPublicChannels(networkId: String) {
+		val channels = channelService.getPublicChannels(networkId)
+		for (channel in channels) runCatching {
+			if (channel.members.find { it.id == userId } == null) {
+				joinChannel(channel.toModel())
+			}
+		}
 	}
 
 	override suspend fun joinChannel(channel: Channel) = channelService.joinChannel(channel)
 
 	override suspend fun leaveChannel(channel: Channel) {
 		channelService.leaveChannel(channel)
-		channelDao.delete(ChannelEntity(id = channel.id, isDirectChannel = channel is DirectChannel))
+		channelDao.delete(channel.id)
 	}
 
 	override suspend fun deleteChannel(channel: Channel) {
-		channelDao.delete(ChannelEntity(id = channel.id, isDirectChannel = channel is DirectChannel))
+		channelDao.delete(channel.id)
 		channelService.deleteChannel(channel)
 	}
 
@@ -174,7 +171,6 @@ constructor(
 
 	override suspend fun getUnreadDirectMessagesCount() = channelDao.getUnreadDirectMessagesCount()
 
-	override suspend fun getLastMessage(channelId: String) {
-		messageDao.getLastMessage(channelId).collectLatest { lastMessage.emit(it.toModel()) }
-	}
+	override suspend fun getLastMessage(channelId: String) =
+		messageDao.getLastMessage(channelId).map { it.toModel() }
 }

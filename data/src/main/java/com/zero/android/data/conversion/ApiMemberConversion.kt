@@ -12,7 +12,7 @@ internal fun ApiMember.toModel() =
 		id = id,
 		name = nickname,
 		profileJson = profileJson,
-		profileImage = profileImage,
+		image = profileImage,
 		friendDiscoveryKey = friendDiscoveryKey,
 		friendName = friendName,
 		metadata = metadata,
@@ -41,11 +41,21 @@ internal fun ApiMember.toEntity() =
 		isMuted = isMuted
 	)
 
+internal fun ApiNetworkMember.toModel() =
+	Member(
+		id = id,
+		name = name,
+		image = image,
+		status = if (isOnline) ConnectionStatus.ONLINE else ConnectionStatus.OFFLINE,
+		lastSeenAt = lastActiveAt?.toEpochMilliseconds() ?: 0,
+		profileJson = JSONObject().apply { put("id", profileId) }.toString()
+	)
+
 internal fun ApiNetworkMember.toEntity() =
 	MemberEntity(
 		id = id,
 		name = name,
-		profileImage = profileImage,
+		profileImage = image,
 		status = if (isOnline) ConnectionStatus.ONLINE else ConnectionStatus.OFFLINE,
 		lastSeenAt = lastActiveAt?.toEpochMilliseconds() ?: 0,
 		profileJson = JSONObject().apply { put("id", profileId) }.toString()

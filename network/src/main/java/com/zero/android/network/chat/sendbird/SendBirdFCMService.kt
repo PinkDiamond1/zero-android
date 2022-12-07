@@ -61,7 +61,6 @@ constructor(private val logger: Logger, private val notificationManager: Notific
 				channel?.getString("channel_url")?.let { url ->
 					notificationManager.createMessageNotification(
 						channelId = url,
-						isGroupChannel = !isDirectChannel,
 						title = title ?: "",
 						text = message ?: "",
 						image = image

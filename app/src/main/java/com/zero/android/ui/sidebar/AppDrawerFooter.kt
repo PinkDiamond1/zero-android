@@ -21,8 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R.drawable
 import com.zero.android.common.R.string
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun AppDrawerFooter(modifier: Modifier = Modifier, onCreateWorldClick: () -> Unit) {

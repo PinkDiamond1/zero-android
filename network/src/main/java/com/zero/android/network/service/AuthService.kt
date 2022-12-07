@@ -2,18 +2,17 @@ package com.zero.android.network.service
 
 import android.content.Context
 import com.zero.android.models.AuthCredentials
-import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface AuthService {
 
-	suspend fun login(email: String, password: String): Flow<AuthCredentials>
+	suspend fun login(email: String, password: String): AuthCredentials
 
-	suspend fun loginWithApple(context: Context): Flow<AuthCredentials>
+	suspend fun loginWithApple(context: Context): AuthCredentials
 
-	suspend fun loginWithGoogle(context: Context): Flow<AuthCredentials>
+	suspend fun loginWithGoogle(context: Context): AuthCredentials
 
-	suspend fun forgotPassword(email: String): Flow<Unit>
+	suspend fun forgotPassword(email: String)
 
 	suspend fun register(
 		name: String,
@@ -21,7 +20,7 @@ interface AuthService {
 		password: String,
 		inviteCode: String,
 		profilePic: File?
-	): Flow<AuthCredentials>
+	): AuthCredentials
 
-	suspend fun revokeToken(token: String): Flow<Unit>
+	suspend fun revokeToken(token: String)
 }

@@ -50,20 +50,14 @@ constructor(
 	val forgotPasswordValidator = MutableStateFlow(AuthValidator.ResetPasswordValidator())
 	val forgotPasswordRequestState: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-	fun login(email: String?, password: String?) {
+	fun login(email: String, password: String) {
 		ioScope.launch {
 			val formValidator = authValidator.validateLogin(email, password)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
-				authRepository.login(email!!, password!!).asResult().collect {
-					when (it) {
-						is Result.Success -> onAuth(it.data)
-						is Result.Error -> {
-							loading.emit(false)
-							error.emit((it as? Result.Error)?.exception?.message)
-						}
-						else -> {}
-					}
+				runAuthApi {
+					val credentials = authRepository.login(email, password)
+					onAuth(credentials)
 				}
 			} else {
 				loginValidator.emit(formValidator)
@@ -74,15 +68,9 @@ constructor(
 	fun loginWithGoogle(context: Context) {
 		ioScope.launch {
 			loading.emit(true)
-			authRepository.loginWithGoogle(context).asResult().collect {
-				when (it) {
-					is Result.Success -> onAuth(it.data)
-					is Result.Error -> {
-						loading.emit(false)
-						error.emit((it as? Result.Error)?.exception?.message)
-					}
-					else -> {}
-				}
+			runAuthApi {
+				val credentials = authRepository.loginWithGoogle(context)
+				onAuth(credentials)
 			}
 		}
 	}
@@ -90,36 +78,23 @@ constructor(
 	fun loginWithApple(context: Context) {
 		ioScope.launch {
 			loading.emit(true)
-			authRepository.loginWithApple(context).asResult().collect {
-				when (it) {
-					is Result.Success -> onAuth(it.data)
-					is Result.Error -> {
-						loading.emit(false)
-						error.emit((it as? Result.Error)?.exception?.message)
-					}
-					else -> {}
-				}
+			runAuthApi {
+				val credentials = authRepository.loginWithApple(context)
+				onAuth(credentials)
 			}
 		}
 	}
 
-	fun resetPassword(email: String?) {
+	fun resetPassword(email: String) {
 		ioScope.launch {
 			val formValidator = authValidator.validateForgotPassword(email)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
-				authRepository.forgotPassword(email!!).asResult().collect {
-					when (it) {
-						is Result.Success -> {
-							loading.emit(false)
-							forgotPasswordRequestState.emit(true)
-						}
-						is Result.Error -> {
-							loading.emit(false)
-							error.emit((it as? Result.Error)?.exception?.message)
-						}
-						else -> {}
-					}
+				runAuthApi {
+					authRepository.forgotPassword(email)
+
+					loading.emit(false)
+					forgotPasswordRequestState.emit(true)
 				}
 			} else {
 				forgotPasswordValidator.emit(formValidator)
@@ -128,54 +103,22 @@ constructor(
 	}
 
 	fun register(
-		name: String?,
-		email: String?,
-		password: String?,
-		confirmPassword: String?,
+		name: String,
+		email: String,
+		password: String,
+		confirmPassword: String,
 		profilePic: File? = null
 	) {
 		ioScope.launch {
 			val formValidator = authValidator.validateRegistration(name, email, password, confirmPassword)
 			if (formValidator.isDataValid) {
 				loading.emit(true)
-				authRepository
-					.register(name!!, email!!, password!!, inviteCode, profilePic)
-					.asResult()
-					.collect {
-						when (it) {
-							is Result.Success -> loginAndCreateUser(email, password, name, inviteCode)
-							is Result.Error -> {
-								loading.emit(false)
-								error.emit((it as? Result.Error)?.exception?.message)
-							}
-							else -> {}
-						}
-					}
+				runAuthApi {
+					val credentials = authRepository.register(name, email, password, inviteCode, profilePic)
+					onAuth(credentials)
+				}
 			} else {
 				registerValidator.emit(formValidator)
-			}
-		}
-	}
-
-	private fun loginAndCreateUser(
-		email: String,
-		password: String,
-		name: String,
-		inviteCode: String?
-	) {
-		ioScope.launch {
-			authRepository.login(email, password).asResult().collect {
-				when (it) {
-					is Result.Success -> {
-						authRepository.createUser(it.data.accessToken, name, inviteCode)
-						onAuth(it.data)
-					}
-					is Result.Error -> {
-						loading.emit(false)
-						error.emit((it as? Result.Error)?.exception?.message)
-					}
-					else -> {}
-				}
 			}
 		}
 	}
@@ -217,6 +160,15 @@ constructor(
 					}
 				}
 			}
+		}
+	}
+
+	private suspend fun runAuthApi(run: suspend () -> Unit) {
+		try {
+			run()
+		} catch (e: Exception) {
+			loading.emit(false)
+			error.emit(e.message)
 		}
 	}
 }

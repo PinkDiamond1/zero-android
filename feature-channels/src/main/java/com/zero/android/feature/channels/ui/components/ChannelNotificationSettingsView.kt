@@ -8,7 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.zero.android.common.R
 import com.zero.android.models.enums.AlertType
 import com.zero.android.ui.components.TextIconListItem
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun ChannelNotificationSettingsView(

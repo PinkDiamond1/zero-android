@@ -2,6 +2,7 @@ package com.zero.android.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.zero.android.models.AuthCredentials
@@ -16,10 +17,11 @@ import javax.inject.Singleton
 @Singleton
 class AppPreferences(private val dataStore: DataStore<Preferences>) {
 
-	companion object {
-		private val USER_ID = stringPreferencesKey("USER_ID")
-		private val USER_IMAGE = stringPreferencesKey("USER_IMAGE")
-		private val AUTH_CREDENTIALS = stringPreferencesKey("AUTH_CREDENTIALS")
+	internal companion object {
+		internal val USER_ID = stringPreferencesKey("USER_ID")
+		internal val USER_IMAGE = stringPreferencesKey("USER_IMAGE")
+		internal val AUTH_CREDENTIALS = stringPreferencesKey("AUTH_CREDENTIALS")
+		internal val IS_SETUP_COMPLETE = booleanPreferencesKey("IS_SETUP_COMPLETE")
 	}
 
 	suspend fun token() = authCredentials()?.accessToken
@@ -50,5 +52,12 @@ class AppPreferences(private val dataStore: DataStore<Preferences>) {
 		profileImage?.let { imageUrl ->
 			dataStore.edit { preferences -> preferences[USER_IMAGE] = imageUrl }
 		}
+	}
+
+	suspend fun isSetupComplete() =
+		dataStore.data.map { preferences -> preferences[IS_SETUP_COMPLETE] }.first() ?: false
+
+	suspend fun setSetupComplete() {
+		dataStore.edit { preferences -> preferences[IS_SETUP_COMPLETE] = true }
 	}
 }

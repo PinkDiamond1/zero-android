@@ -31,8 +31,6 @@ constructor(
 ) : BaseViewModel() {
 
 	val channelId: String = checkNotNull(savedStateHandle[ChannelDetailsDestination.ARG_CHANNEL_ID])
-	val isGroupChannel: Boolean =
-		checkNotNull(savedStateHandle[ChannelDetailsDestination.ARG_IS_GROUP_CHANNEL])
 
 	private val _channel = MutableStateFlow<Result<Channel>>(Result.Loading)
 	val channel = _channel.asStateFlow()
@@ -47,16 +45,7 @@ constructor(
 	}
 
 	private fun loadChannel() {
-		ioScope.launch {
-			val request =
-				if (isGroupChannel) {
-					channelRepository.getGroupChannel(channelId)
-				} else {
-					channelRepository.getDirectChannel(channelId)
-				}
-
-			request.asResult().collect(_channel)
-		}
+		ioScope.launch { channelRepository.getChannel(channelId).asResult().collect(_channel) }
 	}
 
 	private fun getChatMedia() {
@@ -66,11 +55,10 @@ constructor(
 	fun updateAlerts(alertType: AlertType) {
 		ioScope.launch {
 			channel.data()?.let {
-				if (isGroupChannel) {
-					networkRepository.updateNotificationSettings(
-						(it as GroupChannel).networkId,
-						alertType = alertType
-					)
+				if (it is GroupChannel) {
+					networkRepository.updateNotificationSettings(it.networkId, alertType = alertType)
+				} else {
+					channelRepository.updateNotificationSettings(it, alertType = alertType)
 				}
 			}
 		}

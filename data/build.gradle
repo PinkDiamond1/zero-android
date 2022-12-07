@@ -15,11 +15,11 @@ dependencies {
 	implementation project(":database")
 
 	implementation "androidx.core:core-ktx:${versions.coreKtx}"
-	implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
 	implementation "com.google.dagger:hilt-android:${versions.hilt}"
 	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
 
 	// Data
+	implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
 	implementation "androidx.paging:paging-compose:${versions.pagingCompose}"
 	implementation "io.coil-kt:coil-compose:${versions.coil}"
 	implementation "com.github.lincollincol:amplituda:${versions.amplituda}"

@@ -53,8 +53,8 @@ import com.zero.android.feature.auth.util.AuthValidator
 import com.zero.android.models.InviteDetail
 import com.zero.android.ui.components.ErrorDialog
 import com.zero.android.ui.components.StrikeLabel
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun LoginRoute(
@@ -82,7 +82,7 @@ fun LoginRoute(
 			inviteDetails,
 			onForgotPassword,
 			onRegister = { onRegister(viewModel.inviteId) },
-			onLogin = { email, password -> viewModel.login(email?.trim(), password?.trim()) },
+			onLogin = { email, password -> viewModel.login(email.trim(), password.trim()) },
 			onLoginWithGoogle = { viewModel.loginWithGoogle(context) },
 			onLoginWithApple = { viewModel.loginWithApple(context) },
 			onErrorShown = { viewModel.resetErrorState() },
@@ -99,7 +99,7 @@ fun LoginScreen(
 	inviteDetail: InviteDetail?,
 	onForgotPassword: () -> Unit,
 	onRegister: () -> Unit,
-	onLogin: (String?, String?) -> Unit,
+	onLogin: (String, String) -> Unit,
 	onLoginWithGoogle: () -> Unit,
 	onLoginWithApple: () -> Unit,
 	onErrorShown: () -> Unit,
@@ -107,8 +107,8 @@ fun LoginScreen(
 ) {
 	LaunchedEffect(Unit) { checkInviteCode() }
 
-	var email: String? by remember { mutableStateOf(null) }
-	var password: String? by remember { mutableStateOf(null) }
+	var email: String by remember { mutableStateOf("") }
+	var password: String by remember { mutableStateOf("") }
 	val emailError = remember(loginValidator) { mutableStateOf(loginValidator.emailError) }
 	val passwordError = remember(loginValidator) { mutableStateOf(loginValidator.passwordError) }
 

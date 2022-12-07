@@ -12,6 +12,7 @@ import com.sendbird.android.ReactionEvent.ReactionEventAction
 import com.sendbird.android.UserMessage
 import com.sendbird.android.UserMessageParams
 import com.sendbird.android.constant.StringSet.value
+import com.zero.android.database.converter.AppJson.decodeJson
 import com.zero.android.models.DraftMessage
 import com.zero.android.models.FileThumbnail
 import com.zero.android.models.enums.DeliveryStatus
@@ -26,8 +27,6 @@ import com.zero.android.network.model.ApiFileData
 import com.zero.android.network.model.ApiFileThumbnail
 import com.zero.android.network.model.ApiMessage
 import com.zero.android.network.model.ApiMessageReaction
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 private const val KEY_FILE_REQUEST_META = "fileRequest"
 
@@ -43,10 +42,7 @@ internal fun BaseMessage.toApi(
 	channelId: String = channelUrl,
 	mParentMessageId: Long? = null
 ): ApiMessage {
-	val data =
-		if (this is FileMessage && data.isNotEmpty()) {
-			Json { ignoreUnknownKeys = true }.decodeFromString<ApiFileData?>(data)
-		} else null
+	val data = if (this is FileMessage && data.isNotEmpty()) data.decodeJson<ApiFileData?>() else null
 	return ApiMessage(
 		id = mParentMessageId?.toString() ?: messageId.toString(),
 		type = if (this is FileMessage) data?.type.toMessageType() else customType.toMessageType(),

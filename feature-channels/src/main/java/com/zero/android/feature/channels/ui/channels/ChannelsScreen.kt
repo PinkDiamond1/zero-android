@@ -18,6 +18,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.zero.android.common.R
 import com.zero.android.common.ui.Result
@@ -29,9 +30,10 @@ import com.zero.android.models.Network
 import com.zero.android.ui.components.FadeAnimation
 import com.zero.android.ui.components.FadeExpandAnimation
 import com.zero.android.ui.components.SearchView
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.util.Preview
 import kotlinx.coroutines.flow.Flow
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ChannelsRoute(
 	network: Network?,
@@ -45,16 +47,21 @@ fun ChannelsRoute(
 	val isSearchState by viewModel.searchState.collectAsState()
 
 	val pagers by viewModel.pagers.collectAsState()
+	val pagerState = rememberPagerState(initialPage = 0)
 
-	LaunchedEffect(network?.id) { network?.let { viewModel.onNetworkUpdated(it) } }
+	LaunchedEffect(network?.id) {
+		network?.let { viewModel.onNetworkUpdated(it) }
+		pagerState.scrollToPage(0)
+	}
 
 	ChannelsScreen(
-		categoriesUiState,
-		pagers,
-		lazyFilteredItems,
-		showSearch,
-		isSearchState,
-		onChannelSelected,
+		categoriesUiState = categoriesUiState,
+		pagers = pagers,
+		filteredChannels = lazyFilteredItems,
+		showSearchBar = showSearch,
+		isSearchState = isSearchState,
+		pagerState = pagerState,
+		onChannelSelected = onChannelSelected,
 		onChannelSearched = { viewModel.filterChannels(it) },
 		onSearchClosed = viewModel::onSearchClosed
 	)
@@ -68,12 +75,12 @@ fun ChannelsScreen(
 	filteredChannels: LazyPagingItems<GroupChannel>,
 	showSearchBar: Boolean = false,
 	isSearchState: Boolean = false,
+	pagerState: PagerState,
 	onChannelSelected: (Channel) -> Unit,
 	onChannelSearched: (String) -> Unit,
 	onSearchClosed: () -> Unit
 ) {
 	val coroutineScope = rememberCoroutineScope()
-	val pagerState = rememberPagerState(initialPage = 0)
 	var searchText: String by remember { mutableStateOf("") }
 
 	if (categoriesUiState is Result.Success) {

@@ -8,7 +8,7 @@ import com.zero.android.models.ChannelCategory
 import com.zero.android.models.DirectChannel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.Member
-import com.zero.android.models.Message
+import com.zero.android.models.MessageMeta
 import com.zero.android.models.enums.AccessType
 import com.zero.android.models.enums.AlertType
 import com.zero.android.models.enums.ChannelType
@@ -35,12 +35,13 @@ import com.zero.android.models.enums.ChannelType
 data class ChannelEntity(
 	@PrimaryKey override val id: String,
 	val name: String = "",
-	val lastMessageId: String? = null,
+	val description: String? = "",
+	val lastMessage: MessageMeta? = null,
+	val lastMessageTime: Long = 0L,
 	val authorId: String? = null,
 	val memberCount: Int = 0,
 	val image: String? = null,
 	val createdAt: Long = 0,
-	val lastMessageTime: Long = 0,
 	val isTemporary: Boolean = false,
 	val unreadMentionCount: Int = 0,
 	val unreadMessageCount: Int = 0,
@@ -61,11 +62,15 @@ data class ChannelEntity(
 	val isDirectChannel: Boolean
 ) : BaseEntity
 
-fun ChannelEntity.toDirectModel(members: List<Member>, lastMessage: Message? = null) =
+fun ChannelEntity.toDirectModel(
+	members: List<Member>,
+	operators: List<Member>,
+	lastMessage: MessageMeta? = null
+) =
 	DirectChannel(
 		id = id,
 		name = name,
-		memberCount = memberCount,
+		description = description,
 		image = image,
 		createdAt = createdAt,
 		isTemporary = isTemporary,
@@ -74,7 +79,9 @@ fun ChannelEntity.toDirectModel(members: List<Member>, lastMessage: Message? = n
 		messageLifeSeconds = messageLifeSeconds,
 		alerts = alerts,
 		accessCode = accessCode,
+		operators = operators,
 		members = members,
+		memberCount = memberCount,
 		lastMessage = lastMessage
 	)
 
@@ -82,7 +89,7 @@ fun ChannelEntity.toGroupModel(
 	members: List<Member>,
 	operators: List<Member>,
 	createdBy: Member?,
-	lastMessage: Message? = null
+	lastMessage: MessageMeta? = null
 ) =
 	GroupChannel(
 		id = id,
@@ -100,6 +107,7 @@ fun ChannelEntity.toGroupModel(
 		networkId = networkId ?: "",
 		category = category,
 		name = name,
+		description = description,
 		isSuper = isSuper,
 		isPublic = isPublic,
 		isDiscoverable = isDiscoverable,

@@ -1,6 +1,8 @@
 package com.zero.android.network.model
 
+import com.zero.android.models.enums.ProfileType
 import com.zero.android.network.model.serializer.InstantSerializer
+import com.zero.android.network.model.serializer.ProfileTypeSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -12,7 +14,6 @@ data class ApiProfile(
 	val lastName: String? = null,
 	val profileImage: String? = null,
 	val gender: String? = null,
-	val guild: String? = null,
 	val summary: String? = null,
 	val skills: List<ApiValuable>? = null,
 	val values: List<ApiValuable>? = null,
@@ -27,6 +28,10 @@ data class ApiProfile(
 	val primaryPhone: String? = null,
 	val secondaryPhone: String? = null,
 	val website: String? = null,
+	val profileHandle: ApiProfileHandle? = null,
+	val guild: String? = null,
+	val guildId: String? = null,
+	val sshPublicKey: String? = null,
 
 	// Social media
 	val facebook: String? = null,
@@ -64,4 +69,14 @@ data class ApiProfile(
 	val educationRecords: List<ApiEducation>? = null,
 	val rawAvatarURL: String? = null,
 	val _wallpaperURL: String? = null
+)
+
+@Serializable
+data class ApiProfileHandle(
+	val id: String,
+	@Serializable(ProfileTypeSerializer::class) val profileType: ProfileType,
+	val profileId: String,
+	val handle: String,
+	val createdAt: Instant,
+	val updatedAt: Instant
 )

@@ -15,5 +15,3 @@ internal fun ApiExperience.toModel() =
 	)
 
 internal fun ApiExperience.toEntity() = toModel()
-
-internal fun List<ApiExperience>.toEntity() = map { it.toEntity() }

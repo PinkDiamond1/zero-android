@@ -5,11 +5,10 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.zero.android.common.system.Logger
-import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
-import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.extensions.initialPageSize
 import com.zero.android.database.dao.ChannelDao
-import com.zero.android.database.model.GroupChannelWithRefs
+import com.zero.android.database.model.ChannelWithRefs
 import com.zero.android.network.service.ChannelService
 import java.io.IOException
 import java.net.UnknownHostException
@@ -21,11 +20,11 @@ internal class GroupChannelsRemoteMediator(
 	private val channelService: ChannelService,
 	private val logger: Logger,
 	private val search: String? = null
-) : RemoteMediator<Int, GroupChannelWithRefs>() {
+) : RemoteMediator<Int, ChannelWithRefs>() {
 
 	override suspend fun load(
 		loadType: LoadType,
-		state: PagingState<Int, GroupChannelWithRefs>
+		state: PagingState<Int, ChannelWithRefs>
 	): MediatorResult {
 		return try {
 			val lastChannelId =
@@ -45,13 +44,14 @@ internal class GroupChannelsRemoteMediator(
 					channelService.getGroupChannels(
 						networkId = networkId,
 						before = it,
+						limit = state.config.pageSize,
 						searchName = search,
 						refresh = loadType == LoadType.REFRESH
 					)
 				}
 					?: channelService.getGroupChannels(
 						networkId = networkId,
-						loadSize = INITIAL_LOAD_SIZE,
+						limit = state.config.initialPageSize,
 						searchName = search,
 						refresh = loadType == LoadType.REFRESH
 					)
@@ -61,7 +61,7 @@ internal class GroupChannelsRemoteMediator(
 			logger.d("Loading Group Channels: $loadType - $lastChannelId: ${response.size}")
 
 			MediatorResult.Success(
-				endOfPaginationReached = response.isEmpty() || response.size < CHANNELS_PAGE_LIMIT
+				endOfPaginationReached = response.isEmpty() || response.size < state.config.pageSize
 			)
 		} catch (e: UnknownHostException) {
 			MediatorResult.Error(e)

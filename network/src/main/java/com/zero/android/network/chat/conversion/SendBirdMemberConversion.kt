@@ -4,11 +4,11 @@ import android.util.Base64
 import com.sendbird.android.Member
 import com.sendbird.android.Sender
 import com.sendbird.android.User
+import com.zero.android.database.converter.AppJson.decodeJson
 import com.zero.android.models.enums.ConnectionStatus
 import com.zero.android.models.enums.toConnectionStatus
 import com.zero.android.network.model.ApiMember
 import com.zero.android.network.model.ApiMemberProfile
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
@@ -42,7 +42,7 @@ internal fun ApiMember.toUser() = User.buildFromSerializedData(toSendBirdBase64(
 internal fun Member.toApi(): ApiMember {
 	val properties =
 		if (profileUrl.isNullOrBlank()) ApiMemberProfile(null)
-		else Json { ignoreUnknownKeys = true }.decodeFromString<ApiMemberProfile?>(profileUrl)
+		else profileUrl.decodeJson<ApiMemberProfile?>()
 	return ApiMember(
 		id = userId,
 		nickname = nickname,
@@ -65,7 +65,7 @@ internal fun ApiMember.toMember() = Member.buildFromSerializedData(toSendBirdBas
 internal fun Sender.toApi(): ApiMember {
 	val properties =
 		if (profileUrl.isNullOrBlank()) ApiMemberProfile(null)
-		else Json { ignoreUnknownKeys = true }.decodeFromString<ApiMemberProfile?>(profileUrl)
+		else profileUrl.decodeJson<ApiMemberProfile?>()
 	return ApiMember(
 		id = userId,
 		nickname = nickname,

@@ -13,38 +13,27 @@ import com.zero.android.navigation.extensions.composable
 
 object MessagesDestination : NavDestination() {
 	const val ARG_CHANNEL_ID = "channelId"
-	const val ARG_IS_GROUP_CHANNEL = "isGroupChannel"
 
 	private const val BASE_ROUTE = "messages_route"
 
-	override val route = "$BASE_ROUTE/{$ARG_CHANNEL_ID}/{$ARG_IS_GROUP_CHANNEL}"
+	override val route = "$BASE_ROUTE/{$ARG_CHANNEL_ID}"
 	override val destination = "messages_destination"
 
-	override val arguments =
-		listOf(
-			navArgument(ARG_CHANNEL_ID) { type = NavType.StringType },
-			navArgument(ARG_IS_GROUP_CHANNEL) { type = NavType.BoolType }
-		)
+	override val arguments = listOf(navArgument(ARG_CHANNEL_ID) { type = NavType.StringType })
 
 	override val deepLinks =
-		listOf(
-			navDeepLink {
-				uriPattern =
-					"${DeepLinks.URI}/channel?channel_id={$ARG_CHANNEL_ID}&is_group={$ARG_IS_GROUP_CHANNEL}"
-			}
-		)
+		listOf(navDeepLink { uriPattern = "${DeepLinks.URI}/channel?channel_id={$ARG_CHANNEL_ID}" })
 
-	fun route(id: String, isGroupChannel: Boolean) = "$BASE_ROUTE/$id/$isGroupChannel"
+	fun route(id: String) = "$BASE_ROUTE/$id"
 
-	fun deeplink(id: String, isGroupChannel: Boolean) =
-		"${DeepLinks.URI}/channel?channel_id=$id&is_group=$isGroupChannel"
+	fun deeplink(id: String) = "${DeepLinks.URI}/channel?channel_id=$id"
 }
 
 @ExperimentalAnimationApi
 fun NavGraphBuilder.chatGraph(
 	onBackClick: () -> Unit,
 	onMediaClicked: (String, String) -> Unit,
-	onChannelDetails: (String, Boolean) -> Unit
+	onChannelDetails: (String) -> Unit
 ) {
 	composable(MessagesDestination) { MessagesRoute(onBackClick, onMediaClicked, onChannelDetails) }
 	composable(ChatMediaViewerDestination) { MediaViewerRoute(onBackClick) }

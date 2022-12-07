@@ -11,6 +11,7 @@ import com.zero.android.models.Experience
 import com.zero.android.models.Investment
 import com.zero.android.models.Profile
 import com.zero.android.models.Valuable
+import com.zero.android.models.enums.ProfileType
 import kotlinx.datetime.Instant
 
 @Entity(
@@ -32,7 +33,10 @@ data class ProfileEntity(
 	val firstName: String?,
 	val lastName: String?,
 	val profileImage: String?,
+	val type: ProfileType?,
 	val gender: String?,
+	val handle: String?,
+	val guildId: String?,
 	val guild: String?,
 	val summary: String?,
 	val skills: List<Valuable>?,
@@ -94,6 +98,9 @@ fun ProfileEntity.toModel() =
 		lastName = lastName,
 		profileImage = profileImage,
 		gender = gender,
+		type = type,
+		handle = handle,
+		guildId = guildId,
 		guild = guild,
 		summary = summary,
 		skills = skills,

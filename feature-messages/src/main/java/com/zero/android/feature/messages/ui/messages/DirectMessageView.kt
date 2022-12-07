@@ -32,9 +32,9 @@ import com.zero.android.feature.messages.ui.components.VideoMessage
 import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
+import com.zero.android.ui.components.Avatar
 import com.zero.android.ui.components.FlashAnimationComposable
 import com.zero.android.ui.components.InstantAnimation
-import com.zero.android.ui.components.SmallCircularImage
 import com.zero.android.ui.theme.AppTheme
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -90,10 +90,10 @@ fun DirectMessage(
 				horizontalArrangement = if (isUserMe) Arrangement.End else Arrangement.Start
 			) {
 				if (!isUserMe && (isLastMessageByAuthor || !isSameDay)) {
-					SmallCircularImage(
+					Avatar(
 						modifier = Modifier.align(Alignment.Bottom).padding(bottom = 4.dp),
-						imageUrl = msg.author?.profileImage,
-						placeholder = R.drawable.ic_user_profile_placeholder
+						size = 36.dp,
+						user = msg.author
 					)
 				} else {
 					Spacer(modifier = Modifier.width(36.dp))

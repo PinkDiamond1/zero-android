@@ -10,6 +10,8 @@ import com.zero.android.navigation.AppGraph
 import com.zero.android.ui.manager.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,11 +38,26 @@ constructor(
 	}
 
 	private fun checkAuthOnLaunch() {
-		val authCredentials = runBlocking(Dispatchers.IO) { preferences.authCredentials() }
-		val isLoggedIn = authCredentials != null
+		val result =
+			runBlocking(Dispatchers.IO) {
+				awaitAll(async { preferences.authCredentials() }, async { preferences.isSetupComplete() })
+			}
+
+		val credentials = result[0] as AuthCredentials?
+		val isSetupComplete = result[1] as Boolean
+
 		startDestination = AppGraph.MAIN
 
-		if (isLoggedIn) onLoggedIn(authCredentials!!) else loading.emitInScope(false)
+		if (credentials != null) {
+			if (!isSetupComplete) {
+				ioScope.launch {
+					sessionManager.login(credentials)
+					loading.emit(false)
+				}
+			} else onLoggedIn(credentials)
+		} else {
+			loading.emitInScope(false)
+		}
 	}
 
 	private fun onLoggedIn(authCredentials: AuthCredentials) =

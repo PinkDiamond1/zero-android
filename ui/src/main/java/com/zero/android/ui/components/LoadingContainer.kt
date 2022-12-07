@@ -1,5 +1,6 @@
 package com.zero.android.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun LoadingContainer(
@@ -47,7 +49,12 @@ fun OverlappingLoadingContainer(
 		content()
 		if (loading) {
 			Column(
-				modifier = modifier.fillMaxWidth().clickable {}.defaultMinSize(minHeight = 100.dp),
+				modifier =
+				modifier
+					.fillMaxSize()
+					.clickable {}
+					.defaultMinSize(minHeight = 100.dp)
+					.background(color = AppTheme.colors.surfaceInverse.copy(alpha = 0.65f)),
 				verticalArrangement = Arrangement.Center,
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
@@ -60,5 +67,5 @@ fun OverlappingLoadingContainer(
 @Preview
 @Composable
 fun LoadingContainerPreview() = Preview {
-	LoadingContainer(loading = true) { Text(text = "Testing") }
+	OverlappingLoadingContainer(loading = true) { Text(text = "Testing") }
 }

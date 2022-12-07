@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zero.android.common.R
+import com.zero.android.feature.account.navigation.NotificationsDestination
 import com.zero.android.feature.channels.navigation.ChannelsDestination
 import com.zero.android.feature.channels.navigation.DirectChannelsDestination
 import com.zero.android.feature.feed.navigation.FeedDestination
@@ -25,8 +26,8 @@ import com.zero.android.feature.people.navigation.MembersDestination
 import com.zero.android.navigation.NavDestination
 import com.zero.android.ui.components.BottomBarDivider
 import com.zero.android.ui.components.CountBadge
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
+import com.zero.android.ui.util.Preview
 
 val HOME_DESTINATIONS =
 	listOf(
@@ -35,6 +36,11 @@ val HOME_DESTINATIONS =
 			MembersDestination,
 			R.drawable.ic_people_selected,
 			R.drawable.ic_people_unselected
+		),
+		AppBarItem(
+			NotificationsDestination,
+			R.drawable.ic_notification_selected,
+			R.drawable.ic_notification_unselected
 		),
 		AppBarItem(
 			DirectChannelsDestination,

@@ -14,5 +14,3 @@ internal fun ApiEducation.toModel() =
 	)
 
 internal fun ApiEducation.toEntity() = toModel()
-
-internal fun List<ApiEducation>.toEntity() = map { it.toEntity() }

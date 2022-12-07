@@ -27,12 +27,13 @@ import com.zero.android.common.util.DateUtil
 import com.zero.android.models.Member
 import com.zero.android.models.enums.ConnectionStatus
 import com.zero.android.models.fake.FakeModel
-import com.zero.android.ui.components.SmallCircularImage
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.components.Avatar
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.theme.BODY_PADDING_HORIZONTAL
 import com.zero.android.ui.theme.EmeraldGreen
 import com.zero.android.ui.theme.Gray
+import com.zero.android.ui.util.LIST_IMAGE_SMALL
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun MemberListItem(
@@ -59,11 +60,7 @@ fun MemberListItem(
 
 		Row(verticalAlignment = Alignment.CenterVertically) {
 			Box(modifier = Modifier.padding(if (showStatus) (iconSize / 2) else 0.dp)) {
-				SmallCircularImage(
-					placeholder = R.drawable.ic_user_profile_placeholder,
-					imageUrl = member.profileImage,
-					contentDescription = member.id
-				)
+				Avatar(size = LIST_IMAGE_SMALL.dp, user = member)
 
 				if (showStatus) {
 					val offsetInPx = LocalDensity.current.run { (iconSize / 2f).roundToPx() }

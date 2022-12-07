@@ -72,7 +72,7 @@ interface SocketListener {
 
 	fun onOperatorUpdated(channel: ApiChannel) {}
 
-	fun onChannelMemberCountChanged(ApiChannels: List<ApiChannel>?) {}
+	fun onChannelMemberCountChanged(channels: List<ApiChannel>?) {}
 
 	fun onChannelParticipantCountChanged(openChannels: List<ApiGroupChannel>?) {}
 }

@@ -1,14 +1,7 @@
 package com.zero.android.database.di
 
 import com.zero.android.database.AppDatabase
-import com.zero.android.database.dao.ChannelDao
-import com.zero.android.database.dao.DirectChannelDaoImpl
-import com.zero.android.database.dao.GroupChannelDaoImpl
-import com.zero.android.database.dao.MemberDao
-import com.zero.android.database.dao.MessageDao
-import com.zero.android.database.dao.NetworkDao
-import com.zero.android.database.dao.ProfileDao
-import com.zero.android.database.dao.UserDao
+import com.zero.android.database.dao.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +30,7 @@ internal object DaoModule {
 	@Provides
 	fun provideChannelDao(database: AppDatabase, messageDao: MessageDao) =
 		ChannelDao(
+			database.groupChannelDao(),
 			database.directChannelDao(),
 			database.groupChannelDao(),
 			database.memberDao(),
@@ -46,4 +40,6 @@ internal object DaoModule {
 	@Provides
 	fun provideMessageDao(database: AppDatabase) =
 		MessageDao(database.messageDao(), database.memberDao(), database.directChannelDao())
+
+	@Provides fun provideNotificationDao(database: AppDatabase) = database.notificationDao()
 }

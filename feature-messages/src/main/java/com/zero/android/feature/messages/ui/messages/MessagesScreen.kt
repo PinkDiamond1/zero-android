@@ -34,17 +34,17 @@ import com.zero.android.models.Member
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.ui.components.*
-import com.zero.android.ui.extensions.OnLifecycleEvent
-import com.zero.android.ui.extensions.Preview
 import com.zero.android.ui.theme.AppTheme
 import com.zero.android.ui.util.BackHandler
+import com.zero.android.ui.util.OnLifecycleEvent
+import com.zero.android.ui.util.Preview
 import java.io.File
 
 @Composable
 fun MessagesRoute(
 	onBackClick: () -> Unit,
 	onMediaClicked: (String, String) -> Unit,
-	onChannelDetails: (String, Boolean) -> Unit,
+	onChannelDetails: (String) -> Unit,
 	viewModel: MessagesViewModel = hiltViewModel(),
 	recordMemoViewModel: MemoRecorderViewModel = hiltViewModel()
 ) {
@@ -82,6 +82,7 @@ fun MessagesRoute(
 			onBackClick()
 		}
 	}
+
 	OnLifecycleEvent { _, event ->
 		if (event == Lifecycle.Event.ON_START && chatUiState.channelUiState.isSuccess) {
 			pagedMessages.refresh()
@@ -182,7 +183,7 @@ fun MessagesRoute(
 			onMediaClicked = { messageId -> onMediaClicked(viewModel.channelId, messageId) },
 			onMessagesLoaded = { viewModel.configureChat() },
 			onCopyMedia = { viewModel.copyMediaFile(it) },
-			onChannelDetailsClick = { onChannelDetails(viewModel.channelId, viewModel.isGroupChannel) }
+			onChannelDetailsClick = { onChannelDetails(viewModel.channelId) }
 		)
 	}
 }

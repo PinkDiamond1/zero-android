@@ -117,15 +117,15 @@ fun RegisterScreen(
 	requestError: String?,
 	onBack: () -> Unit,
 	onPickImage: (Intent) -> Unit,
-	onRegister: (String?, String?, String?, String?) -> Unit,
+	onRegister: (String, String, String, String) -> Unit,
 	onErrorShown: () -> Unit
 ) {
 	val context = LocalContext.current
 
-	var name: String? by remember { mutableStateOf(null) }
-	var email: String? by remember { mutableStateOf(null) }
-	var password: String? by remember { mutableStateOf(null) }
-	var confirmPassword: String? by remember { mutableStateOf(null) }
+	var name: String by remember { mutableStateOf("") }
+	var email: String by remember { mutableStateOf("") }
+	var password: String by remember { mutableStateOf("") }
+	var confirmPassword: String by remember { mutableStateOf("") }
 	val nameError = remember(registerValidator) { mutableStateOf(registerValidator.nameError) }
 	val emailError = remember(registerValidator) { mutableStateOf(registerValidator.emailError) }
 	val passwordError =
@@ -213,11 +213,11 @@ fun RegisterScreen(
 					onFocusChanged = { showPasswordMeter = it },
 					imeAction = ImeAction.Next
 				)
-				if (showPasswordMeter && !password.isNullOrEmpty()) {
+				if (showPasswordMeter && password.isNotEmpty()) {
 					Spacer(modifier = Modifier.size(8.dp))
 					PasswordStrengthMeter(
 						modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
-						password = password!!
+						password = password
 					)
 				}
 				Spacer(modifier = Modifier.size(16.dp))

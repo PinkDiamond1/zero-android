@@ -20,9 +20,8 @@ import com.zero.android.common.R
 import com.zero.android.models.Channel
 import com.zero.android.models.GroupChannel
 import com.zero.android.models.fake.FakeModel
-import com.zero.android.models.isGroupChannel
 import com.zero.android.ui.components.CircularInitialsImage
-import com.zero.android.ui.extensions.Preview
+import com.zero.android.ui.util.Preview
 
 @Composable
 fun ChatScreenAppBarTitle(channel: Channel) {
@@ -33,7 +32,7 @@ fun ChatScreenAppBarTitle(channel: Channel) {
 				name = channel.name,
 				url = channel.image,
 				placeholder =
-				if (channel.isGroupChannel) null
+				if (channel is GroupChannel) null
 				else painterResource(R.drawable.ic_user_profile_placeholder)
 			)
 		}
@@ -45,8 +44,8 @@ fun ChatScreenAppBarTitle(channel: Channel) {
 			style = MaterialTheme.typography.displayLarge
 		)
 		Spacer(modifier = Modifier.padding(6.dp))
-		if (channel.isGroupChannel) {
-			(channel as GroupChannel).icon?.let { icon ->
+		if (channel is GroupChannel) {
+			channel.icon?.let { icon ->
 				Image(
 					painter = painterResource(icon),
 					contentDescription = "",

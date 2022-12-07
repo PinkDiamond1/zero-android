@@ -72,4 +72,9 @@ object ServiceModule {
 	@Singleton
 	@Provides
 	fun provideInviteService(retrofit: Retrofit) = retrofit.api.create(InviteService::class.java)
+
+	@Singleton
+	@Provides
+	fun provideNotificationService(retrofit: Retrofit) =
+		retrofit.api.create(NotificationService::class.java)
 }

@@ -75,10 +75,10 @@ fun ResetPasswordScreen(
 	isForgotPasswordSuccess: Boolean,
 	requestError: String?,
 	onBack: () -> Unit,
-	onForgotPassword: (String?) -> Unit,
+	onForgotPassword: (String) -> Unit,
 	onErrorShown: () -> Unit
 ) {
-	var email: String? by remember { mutableStateOf(null) }
+	var email: String by remember { mutableStateOf("") }
 	val emailError =
 		remember(forgotPasswordValidator) { mutableStateOf(forgotPasswordValidator.emailError) }
 

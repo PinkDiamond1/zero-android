@@ -2,7 +2,6 @@ package com.zero.android.network.chat.sendbird
 
 import com.sendbird.android.*
 import com.zero.android.common.system.Logger
-import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.models.Message
 import com.zero.android.models.enums.MessageType
 import com.zero.android.network.chat.conversion.toApi
@@ -16,7 +15,6 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 
 	private val params =
 		MessageListParams().apply {
-			previousResultSize = MESSAGES_PAGE_LIMIT
 			nextResultSize = 0
 			isInclusive = true
 			setReverse(true)
@@ -32,12 +30,12 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 
 	fun getMessages(
 		channel: BaseChannel,
-		loadSize: Int = 1,
+		limit: Int,
 		callback: PreviousMessageListQuery.MessageListQueryResult
 	) {
 		val query =
 			channel.createPreviousMessageListQuery().apply {
-				limit = MESSAGES_PAGE_LIMIT * loadSize
+				this.limit = limit
 				setReverse(params.shouldReverse())
 				setIncludeReactions(params.shouldIncludeReactions())
 				replyTypeFilter = params.replyTypeFilter
@@ -50,9 +48,11 @@ internal class SendBirdMessages @Inject constructor(private val logger: Logger) 
 
 	fun getMessages(
 		channel: BaseChannel,
+		limit: Int,
 		beforeId: String,
 		callback: BaseChannel.GetMessagesHandler
 	) {
+		params.previousResultSize = limit
 		channel.getMessagesByMessageId(beforeId.toLong(), params, callback)
 	}
 

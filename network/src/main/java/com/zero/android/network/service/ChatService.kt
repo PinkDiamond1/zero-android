@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatService {
 
-	suspend fun getMessages(channel: Channel, loadSize: Int = 1): Flow<List<ApiMessage>>
+	suspend fun getMessages(channel: Channel, limit: Int): Flow<List<ApiMessage>>
 
-	suspend fun getMessages(channel: Channel, before: String): Flow<List<ApiMessage>>
+	suspend fun getMessages(channel: Channel, limit: Int, before: String): Flow<List<ApiMessage>>
 
 	suspend fun send(channel: Channel, message: DraftMessage): Flow<ApiMessage>
 

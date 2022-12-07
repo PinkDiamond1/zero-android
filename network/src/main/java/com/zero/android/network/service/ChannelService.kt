@@ -16,7 +16,6 @@ interface ChannelService {
 		networkId: String,
 		type: ChannelType = ChannelType.GROUP,
 		before: String? = null,
-		loadSize: Int = 1,
 		limit: Int = 100,
 		searchName: String? = null,
 		refresh: Boolean = false
@@ -24,7 +23,7 @@ interface ChannelService {
 
 	suspend fun getDirectChannels(
 		before: String? = null,
-		loadSize: Int = 1,
+		limit: Int = 100,
 		searchName: String? = null,
 		refresh: Boolean = false
 	): List<ApiDirectChannel>
@@ -39,11 +38,15 @@ interface ChannelService {
 
 	suspend fun updateChannel(channel: Channel): ApiChannel
 
-	suspend fun getNetworkNotificationSettings(networkId: String): AlertType
+	suspend fun addMembers(id: String, memberIds: List<String>)
 
-	suspend fun updateNotificationSettings(channel: Channel, alertType: AlertType)
+	suspend fun getNotificationSettings(id: String): AlertType
 
-	suspend fun updateNotificationSettings(networkId: String, alertType: AlertType)
+	suspend fun getNotificationSettingsByNetwork(networkId: String): AlertType
+
+	suspend fun updateNotificationSettings(id: String, alertType: AlertType)
+
+	suspend fun updateNotificationSettingsByNetwork(networkId: String, alertType: AlertType)
 
 	suspend fun joinChannel(channel: Channel)
 

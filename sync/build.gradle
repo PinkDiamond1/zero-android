@@ -1,0 +1,27 @@
+plugins {
+	id 'com.android.library'
+	id 'org.jetbrains.kotlin.android'
+	id 'dagger.hilt.android.plugin'
+	id 'kotlin-kapt'
+}
+
+apply from: '../module.gradle'
+
+dependencies {
+	implementation project(":common")
+	implementation project(":network")
+	implementation project(":data")
+	implementation project(":models")
+
+	implementation "androidx.core:core-ktx:${versions.coreKtx}"
+	implementation "com.google.dagger:hilt-android:${versions.hilt}"
+	implementation "androidx.hilt:hilt-work:${versions.hiltWorkManager}"
+	kapt "androidx.hilt:hilt-compiler:${versions.hiltWorkManager}"
+	kapt "com.google.dagger:hilt-compiler:${versions.hilt}"
+
+	// Data
+	implementation "androidx.work:work-runtime-ktx:${versions.workManager}"
+
+	// Testing
+	androidTestImplementation "androidx.work:work-testing:${versions.workManager}"
+}

@@ -5,11 +5,10 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.zero.android.common.system.Logger
-import com.zero.android.common.util.CHANNELS_PAGE_LIMIT
-import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.data.conversion.toEntity
+import com.zero.android.data.extensions.initialPageSize
 import com.zero.android.database.dao.ChannelDao
-import com.zero.android.database.model.DirectChannelWithRefs
+import com.zero.android.database.model.ChannelWithRefs
 import com.zero.android.network.service.ChannelService
 import java.io.IOException
 import java.net.UnknownHostException
@@ -20,11 +19,11 @@ internal class DirectChannelsRemoteMediator(
 	private val channelDao: ChannelDao,
 	private val channelService: ChannelService,
 	private val logger: Logger
-) : RemoteMediator<Int, DirectChannelWithRefs>() {
+) : RemoteMediator<Int, ChannelWithRefs>() {
 
 	override suspend fun load(
 		loadType: LoadType,
-		state: PagingState<Int, DirectChannelWithRefs>
+		state: PagingState<Int, ChannelWithRefs>
 	): MediatorResult {
 		return try {
 			val lastChannelId =
@@ -41,10 +40,14 @@ internal class DirectChannelsRemoteMediator(
 
 			val response =
 				lastChannelId?.let {
-					channelService.getDirectChannels(before = it, refresh = loadType == LoadType.REFRESH)
+					channelService.getDirectChannels(
+						limit = state.config.pageSize,
+						before = it,
+						refresh = loadType == LoadType.REFRESH
+					)
 				}
 					?: channelService.getDirectChannels(
-						loadSize = INITIAL_LOAD_SIZE,
+						limit = state.config.initialPageSize,
 						refresh = loadType == LoadType.REFRESH
 					)
 
@@ -53,7 +56,7 @@ internal class DirectChannelsRemoteMediator(
 			logger.d("Loading Direct Channels: $loadType - $lastChannelId: ${response.size}")
 
 			MediatorResult.Success(
-				endOfPaginationReached = response.isEmpty() || response.size < CHANNELS_PAGE_LIMIT
+				endOfPaginationReached = response.isEmpty() || response.size < state.config.pageSize
 			)
 		} catch (e: UnknownHostException) {
 			MediatorResult.Error(e)

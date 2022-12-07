@@ -13,5 +13,3 @@ internal fun ApiInvestment.toModel() =
 	)
 
 internal fun ApiInvestment.toEntity() = toModel()
-
-internal fun List<ApiInvestment>.toEntity() = map { it.toEntity() }

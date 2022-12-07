@@ -6,6 +6,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.zero.android.common.system.Logger
+import com.zero.android.common.util.INITIAL_LOAD_SIZE
 import com.zero.android.common.util.MESSAGES_PAGE_LIMIT
 import com.zero.android.data.conversion.toDraft
 import com.zero.android.data.conversion.toEntity
@@ -52,7 +53,12 @@ constructor(
 		messages.emit(PagingData.empty())
 
 		return Pager(
-			config = PagingConfig(pageSize = MESSAGES_PAGE_LIMIT, prefetchDistance = 0),
+			config =
+			PagingConfig(
+				pageSize = MESSAGES_PAGE_LIMIT,
+				initialLoadSize = MESSAGES_PAGE_LIMIT * INITIAL_LOAD_SIZE,
+				prefetchDistance = 0
+			),
 			remoteMediator =
 			MessagesRemoteMediator(chatService, messageDao, channel, tillMessage, logger),
 			pagingSourceFactory = { messageDao.getByChannel(channel.id) }
@@ -126,10 +132,6 @@ constructor(
 	override suspend fun updateMessage(id: String, channelId: String, text: String) {
 		val res = messageService.updateMessage(id, channelId, text)
 		if (res.isSuccessful) messageDao.update(id, text)
-	}
-
-	override suspend fun markRead(message: Message) {
-		messageDao.markRead(message.id)
 	}
 
 	override suspend fun markMessagesRead(channelId: String) {

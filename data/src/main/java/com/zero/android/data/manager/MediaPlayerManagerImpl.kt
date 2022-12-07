@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
+import com.zero.android.common.extensions.nullableBlocking
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -88,11 +89,13 @@ constructor(@ApplicationContext private val context: Context) : MediaPlayerManag
 	}
 
 	override fun getFileDuration(file: File): String? {
-		val retriever = MediaMetadataRetriever()
-		retriever.setDataSource(context, Uri.fromFile(file))
-		val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-		retriever.release()
-		return time
+		return nullableBlocking {
+			val retriever = MediaMetadataRetriever()
+			retriever.setDataSource(context, Uri.fromFile(file))
+			val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+			retriever.release()
+			time
+		}
 	}
 
 	override suspend fun getAudioAmplitudes(file: File): List<Int> =

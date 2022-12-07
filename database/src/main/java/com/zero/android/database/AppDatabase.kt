@@ -8,14 +8,17 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zero.android.database.converter.DateConverters
 import com.zero.android.database.converter.ListConverters
+import com.zero.android.database.converter.ObjectConverters
 import com.zero.android.database.dao.DirectChannelDaoImpl
 import com.zero.android.database.dao.GroupChannelDaoImpl
 import com.zero.android.database.dao.MemberDao
 import com.zero.android.database.dao.MessageDaoImpl
 import com.zero.android.database.dao.NetworkDao
+import com.zero.android.database.dao.NotificationDao
 import com.zero.android.database.dao.ProfileDao
 import com.zero.android.database.dao.UserDao
 import com.zero.android.database.migrations.MigrationSpec3to4
+import com.zero.android.database.migrations.MigrationSpec4to5
 import com.zero.android.database.model.ChannelEntity
 import com.zero.android.database.model.ChannelMembersCrossRef
 import com.zero.android.database.model.ChannelOperatorsCrossRef
@@ -25,6 +28,7 @@ import com.zero.android.database.model.MessageMentionCrossRef
 import com.zero.android.database.model.MessageWithRefs
 import com.zero.android.database.model.NetworkEntity
 import com.zero.android.database.model.NetworkMembersCrossRef
+import com.zero.android.database.model.NotificationEntity
 import com.zero.android.database.model.ProfileEntity
 import com.zero.android.database.model.UserEntity
 
@@ -37,20 +41,23 @@ import com.zero.android.database.model.UserEntity
 		MessageEntity::class,
 		MemberEntity::class,
 		ChannelEntity::class,
+		NotificationEntity::class,
 		NetworkMembersCrossRef::class,
 		MessageMentionCrossRef::class,
 		ChannelMembersCrossRef::class,
 		ChannelOperatorsCrossRef::class
 	],
 	views = [MessageWithRefs::class],
-	version = 4,
+	version = 6,
 	autoMigrations =
 	[
 		AutoMigration(from = 2, to = 3),
-		AutoMigration(from = 3, to = 4, spec = MigrationSpec3to4::class)
+		AutoMigration(from = 3, to = 4, spec = MigrationSpec3to4::class),
+		AutoMigration(from = 4, to = 5, spec = MigrationSpec4to5::class),
+		AutoMigration(from = 5, to = 6)
 	]
 )
-@TypeConverters(DateConverters::class, ListConverters::class)
+@TypeConverters(DateConverters::class, ListConverters::class, ObjectConverters::class)
 abstract class AppDatabase : RoomDatabase() {
 
 	companion object {
@@ -81,4 +88,6 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun groupChannelDao(): GroupChannelDaoImpl
 
 	abstract fun messageDao(): MessageDaoImpl
+
+	abstract fun notificationDao(): NotificationDao
 }
